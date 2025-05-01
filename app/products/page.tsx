@@ -10,12 +10,15 @@ export default function ProductsPage() {
       <Header />
       <div className="page-container">
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-5xl font-bold mb-6 text-[#ffd6c0]">our products</h1>
+          <h1 className="text-5xl font-bold mb-6 text-black">our products</h1>
           <p className="text-xl mb-8 text-black">discover our premium products for your wellness journey</p>
 
-          <Suspense fallback={<ProductLoadingSkeleton />}>
-            <ProductGrid />
-          </Suspense>
+          {/* Added lighter pink background container */}
+          <div className="bg-[#fff0e8] rounded-lg p-8 shadow-sm">
+            <Suspense fallback={<ProductLoadingSkeleton />}>
+              <ProductGrid />
+            </Suspense>
+          </div>
         </div>
       </div>
     </>

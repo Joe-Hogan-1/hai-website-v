@@ -10,7 +10,7 @@ export default function BlogPage() {
       <Header />
       <div className="page-container">
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-5xl font-bold mb-6 text-[#ffd6c0]">blog</h1>
+          <h1 className="text-5xl font-bold mb-6 text-black">blog</h1>
           <p className="text-xl mb-12 text-black">
             stay tuned for our latest articles and updates on wellness and lifestyle.
           </p>

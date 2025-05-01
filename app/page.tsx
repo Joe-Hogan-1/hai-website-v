@@ -2,13 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import Header from "@/components/header"
-import WaterBackground from "@/components/water-background"
-import ScrollingMediaBanner from "@/components/scrolling-media-banner"
-
-// Add imports for our components
-import ScrollAnimatedText from "@/components/scroll-animated-text"
-import ScrollAnimatedElement from "@/components/scroll-animated-element"
+import HomeMediaCarousel from "@/components/home-media-carousel"
+import NewsletterPopup from "@/components/newsletter-popup"
+import PhotoGrid from "@/components/photo-grid"
 
 export default function HomePage() {
   const router = useRouter()
@@ -32,38 +30,52 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-pulse text-3xl text-[#ffd6c0]">hai.</div>
+        <div className="text-3xl text-[#ffd6c0] animate-pulse">hai.</div>
       </div>
     )
   }
 
   return (
     <>
-      <WaterBackground />
       <Header />
+      <NewsletterPopup />
       <div className="relative overflow-hidden">
         <div className="relative z-10">
-          {/* Welcome Section */}
-          <section className="min-h-screen flex flex-col items-center justify-start pt-24 relative welcome-section">
-            <div className="max-w-4xl mx-auto text-center p-6 mb-8 mt-4">
-              <ScrollAnimatedText
-                text="welcome to hai."
-                tag="h1"
-                className="text-6xl font-semibold mb-6 text-white drop-shadow-xl tracking-wide"
-                threshold={0.5}
-                delay={200}
-              />
-              <ScrollAnimatedElement delay={400} threshold={0.5}>
-                <p className="text-2xl mb-4 text-black font-medium">
-                  discover our premium products and stay updated with our latest news.
-                </p>
-              </ScrollAnimatedElement>
+          {/* Main content area with full-width image carousel */}
+          <div className="min-h-screen pt-24 px-6 pb-6 flex flex-col">
+            <div className="flex-grow flex flex-col">
+              {/* Full-width media carousel */}
+              <div className="w-full h-[calc(100vh-96px-3rem)]">
+                <HomeMediaCarousel />
+              </div>
+
+              {/* Tagline and photo grid section */}
+              <div className="w-full py-12">
+                <div className="container mx-auto">
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                    {/* Tagline */}
+                    <div className="text-center md:text-left md:w-1/2">
+                      <h2 className="text-3xl font-bold mb-4 text-black">embrace the glow</h2>
+                      <p className="text-xl text-black mb-6">
+                        discover the balance of health, wellness, and recreation
+                      </p>
+                      <Link
+                        href="/products"
+                        className="inline-flex px-6 py-3 bg-[#ffd6c0] text-white rounded-md border border-white/20 hover:bg-[#ffd6c0]/90 transition-colors font-medium"
+                      >
+                        explore products
+                      </Link>
+                    </div>
+
+                    {/* Photo Grid */}
+                    <div className="w-full md:w-1/2 max-w-md mx-auto md:mx-0">
+                      <PhotoGrid />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            {/* Scrolling Media Banner - Larger size */}
-            <div className="w-full max-w-6xl mx-auto h-[80vh] px-4">
-              <ScrollingMediaBanner position={0} />
-            </div>
-          </section>
+          </div>
         </div>
       </div>
     </>

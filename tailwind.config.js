@@ -53,6 +53,7 @@ module.exports = {
         },
         ffd6c0: "#ffd6c0",
         a8d1e7: "#a8d1e7",
+        white: "#ffffff",
       },
       borderRadius: {
         lg: "var(--radius)",

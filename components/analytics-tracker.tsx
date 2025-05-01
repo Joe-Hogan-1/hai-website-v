@@ -15,7 +15,9 @@ export default function AnalyticsTracker() {
       trackPageView(pathname)
 
       // Track page view in Supabase
-      trackPageViewInSupabase(pathname).catch(console.error)
+      trackPageViewInSupabase(pathname).catch(() => {
+        // Silent error handling
+      })
     }
   }, [pathname])
 

@@ -1,52 +1,150 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { supabase } from "@/utils/supabase"
 import { useTilt } from "@/hooks/use-tilt"
+import { Badge } from "@/components/ui/badge"
+import { ChevronRight } from "lucide-react"
+import ProductDetailModal from "./product-detail-modal"
 
 interface Product {
   id: string
   name: string
   description: string
-  price: number
   image_url: string
   category?: "Indica" | "Sativa" | "Hybrid" | null
+  product_category?: string | null
+}
+
+interface ProductCategory {
+  id: string
+  name: string
+  is_active: boolean
+  display_order: number
 }
 
 export default function ProductGrid() {
   const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<ProductCategory[]>([])
   const [loading, setLoading] = useState(true)
-  const { handleMouseMove, handleMouseEnter, handleMouseLeave, tiltRef } = useTilt()
+  const [error, setError] = useState<string | null>(null)
+  const { tiltRef, handleMouseMove, handleMouseEnter, handleMouseLeave } = useTilt()
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function fetchData() {
       try {
-        const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false })
+        setLoading(true)
 
-        if (error) throw error
-        setProducts(data || [])
+        // Fetch categories first
+        const { data: categoryData, error: categoryError } = await supabase
+          .from("product_categories")
+          .select("*")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true })
+
+        if (categoryError) {
+          setCategories([])
+        } else {
+          setCategories(categoryData || [])
+        }
+
+        // Then fetch products
+        const { data: productData, error: productError } = await supabase
+          .from("products")
+          .select("*")
+          .order("created_at", { ascending: false })
+
+        if (productError) {
+          // If the table doesn't exist, use fallback data
+          if (productError.message.includes("does not exist")) {
+            setProducts(getFallbackProducts())
+          } else {
+            setError(`Failed to load products: ${productError.message}`)
+            setProducts(getFallbackProducts())
+          }
+        } else {
+          setProducts(productData && productData.length > 0 ? productData : getFallbackProducts())
+          setError(null)
+        }
       } catch (error) {
-        // Error fetching products
+        setError("An unexpected error occurred while loading products")
+        setProducts(getFallbackProducts())
       } finally {
         setLoading(false)
       }
     }
 
-    fetchProducts()
+    fetchData()
   }, [])
 
-  if (loading) {
-    return <div className="text-center py-8">Loading products...</div>
+  // Add this function to provide fallback data
+  function getFallbackProducts(): Product[] {
+    return [
+      {
+        id: "1",
+        name: "Relaxing Tincture",
+        description:
+          "A calming blend for relaxation and stress relief. This premium tincture is crafted with care to help you unwind after a long day. Our proprietary blend combines natural ingredients to create a soothing experience that promotes relaxation without sedation.",
+        image_url: "/placeholder.svg?height=200&width=300",
+        category: "Indica",
+        product_category: "Flower",
+      },
+      {
+        id: "2",
+        name: "Energizing Gummies",
+        description:
+          "Boost your day with these energizing treats. Each gummy is infused with a precise blend of ingredients designed to enhance focus and energy. Perfect for creative professionals or anyone needing a productivity boost without the jitters of caffeine.",
+        image_url: "/placeholder.svg?height=200&width=300",
+        category: "Sativa",
+        product_category: "Edibles",
+      },
+      {
+        id: "3",
+        name: "Balance Vape",
+        description:
+          "Find your perfect balance with this hybrid blend. Our Balance Vape offers a harmonious experience that combines the best of both worlds. The sleek design and premium materials ensure a consistent and enjoyable experience every time.",
+        image_url: "/placeholder.svg?height=200&width=300",
+        category: "Hybrid",
+        product_category: "Vapes",
+      },
+      {
+        id: "4",
+        name: "Sleep Aid Drops",
+        description:
+          "Gentle support for a restful night's sleep. These carefully formulated drops help you fall asleep naturally and wake up refreshed. Each bottle contains a month's supply of our proprietary blend, designed to promote healthy sleep patterns.",
+        image_url: "/placeholder.svg?height=200&width=300",
+        category: "Indica",
+        product_category: "Concentrates",
+      },
+      {
+        id: "5",
+        name: "Classic Pre-Roll Pack",
+        description:
+          "Premium pre-rolled joints for convenience. Each pre-roll is hand-crafted using only the finest ingredients to ensure a smooth and consistent experience. Our Classic Pack includes five individually wrapped pre-rolls, perfect for sharing or solo enjoyment.",
+        image_url: "/placeholder.svg?height=200&width=300",
+        category: "Hybrid",
+        product_category: "Pre-Rolls",
+      },
+      {
+        id: "6",
+        name: "hai. Logo T-Shirt",
+        description:
+          "Comfortable cotton t-shirt with embroidered logo. Made from 100% organic cotton, this shirt is both stylish and sustainable. The minimalist design features our signature logo embroidered with precision. Available in multiple sizes.",
+        image_url: "/placeholder.svg?height=200&width=300",
+        product_category: "Merch",
+      },
+    ]
   }
 
-  if (products.length === 0) {
-    return (
-      <div className="text-center py-12 bg-white rounded-lg shadow-md">
-        <p className="text-xl text-gray-600">No products available yet.</p>
-        <p className="text-gray-500 mt-2">Check back soon for our product lineup!</p>
-      </div>
-    )
-  }
+  // Filter products by category
+  const filteredProducts = activeCategory
+    ? products.filter((product) => product.product_category === activeCategory)
+    : products
 
   // Function to get category badge color
   const getCategoryColor = (category?: string | null) => {
@@ -62,43 +160,169 @@ export default function ProductGrid() {
     }
   }
 
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {products.map((product) => (
-        <div
-          key={product.id}
-          ref={tiltRef}
-          onMouseMove={handleMouseMove}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          className="bg-white rounded-lg shadow-md overflow-hidden transform-gpu transition-all duration-300 hover:shadow-xl product-card border border-white/30 relative"
-          style={{ transformStyle: "preserve-3d", boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)" }}
-        >
-          <div className="h-48 overflow-hidden relative">
-            <img
-              src={product.image_url || "/placeholder.svg?height=200&width=300"}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-              style={{ transform: "translateZ(20px)" }}
-            />
+  // Function to get product category badge color
+  const getProductCategoryColor = (category?: string | null) => {
+    switch (category) {
+      case "Flower":
+        return "bg-green-500 text-white"
+      case "Pre-Rolls":
+        return "bg-orange-500 text-white"
+      case "Edibles":
+        return "bg-pink-500 text-white"
+      case "Merch":
+        return "bg-blue-500 text-white"
+      case "Concentrates":
+        return "bg-purple-500 text-white"
+      case "Vapes":
+        return "bg-teal-500 text-white"
+      default:
+        return "bg-gray-200 text-gray-700"
+    }
+  }
+
+  const openProductModal = (product: Product) => {
+    setSelectedProduct(product)
+    setIsModalOpen(true)
+  }
+
+  const closeProductModal = () => {
+    setIsModalOpen(false)
+    setSelectedProduct(null)
+  }
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="bg-white/30 backdrop-blur-sm rounded-lg p-6 animate-pulse h-80">
+            <div className="h-40 bg-white/40 rounded-lg mb-4"></div>
+            <div className="h-6 bg-white/40 rounded w-3/4 mb-3"></div>
+            <div className="h-4 bg-white/40 rounded w-1/4 mb-3"></div>
+            <div className="h-4 bg-white/40 rounded mb-2"></div>
+            <div className="h-10 bg-white/40 rounded mt-4"></div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white/30 backdrop-blur-sm rounded-lg p-6 text-center">
+        <p className="text-red-500 mb-4">{error}</p>
+        <p className="text-black">Showing fallback products instead</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+          {products.map((product) => renderProduct(product))}
+        </div>
+      </div>
+    )
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="text-center py-12 bg-white/30 backdrop-blur-sm rounded-lg">
+        <p className="text-xl text-black">No products available yet.</p>
+        <p className="text-black mt-2">Check back soon for our product lineup!</p>
+      </div>
+    )
+  }
+
+  function renderProduct(product: Product) {
+    return (
+      <div
+        key={product.id}
+        ref={tiltRef as React.RefObject<HTMLDivElement>}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="bg-white/90 backdrop-blur-sm rounded-lg overflow-hidden transform-gpu transition-all duration-300 hover:shadow-xl product-card border border-white/30"
+        style={{
+          transformStyle: "preserve-3d",
+          boxShadow: "0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <div className="h-48 overflow-hidden relative">
+          <img
+            src={product.image_url || "/placeholder.svg?height=200&width=300"}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            style={{ transform: "translateZ(20px)" }}
+          />
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
             {product.category && (
               <div
-                className={`absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-bold ${getCategoryColor(
-                  product.category,
-                )}`}
+                className={`${getCategoryColor(product.category)} text-xs font-bold px-2 py-1 rounded-full`}
                 style={{ transform: "translateZ(40px)" }}
               >
                 {product.category}
               </div>
             )}
-          </div>
-          <div className="p-4" style={{ transform: "translateZ(30px)" }}>
-            <h2 className="text-xl font-semibold mb-1 text-[#0e7490]">{product.name}</h2>
-            <p className="text-[#e76f51] font-bold mb-2">${product.price.toFixed(2)}</p>
-            <p className="text-gray-600 text-sm mb-4 font-medium">{product.description}</p>
+            {product.product_category && (
+              <div
+                className={`${getProductCategoryColor(product.product_category)} text-xs font-bold px-2 py-1 rounded-full`}
+                style={{ transform: "translateZ(40px)" }}
+              >
+                {product.product_category}
+              </div>
+            )}
           </div>
         </div>
-      ))}
-    </div>
+        <div className="p-4" style={{ transform: "translateZ(30px)" }}>
+          {/* First line: Product name */}
+          <h2 className="text-xl font-semibold text-[#0e7490] line-clamp-1">{product.name}</h2>
+
+          {/* Second line: Short description (first sentence) */}
+          <p className="text-gray-700 text-sm mt-1 font-medium line-clamp-1">{product.description.split(".")[0]}.</p>
+
+          {/* Third line: Area for 3 lines of text with read more */}
+          <div className="mt-2 relative">
+            <p className="text-gray-700 text-sm font-medium line-clamp-3">{product.description}</p>
+            <button
+              onClick={() => openProductModal(product)}
+              className="mt-2 text-[#e76f51] hover:text-[#e76f51]/80 text-sm font-medium flex items-center"
+            >
+              Read more <ChevronRight className="h-3 w-3 ml-1" />
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      {/* Category Filter */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4 text-black">Categories</h2>
+        <div className="flex flex-wrap gap-2">
+          <Badge
+            className={`cursor-pointer ${!activeCategory ? "bg-[#ffd6c0]" : "bg-gray-200 hover:bg-gray-300"}`}
+            onClick={() => setActiveCategory(null)}
+          >
+            All Products
+          </Badge>
+          {categories.map((category) => (
+            <Badge
+              key={category.id}
+              className={`cursor-pointer ${
+                activeCategory === category.name
+                  ? getProductCategoryColor(category.name)
+                  : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+              }`}
+              onClick={() => setActiveCategory(category.name)}
+            >
+              {category.name}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {filteredProducts.map((product) => renderProduct(product))}
+      </div>
+
+      {/* Product Detail Modal */}
+      <ProductDetailModal product={selectedProduct} isOpen={isModalOpen} onClose={closeProductModal} />
+    </>
   )
 }

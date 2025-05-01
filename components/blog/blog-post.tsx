@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
+import { useState } from "react"
 
 interface BlogPostProps {
   post: {
@@ -14,6 +15,9 @@ interface BlogPostProps {
 }
 
 export default function BlogPost({ post }: BlogPostProps) {
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
+
   // Function to format the content with proper paragraphs
   const formatContent = (content: string) => {
     return content.split("\n").map((paragraph, index) => (
@@ -24,12 +28,12 @@ export default function BlogPost({ post }: BlogPostProps) {
   }
 
   return (
-    <article className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+    <article className="max-w-3xl mx-auto bg-white/90 backdrop-blur-sm p-8 rounded-lg shadow-md">
       <Link href="/blog" className="inline-flex items-center text-[#a8d1e7] hover:text-[#97c0d6] mb-6">
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to all posts
       </Link>
 
-      <h1 className="text-3xl md:text-4xl font-bold mb-4 text-[#ffd6c0]">{post.title}</h1>
+      <h1 className="text-3xl md:text-4xl font-bold mb-4 text-black">{post.title}</h1>
 
       <div className="text-gray-500 mb-8">
         {new Date(post.created_at).toLocaleDateString("en-US", {
@@ -40,8 +44,25 @@ export default function BlogPost({ post }: BlogPostProps) {
       </div>
 
       {post.image_url && (
-        <div className="mb-8">
-          <img src={post.image_url || "/placeholder.svg"} alt={post.title} className="w-full h-auto rounded-lg" />
+        <div className="mb-8 relative w-1/2 mx-auto">
+          <img
+            src={post.image_url || "/placeholder.svg"}
+            alt={post.title}
+            className={`w-full h-auto rounded-lg transition-opacity duration-300 ${
+              isImageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setIsImageLoaded(true)}
+            onError={() => {
+              setImageError(true)
+              setIsImageLoaded(true)
+            }}
+          />
+          {!isImageLoaded && <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg"></div>}
+          {imageError && (
+            <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+              <p className="text-gray-500">Image could not be loaded</p>
+            </div>
+          )}
         </div>
       )}
 

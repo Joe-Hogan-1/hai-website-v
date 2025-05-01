@@ -22,53 +22,62 @@ interface Dispensary {
 export default function DispensaryMapClient() {
   const [dispensaries, setDispensaries] = useState<Dispensary[]>([])
   const [loading, setLoading] = useState(true)
-  const [mapRef, setMapRef] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null)
+  const [showOnlyHaiProducts, setShowOnlyHaiProducts] = useState(false)
 
   // Use useCallback for the fetch function to prevent recreating it on each render
   const fetchDispensaries = useCallback(async () => {
     try {
       setLoading(true)
+      setError(null)
 
       // Try to fetch from Supabase
-      const { data, error } = await supabase.from("dispensaries").select("*").eq("has_hai_products", true).order("name")
+      const { data, error } = await supabase.from("dispensaries").select("*").order("name")
 
       if (error) {
         // If the table doesn't exist, use fallback data
         if (error.message.includes("does not exist")) {
-          setDispensaries(getFallbackDispensaryData())
+          const fallbackData = getFallbackDispensaryData()
+          setDispensaries(fallbackData)
         } else {
-          console.error("Failed to load dispensary locations:", error)
+          setError(`Failed to load dispensary locations: ${error.message}`)
           setDispensaries(getFallbackDispensaryData())
         }
       } else {
-        setDispensaries(data && data.length > 0 ? data : getFallbackDispensaryData())
+        if (data && data.length > 0) {
+          setDispensaries(data)
+        } else {
+          const fallbackData = getFallbackDispensaryData()
+          setDispensaries(fallbackData)
+        }
       }
     } catch (error) {
-      console.error("Error fetching dispensaries:", error)
-      setDispensaries(getFallbackDispensaryData())
+      setError("An unexpected error occurred while loading dispensary data")
+
+      // Always use fallback data on error
+      const fallbackData = getFallbackDispensaryData()
+      setDispensaries(fallbackData)
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    // Only fetch once when the component mounts
-    let isMounted = true
-
-    if (isMounted) {
-      fetchDispensaries()
-    }
-
-    return () => {
-      isMounted = false
-    }
+    fetchDispensaries()
   }, [fetchDispensaries])
 
   // Function to handle selecting a dispensary from the list
   const handleSelectDispensary = (lat: number, lng: number) => {
-    if (mapRef) {
-      mapRef.setView([lat, lng], 15)
-    }
+    // Add a small delay to ensure the component has fully rendered
+    setTimeout(() => {
+      setSelectedLocation([lat, lng])
+    }, 100)
+  }
+
+  // Handle filter change
+  const handleFilterChange = (showOnly: boolean) => {
+    setShowOnlyHaiProducts(showOnly)
   }
 
   // Add this function to provide fallback data
@@ -83,6 +92,7 @@ export default function DispensaryMapClient() {
         lng: -74.006,
         phone: "212-555-1234",
         website: "https://example.com",
+        image_url: "/placeholder.svg?height=150&width=150",
         has_hai_products: true,
       },
       {
@@ -93,6 +103,7 @@ export default function DispensaryMapClient() {
         lat: 40.6782,
         lng: -73.9442,
         phone: "718-555-5678",
+        image_url: "/placeholder.svg?height=150&width=150",
         has_hai_products: true,
       },
       {
@@ -103,7 +114,8 @@ export default function DispensaryMapClient() {
         lat: 42.8864,
         lng: -78.8784,
         website: "https://example.com/buffalo",
-        has_hai_products: true,
+        image_url: "/placeholder.svg?height=150&width=150",
+        has_hai_products: false,
       },
       {
         id: "4",
@@ -113,6 +125,7 @@ export default function DispensaryMapClient() {
         lat: 42.6526,
         lng: -73.7562,
         phone: "518-555-9012",
+        image_url: "/placeholder.svg?height=150&width=150",
         has_hai_products: true,
       },
       {
@@ -124,21 +137,54 @@ export default function DispensaryMapClient() {
         lng: -77.6088,
         phone: "585-555-3456",
         website: "https://example.com/rochester",
-        has_hai_products: true,
+        image_url: "/placeholder.svg?height=150&width=150",
+        has_hai_products: false,
       },
     ]
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-      <div className="lg:col-span-2">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <DispensaryMap dispensaries={dispensaries} loading={loading} />
+    <div className="flex flex-col gap-6">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-700">
+          <p className="font-medium">Error loading dispensary data</p>
+          <p className="text-sm">{error}</p>
         </div>
+      )}
+
+      <div className="bg-white rounded-lg shadow-lg p-6 map-container-wrapper w-full">
+        <DispensaryMap
+          dispensaries={dispensaries}
+          loading={loading}
+          selectedLocation={selectedLocation}
+          showOnlyHaiProducts={showOnlyHaiProducts}
+        />
       </div>
 
-      <div>
-        <DispensaryList dispensaries={dispensaries} onSelectDispensary={handleSelectDispensary} loading={loading} />
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold text-[#a8d1e7]">Dispensary Locations</h2>
+          <div className="flex items-center">
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={showOnlyHaiProducts}
+                onChange={(e) => handleFilterChange(e.target.checked)}
+              />
+              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0e7490]"></div>
+              <span className="ms-3 text-sm font-medium text-gray-900">Show only hai. products</span>
+            </label>
+          </div>
+        </div>
+
+        <DispensaryList
+          dispensaries={dispensaries}
+          onSelectDispensary={handleSelectDispensary}
+          loading={loading}
+          onFilterChange={handleFilterChange}
+          compact={true}
+        />
       </div>
     </div>
   )

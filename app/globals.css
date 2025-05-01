@@ -15,18 +15,25 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Update these styles to remove extra white space above header */
+
+/* Remove any top margin/padding from body */
 body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #ffd6c0;
+  color: black;
+  margin: 0;
+  padding: 0;
 }
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
-  --primary-color: #ffd6c0;
-  --header-color: #ffb6a3;
-  --logo-glow: 0 0 10px rgba(255, 182, 163, 0.8), 0 0 20px rgba(255, 182, 163, 0.6), 0 0 30px rgba(255, 182, 163, 0.4);
+  --background-rgb: 255, 214, 192;
+  --primary-color: black;
+  --header-color: #ffd6c0;
+  --logo-glow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
   --header-height: 96px; /* 6rem */
 }
 
@@ -39,7 +46,7 @@ body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
   font-family: "New Order", system-ui, sans-serif;
-  font-weight: 500; /* New Order Medium for body text */
+  font-weight: 500;
 }
 
 h1,
@@ -49,17 +56,18 @@ h4,
 h5,
 h6,
 .font-semibold {
-  font-weight: 600; /* New Order Semi Bold for headings */
+  font-weight: 600;
+  color: black;
 }
 
 /* Add a class for explicitly setting text to New Order Medium */
 .font-medium {
-  font-weight: 500 !important; /* New Order Medium */
+  font-weight: 500 !important;
 }
 
 /* Add a class for explicitly setting text to New Order Semi Bold */
 .font-semibold {
-  font-weight: 600 !important; /* New Order Semi Bold */
+  font-weight: 600 !important;
 }
 
 /* Ensure consistent font rendering */
@@ -72,7 +80,7 @@ h6,
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
-  background-color: #000 !important;
+  background-color: #ffd6c0 !important;
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;
@@ -82,18 +90,18 @@ h6,
 
 .leaflet-control-zoom {
   border: none !important;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 1px 5px rgba(255, 255, 255, 0.2) !important;
 }
 
 .leaflet-control-zoom a {
-  background-color: white !important;
-  color: #333 !important;
+  background-color: #ffd6c0 !important;
+  color: white !important;
 }
 
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  background-color: white !important;
-  color: #333 !important;
+  background-color: #ffd6c0 !important;
+  color: white !important;
   border-radius: 8px !important;
 }
 
@@ -106,7 +114,7 @@ h6,
 }
 
 .text-shadow-glow {
-  text-shadow: 0 0 10px rgba(255, 214, 192, 0.8), 0 0 20px rgba(255, 214, 192, 0.6), 0 0 30px rgba(255, 214, 192, 0.4);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
 }
 
 .fade-out {
@@ -160,6 +168,8 @@ h6,
   /* This is just a marker class to help with debugging */
 }
 
+/* Update header and footer to peach */
+/* Adjust header positioning to remove extra space */
 header {
   position: fixed;
   top: 0;
@@ -167,6 +177,10 @@ header {
   right: 0;
   z-index: 40;
   transition: opacity 0.3s ease;
+  background-color: #ffd6c0;
+  color: black;
+  margin: 0;
+  padding: 0;
 }
 
 /* Hide header when theater mode is active */
@@ -178,7 +192,7 @@ body.theater-mode-active .breaking-news-bar {
 
 .holographic-street {
   animation: holographicPulse 4s infinite;
-  filter: drop-shadow(0 0 2px #00ffff);
+  filter: drop-shadow(0 0 2px white);
 }
 
 /* Optimize animations for better performance */
@@ -189,7 +203,7 @@ body.theater-mode-active .breaking-news-bar {
     filter: drop-shadow(var(--holographic-glow));
   }
   50% {
-    filter: drop-shadow(0 0 10px rgba(255, 214, 192, 0.7), 0 0 20px rgba(255, 214, 192, 0.5));
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5));
   }
   100% {
     filter: drop-shadow(var(--holographic-glow));
@@ -214,6 +228,7 @@ body.theater-mode-active .breaking-news-bar {
 .header-link {
   position: relative;
   text-decoration: none;
+  color: black;
 }
 
 .header-link::after {
@@ -223,7 +238,7 @@ body.theater-mode-active .breaking-news-bar {
   height: 2px;
   bottom: -4px;
   left: 0;
-  background-color: var(--primary-color);
+  background-color: var(--primary-color); /* Now white */
   transform: scaleX(0);
   transform-origin: bottom right;
   transition: transform 0.3s ease-out;
@@ -236,7 +251,7 @@ body.theater-mode-active .breaking-news-bar {
 }
 
 .glass-effect {
-  background: rgba(168, 209, 231, 0.1);
+  background: rgba(255, 255, 255, 0.1); /* Changed from blue to white */
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -281,9 +296,9 @@ body.theater-mode-active .breaking-news-bar {
   }
   50% {
     filter: drop-shadow(
-      0 0 15px rgba(255, 214, 192, 0.9),
-      0 0 25px rgba(255, 214, 192, 0.7),
-      0 0 35px rgba(255, 214, 192, 0.5)
+      0 0 15px rgba(255, 255, 255, 0.9),
+      0 0 25px rgba(255, 255, 255, 0.7),
+      0 0 35px rgba(255, 255, 255, 0.5)
     );
   }
   100% {
@@ -350,8 +365,9 @@ body.theater-mode-active .breaking-news-bar {
 }
 
 /* Update the white outline frame styles to remove side borders */
+/* Adjust page container to account for header height */
 .page-container {
-  padding-top: 8rem;
+  padding-top: 6rem;
   min-height: 100vh;
   background: transparent;
   margin: 0;
@@ -372,7 +388,7 @@ body.theater-mode-active .breaking-news-bar {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, #ffb6a3, #ffd6c0);
+  background: linear-gradient(to bottom, white, white);
   overflow: hidden;
   z-index: -2;
   border-radius: 0;
@@ -384,7 +400,7 @@ body.theater-mode-active .breaking-news-bar {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 214, 192, 0.05); /* Changed to peach */
   animation: waterFlow 20s linear infinite;
   opacity: 0.1;
   z-index: -1;
@@ -432,27 +448,35 @@ body.theater-mode-active .breaking-news-bar {
 /* Make sure the breaking news bar styles are correct */
 /* Add these styles to ensure the breaking news bar is visible */
 
+/* Update the breaking news bar to light blue */
 .breaking-news-bar {
   height: 32px;
   display: flex;
   align-items: center;
   z-index: 100;
+  background-color: white;
+  color: black;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .marquee-container {
   width: 100%;
   overflow: hidden;
+  position: relative;
 }
 
-/* Ensure the marquee animation works properly */
+/* Ensure the marquee animation works properly and text is visible */
 .marquee {
   display: inline-block;
   white-space: nowrap;
   animation: marquee 30s linear infinite;
   padding-left: 100%;
   font-weight: 600;
+  color: black;
 }
 
+/* Add the missing @keyframes marquee definition */
 @keyframes marquee {
   0% {
     transform: translateX(0);
@@ -462,9 +486,9 @@ body.theater-mode-active .breaking-news-bar {
   }
 }
 
-/* Add text shadow to breaking news text */
+/* Update text shadow for breaking news */
 .text-shadow {
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  text-shadow: none;
   letter-spacing: 0.02em;
 }
 
@@ -492,6 +516,11 @@ body.has-breaking-news header {
 /* Adjust header position when breaking news is present */
 .has-breaking-news header {
   top: 2rem; /* Height of breaking news bar */
+}
+
+/* Ensure breaking news bar doesn't add extra space when not present */
+body:not(.has-breaking-news) header {
+  top: 0;
 }
 
 /* Video Banner Section Styles */
@@ -524,17 +553,17 @@ body.has-breaking-news header {
   transform-origin: center;
 }
 
-/* Update the river-video-box to have a more stable appearance */
+/* Update the river-video-box to remove border and match background */
 .river-video-box {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 0 2px rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.15);
+  box-shadow: none !important; /* Remove box shadow */
+  background: rgba(255, 214, 192, 0.7);
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: none;
   transition: all 0.3s ease;
 }
 
@@ -592,7 +621,7 @@ body.has-breaking-news header {
   left: 0;
   width: 100%;
   padding: 16px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  background: linear-gradient(to top, rgba(255, 214, 192, 0.7), transparent);
   color: white;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   border-radius: 0 0 12px 12px;
@@ -610,11 +639,11 @@ body.has-breaking-news header {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
+  color: #ffd6c0;
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 3;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.5));
 }
 
 /* Video error message */
@@ -624,7 +653,7 @@ body.has-breaking-news header {
   justify-content: center;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(255, 214, 192, 0.7); /* Changed to peach */
   color: white;
   text-align: center;
   padding: 20px;
@@ -641,7 +670,7 @@ body.has-breaking-news header {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(255, 214, 192, 0.9);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -652,10 +681,10 @@ body.has-breaking-news header {
   position: relative;
   width: 90%;
   max-width: 1000px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 214, 192, 0.5);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(255, 255, 255, 0.3);
 }
 
 /* Remove these animations that cause jittering */
@@ -674,7 +703,7 @@ body.has-breaking-news header {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 214, 192, 0.5);
   color: white;
   border: none;
   border-radius: 50%;
@@ -689,7 +718,7 @@ body.has-breaking-news header {
 }
 
 .theater-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2); /* Changed to white */
   transform: scale(1.1);
 }
 
@@ -706,7 +735,7 @@ body.has-breaking-news header {
 .theater-content {
   padding: 24px;
   color: white;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4));
+  background: linear-gradient(to top, rgba(255, 214, 192, 0.8), rgba(255, 214, 192, 0.4));
 }
 
 /* Theater active state for the original container */
@@ -754,7 +783,7 @@ body.has-breaking-news header {
 }
 
 .leaflet-container {
-  background-color: #f2f2f2 !important;
+  background-color: #ffd6c0 !important;
 }
 
 .leaflet-tile-pane {
@@ -784,7 +813,7 @@ body.has-breaking-news header {
 }
 
 .leaflet-container {
-  background-color: #f2f2f2 !important;
+  background-color: #ffd6c0 !important;
 }
 
 .leaflet-tile-pane {
@@ -828,7 +857,7 @@ body.has-breaking-news header {
 /* Style the popups to match the hai brand */
 .leaflet-popup-content-wrapper {
   border-radius: 8px !important;
-  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 3px 14px rgba(255, 255, 255, 0.2) !important;
   padding: 0 !important;
   overflow: hidden !important;
 }
@@ -841,6 +870,7 @@ body.has-breaking-news header {
 .dispensary-popup h3 {
   font-size: 1rem !important;
   margin-bottom: 0.25rem !important;
+  color: white !important; /* Ensure text is white */
 }
 
 .dispensary-popup {
@@ -857,12 +887,12 @@ body.has-breaking-news header {
   border: none !important;
   border-radius: 8px !important;
   overflow: hidden !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.15) !important;
 }
 
 .leaflet-control-zoom a {
-  background-color: white !important;
-  color: #333 !important;
+  background-color: #ffd6c0 !important;
+  color: white !important;
   border: none !important;
   width: 30px !important;
   height: 30px !important;
@@ -872,16 +902,17 @@ body.has-breaking-news header {
 }
 
 .leaflet-control-zoom a:hover {
-  background-color: #f5f5f5 !important;
-  color: #000 !important;
+  background-color: #ffcbb0 !important;
+  color: white !important;
 }
 
 /* Style the attribution */
 .leaflet-control-attribution {
-  background-color: rgba(255, 255, 255, 0.8) !important;
+  background-color: rgba(255, 214, 192, 0.8) !important;
   padding: 2px 5px !important;
   border-radius: 3px !important;
   font-size: 10px !important;
+  color: white !important;
 }
 
 .section-with-video {
@@ -897,10 +928,12 @@ body.has-breaking-news header {
   perspective: 1000px;
   transform-style: preserve-3d;
   will-change: transform;
+  background-color: #ffd6c0 !important;
+  color: white !important;
 }
 
 .product-card:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(255, 255, 255, 0.1), 0 10px 10px -5px rgba(255, 255, 255, 0.04) !important;
   transform: scale(1.05);
   z-index: 10;
 }
@@ -912,7 +945,7 @@ body.has-breaking-news header {
   z-index: -1;
   opacity: 0;
   border-radius: 8px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.25) !important;
   transition: opacity 0.3s ease-in-out;
 }
 
@@ -957,17 +990,17 @@ body.has-breaking-news header {
 
 /* Add a subtle glow effect on hover */
 .product-card:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 20px rgba(168, 209, 231, 0.3), 0 0 10px rgba(255, 214, 192, 0.2) !important;
+  box-shadow: 0 20px 40px rgba(255, 255, 255, 0.2), 0 0 20px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Improve text contrast */
 .product-card h2 {
-  color: #0e7490 !important; /* Darker teal for better contrast */
+  color: white !important; /* Changed from teal to white */
   font-weight: 600;
 }
 
 .product-card p.text-[#ffd6c0] {
-  color: #e76f51 !important; /* Darker orange for better contrast */
+  color: white !important; /* Changed from orange to white */
   font-weight: 700;
 }
 
@@ -1070,7 +1103,7 @@ h1.scroll-animation-title.animate .letter {
 
 .river-image-box:hover {
   transform: scale(1.02);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 15px rgba(255, 214, 192, 0.3);
+  box-shadow: 0 15px 30px rgba(255, 255, 255, 0.2), 0 0 15px rgba(255, 255, 255, 0.3);
 }
 
 /* Enhance the river-image with better hover transitions */
@@ -1090,10 +1123,10 @@ h1.scroll-animation-title.animate .letter {
   height: 100%;
   overflow: hidden;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 0 2px rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  background: rgba(255, 214, 192, 0.7); /* Semi-transparent peach */
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: none; /* Remove border */
   transition: all 0.3s ease;
 }
 
@@ -1122,7 +1155,7 @@ h1.scroll-animation-title.animate .letter {
 
 /* Make the blog content more readable */
 .river-content {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4), transparent);
+  background: linear-gradient(to top, rgba(255, 214, 192, 0.8), rgba(255, 214, 192, 0.4), transparent); /* Changed to peach */
   padding-top: 30px; /* Increased padding for better gradient effect */
 }
 
@@ -1132,12 +1165,13 @@ h1.scroll-animation-title.animate .letter {
   align-items: center;
   padding: 4px 10px;
   border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.1); /* Changed to white */
   transition: all 0.3s ease;
+  color: white; /* Ensure text is white */
 }
 
 .river-content a:hover {
-  background-color: rgba(255, 214, 192, 0.2);
+  background-color: rgba(255, 255, 255, 0.2); /* Changed to white */
   transform: translateX(3px);
 }
 
@@ -1147,7 +1181,7 @@ h1.scroll-animation-title.animate .letter {
   justify-content: center;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(255, 214, 192, 0.7); /* Changed to peach */
   color: white;
   text-align: center;
   padding: 20px;
@@ -1166,23 +1200,23 @@ h1.scroll-animation-title.animate .letter {
 }
 
 .dispensary-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #ffd6c0; /* Changed from light gray to peach */
   border-radius: 10px;
 }
 
 .dispensary-list::-webkit-scrollbar-thumb {
-  background: #ffd6c0;
+  background: white; /* Changed from peach to white */
   border-radius: 10px;
 }
 
 .dispensary-list::-webkit-scrollbar-thumb:hover {
-  background: #ffcbb0;
+  background: #f5f5f5; /* Changed from darker peach to light gray */
 }
 
 /* For Firefox */
 .dispensary-list {
   scrollbar-width: thin;
-  scrollbar-color: #ffd6c0 #f1f1f1;
+  scrollbar-color: white #ffd6c0; /* Swapped colors */
 }
 
 /* Optimize animations for better performance */
@@ -1215,7 +1249,7 @@ h1.scroll-animation-title.animate .letter {
 }
 
 .leaflet-marker-icon {
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 2px 2px rgba(255, 255, 255, 0.5)); /* Changed to white */
 }
 
 .leaflet-popup-content-wrapper {
@@ -1231,11 +1265,13 @@ h1.scroll-animation-title.animate .letter {
 .dispensary-popup h3 {
   margin-top: 0;
   margin-bottom: 4px;
+  color: white; /* Ensure text is white */
 }
 
 .dispensary-popup p {
   margin-top: 0;
   margin-bottom: 4px;
+  color: white; /* Ensure text is white */
 }
 
 /* Custom scrollbar for dispensary list */
@@ -1244,95 +1280,20 @@ h1.scroll-animation-title.animate .letter {
 }
 
 .dispensary-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #ffd6c0; /* Changed from light gray to peach */
   border-radius: 10px;
 }
 
 .dispensary-list::-webkit-scrollbar-thumb {
-  background: #ffd6c0;
+  background: white; /* Changed from peach to white */
   border-radius: 10px;
 }
 
 .dispensary-list::-webkit-scrollbar-thumb:hover {
-  background: #ffcbb0;
+  background: #f5f5f5; /* Changed from darker peach to light gray */
 }
 
 /* Add these styles to ensure the map stays within its container */
-.map-wrapper {
-  position: relative;
-  z-index: 1; /* Lower z-index to prevent covering other content */
-  isolation: isolate; /* Create a new stacking context */
-  overflow: hidden; /* Hide any overflow */
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.map-container {
-  position: relative !important;
-  height: 100% !important;
-  width: 100% !important;
-  z-index: 1;
-}
-
-.map-container-wrapper {
-  position: relative;
-  overflow: hidden;
-  border-radius: 0.5rem;
-}
-
-/* Ensure Leaflet elements stay within the map container */
-.leaflet-container {
-  position: absolute !important;
-  height: 100% !important;
-  width: 100% !important;
-  z-index: 1 !important; /* Lower z-index */
-}
-
-.leaflet-control-container {
-  position: absolute;
-  z-index: 10;
-}
-
-/* Ensure popups don't overflow */
-.leaflet-popup {
-  z-index: 20 !important;
-}
-
-/* Prevent map from capturing scroll events outside its bounds */
-.leaflet-grab {
-  cursor: grab;
-}
-
-.leaflet-marker-pane,
-.leaflet-popup-pane {
-  z-index: 20 !important;
-}
-
-/* Ensure the map doesn't interfere with page scrolling */
-.page-container {
-  position: relative;
-  z-index: 1;
-}
-
-/* Add these styles at the end of your globals.css file */
-
-/* Fix for Leaflet marker icons */
-.leaflet-marker-icon {
-  background: none !important;
-  border: none !important;
-}
-
-.leaflet-marker-shadow {
-  background: none !important;
-  border: none !important;
-}
-
-/* Ensure popups display correctly */
-.leaflet-popup-content-wrapper {
-  min-width: 200px;
-}
-
-/* Fix for map container */
 .map-wrapper {
   isolation: isolate;
   position: relative;
@@ -1352,7 +1313,7 @@ h1.scroll-animation-title.animate .letter {
 
 /* Custom hai. marker styling */
 .hai-marker-icon {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.2)); /* Changed to white */
   transition: transform 0.2s ease;
   background: none !important;
   border: none !important;
@@ -1360,7 +1321,7 @@ h1.scroll-animation-title.animate .letter {
 
 .hai-marker-icon:hover {
   transform: scale(1.1);
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 3px 6px rgba(255, 255, 255, 0.3)); /* Changed to white */
 }
 
 /* Custom popup styling */
@@ -1369,663 +1330,1358 @@ h1.scroll-animation-title.animate .letter {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
   padding: 0 !important;
   overflow: hidden !important;
-  border: 1px solid rgba(255, 214, 192, 0.3) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background-color: white !important; /* Changed from #ffd6c0 to white */
 }
 
 .hai-popup .leaflet-popup-content {
   margin: 0 !important;
   width: auto !important;
   min-width: 250px !important;
+  color: black !important; /* Changed from white to black */
 }
 
 .hai-popup .leaflet-popup-tip {
-  background-color: white !important;
+  background-color: white !important; /* Changed from #ffd6c0 to white */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid rgba(255, 214, 192, 0.3) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
 
 .hai-popup .leaflet-popup-close-button {
-  color: #ffd6c0 !important;
+  color: #666 !important;
   font-size: 18px !important;
   padding: 6px 6px 0 0 !important;
+  z-index: 10 !important;
 }
 
 .hai-popup .leaflet-popup-close-button:hover {
-  color: #ffb6a3 !important;
+  color: #333 !important;
   background: none !important;
 }
 
 /* Dispensary popup styling */
 .dispensary-popup h3 {
-  color: #ffd6c0 !important;
+  color: black !important; /* Changed from white to black */
   font-weight: 600 !important;
   margin-bottom: 0.5rem !important;
 }
 
 .dispensary-popup p {
   margin-bottom: 0.25rem !important;
+  color: black !important; /* Changed from white to black */
 }
 
 .dispensary-popup a {
-  color: #a8d1e7 !important;
+  color: black !important; /* Changed from white/blue to black */
   text-decoration: none !important;
   transition: color 0.2s ease !important;
 }
 
 .dispensary-popup a:hover {
-  color: #97c0d6 !important;
+  color: #333 !important; /* Changed to dark gray on hover */
   text-decoration: underline !important;
 }
 
 .dispensary-popup img {
   border-radius: 8px !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1) !important; /* Changed to white */
 }
 
-/* Add these styles at the end of your globals.css file */
-
-/* Marker and popup styles */
-.hai-marker-icon {
-  background: none !important;
-  border: none !important;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  transition: transform 0.2s ease;
-}
-
-.hai-marker-icon:hover {
-  transform: scale(1.1);
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
-}
-
-.hai-popup .leaflet-popup-content-wrapper {
-  border-radius: 8px !important;
-  overflow: hidden !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
-}
-
-.hai-popup .leaflet-popup-content {
-  margin: 0 !important;
-  padding: 0 !important;
-  min-width: 250px !important;
-}
-
-.hai-popup .leaflet-popup-tip {
-  background-color: white !important;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important;
-}
-
-.dispensary-popup {
-  overflow: hidden !important;
-}
-
-.dispensary-popup img {
-  display: block !important;
-  width: 100% !important;
-  height: auto !important;
-  object-fit: cover !important;
-  border-radius: 4px !important;
-}
-
-/* Fix for map container */
-.map-container {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 1 !important;
-}
-
-/* Ensure the map doesn't interfere with page scrolling */
-.map-wrapper {
+/* Media crossfade transition styles */
+.media-container {
   position: relative;
-  z-index: 1;
-  isolation: isolate;
-  overflow: hidden;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Ensure Leaflet elements stay within the map container */
-.leaflet-container {
-  position: absolute !important;
-  height: 100% !important;
-  width: 100% !important;
-  z-index: 1 !important;
-}
-
-.leaflet-marker-pane,
-.leaflet-popup-pane {
-  z-index: 20 !important;
-}
-
-/* Fix for map popups - adjust these values at the end of your CSS file */
-
-/* Fix z-index issues with Leaflet components */
-.leaflet-map-pane {
-  z-index: 1 !important;
-}
-
-.leaflet-marker-pane {
-  z-index: 500 !important;
-}
-
-.leaflet-popup-pane {
-  z-index: 600 !important;
-}
-
-.leaflet-overlay-pane {
-  z-index: 400 !important;
-}
-
-.leaflet-shadow-pane {
-  z-index: 450 !important;
-}
-
-.leaflet-control {
-  z-index: 800 !important;
-}
-
-.leaflet-bottom .leaflet-control {
-  margin-bottom: 20px; /* Add more space for controls at the bottom */
-}
-
-/* Enhanced popup styling to prevent cutoff */
-.hai-popup .leaflet-popup-content-wrapper {
-  overflow: visible !important;
-  max-height: none !important;
-}
-
-.hai-popup .leaflet-popup-content {
-  overflow: visible !important;
-  max-height: none !important;
-  padding: 0 !important;
-}
-
-.dispensary-popup {
-  padding: 12px !important;
-  max-height: 350px !important;
-  overflow-y: auto !important;
-}
-
-/* Make sure zoom controls don't overlap with popups */
-.leaflet-control-zoom {
-  margin-right: 20px !important;
-  margin-bottom: 30px !important;
-}
-
-/* Fix for popup images */
-.dispensary-popup img {
-  max-height: 150px !important;
-  object-fit: cover !important;
-  width: 100% !important;
-  display: block !important;
-}
-
-/* Add these styles at the end of the file to enhance the video banner */
-
-/* Enhanced video banner styles */
-.carousel-video-banner {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-}
-
-.carousel-video-banner:hover {
-  transform: scale(1.01);
-}
-
-/* Remove these fade transition styles */
-/*
-.video-fade-transition {
-  transition: opacity 0.5s ease;
-}
-
- Smooth crossfade for videos
-.carousel-video-banner video {
-  will-change: opacity;
-}
-
- Fix for video banner transitions
-.carousel-video-banner video {
-  will-change: opacity;
-  transition: opacity 0.3s ease;
-}
-*/
-
-/* Add these styles for smoother video transitions without fading */
-.carousel-video-banner video {
-  transition: transform 0.3s ease;
-}
-
-.carousel-video-banner:hover video {
-  transform: scale(1.02);
-}
-
-/* Enhance navigation buttons */
-.carousel-nav-button {
-  opacity: 0.7;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.carousel-nav-button:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-/* Add these styles at the end of your globals.css file */
-
-/* Enhanced carousel video banner styles */
-.carousel-video-banner {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.carousel-video-banner:hover {
-  transform: scale(1.01);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-}
-
-/* Enhance navigation buttons */
-.carousel-nav-button {
-  opacity: 0.7;
-  transition: opacity 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
-}
-
-.carousel-nav-button:hover:not(:disabled) {
-  opacity: 1;
-  transform: translateY(-50%) scale(1.1);
-}
-
-.carousel-nav-button:disabled {
-  cursor: not-allowed;
-}
-
-/* Smooth crossfade for videos */
-/*
-.carousel-video-banner video {
-  will-change: opacity;
-}
-*/
-
-/* Add styles to improve the video banner and theater mode */
-
-/*
-Add
-  these
-  styles
-  at
-  the
-  end
-  of
-  the
-  file
-  to
-  fix
-  the
-  fade
-  transitions
-  and
-  add
-  theater
-  mode
-  styling */
-/* Fix for video banner transitions */
-/*
-.carousel-video-banner video {
-  will-change: opacity;
-  transition: opacity 0.3s ease;
-}
-*/
-
-/* Add a cursor pointer to indicate videos are clickable */
-.carousel-video-banner > div {
-  cursor: pointer;
-}
-
-/* Theater mode styles */
-.theater-mode-active {
+  height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 
-/* Ensure the theater mode overlay has proper z-index and styling */
-.theater-mode-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.9);
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.3s ease;
-}
-
-/* Add a subtle scale animation for the theater video */
-@keyframes scaleIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Apply the animation to the theater video container */
-.theater-mode-overlay > div {
-  animation: scaleIn 0.3s ease;
-}
-
-/* Add or update these styles for better theater mode */
-
-/* Theater mode styles */
-.theater-mode-active {
-  overflow: hidden;
-}
-
-/* Ensure the theater mode overlay has proper z-index and styling */
-.fixed\.inset-0\.z-\[200\] {
-  animation: fadeIn 0.3s ease;
-}
-
-/* Add a fade-in animation for the theater mode */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Add a subtle scale animation for the theater video */
-@keyframes scaleIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Apply the animation to the theater video container */
-.fixed\.inset-0\.z-\[200\] > div {
-  animation: scaleIn 0.3s ease;
-}
-
-/* Make videos clearly clickable with a pointer cursor */
-.carousel-video-banner video {
-  cursor: pointer;
-}
-
-/* Add a play indicator that appears on hover */
-.carousel-video-banner {
-  position: relative;
-}
-
-.carousel-video-banner::after {
-  content: "";
+.media-item {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60px;
-  height: 60px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
-}
-
-.carousel-video-banner:hover::after {
-  opacity: 0.8;
-}
-
-/* Hide header and other elements when theater mode is active */
-body.theater-mode-active header,
-body.theater-mode-active .breaking-news-bar,
-body.theater-mode-active footer {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-/* Add these styles at the end of the file to ensure the footer is positioned correctly */
-footer {
-  position: relative;
-  z-index: 10;
-  margin-bottom: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-/* Ensure the footer sticks to the bottom */
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-main {
-  flex: 1;
-}
-
-footer {
-  margin-top: auto;
-}
-
-/* Add these styles at the end of the file for the footer design */
-
-/* Footer styles */
-footer {
-  position: relative;
-  z-index: 10;
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-}
-
-footer::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-/* Add a subtle shadow to the color bar */
-footer .absolute.bg-gradient-to-r {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Fix for video player click handling */
-.carousel-video-banner {
-  position: relative;
-  z-index: 1;
-}
-
-/* Make sure videos are clickable */
-.carousel-video-banner video {
-  cursor: pointer;
-  z-index: 2;
-}
-
-/* Ensure content overlay doesn't block clicks */
-.carousel-video-banner .pointer-events-none {
-  pointer-events: none;
-}
-
-/* Ensure navigation elements can receive clicks */
-.carousel-video-banner .pointer-events-auto {
-  pointer-events: auto;
-  position: relative;
-  z-index: 10;
-}
-
-/* Add a play button indicator that shows on hover */
-.carousel-video-banner::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm-2-15l6 5-6 5V7z'/%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  z-index: 5;
-  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
-}
-
-.carousel-video-banner:hover::before {
-  opacity: 0.9;
-}
-
-/* Improve theater mode transition */
-.fixed.inset-0.z-\[200\] {
-  animation: fadeIn 0.3s ease;
-}
-
-/* Make sure theater mode video is properly sized */
-.fixed.inset-0.z-\[200\] video {
-  max-height: 80vh;
-  margin: 0 auto;
-}
-/* Theater mode styles - improved to prevent jittering */
-.theater-mode-active {
-  overflow: hidden;
-}
-
-/* Remove animations that might cause jittering */
-.theater-overlay {
-  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
 }
 
-.theater-container {
-  position: relative;
-  width: 90%;
-  max-width: 1000px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-/* Remove these animations that cause jittering */
-@keyframes scaleIn {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Simplify theater mode transitions */
-body.theater-mode-active header,
-body.theater-mode-active .breaking-news-bar,
-body.theater-mode-active footer {
-  opacity: 0;
-  pointer-events: none;
-  transition: none; /* Remove transition to prevent jittering */
-}
-
-/* Fix for theater mode overlay */
-.fixed.inset-0.z-\[200\] {
-  animation: none; /* Remove animation to prevent jittering */
-  backdrop-filter: none; /* Remove backdrop filter which can cause jitter */
-}
-
-/* Remove scale animation for theater video container */
-.fixed.inset-0.z-\[200\] > div {
-  animation: none; /* Remove animation to prevent jittering */
-}
-
-/* Make sure theater mode video is properly sized without animations */
-.fixed.inset-0.z-\[200\] video {
-  max-height: 80vh;
-  margin: 0 auto;
-  transition: none; /* Remove transition to prevent jittering */
-}
-
-/* Add these styles at the end of your globals.css file */
-
-/* Scrolling Media Banner Styles */
-.scrolling-media-banner {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-}
-
-.scrolling-media-banner:hover {
-  transform: scale(1.01);
-}
-
-/* Enhance navigation buttons with better positioning and styling */
-.scrolling-media-banner button {
-  opacity: 0.8;
-  transition: all 0.3s ease;
-}
-
-.scrolling-media-banner button:hover {
+.media-item.active {
   opacity: 1;
-  transform: translateY(-50%) scale(1.05);
+  z-index: 2;
+  transform: scale(1);
 }
 
-/* Make sure the navigation buttons are always visible */
-.scrolling-media-banner button.absolute {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
+.media-item.inactive {
+  opacity: 0;
+  z-index: 1;
+  transform: scale(1.05);
 }
 
-/* Ensure the content overlay has proper gradient */
-.scrolling-media-banner .bg-gradient-to-t {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 40%, transparent 100%);
+.media-item.fade-out {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.media-item.fade-in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Content overlay transition */
+.content-overlay {
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
 }
 
 /* Ensure media items maintain aspect ratio */
-.scrolling-media-banner video,
-.scrolling-media-banner img {
+.media-item video,
+.media-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Indicator dots styling */
-.scrolling-media-banner .absolute.bottom-4 button {
-  width: 10px;
-  height: 10px;
-  padding: 0;
-  border-radius: 50%;
-  transition: all 0.3s ease;
+/* Add these styles at the end of your globals.css file */
+
+/* Media Card Styles */
+.media-card {
+  transition: transform 0.5s ease;
+  will-change: transform;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
-.scrolling-media-banner .absolute.bottom-4 button:hover {
-  transform: scale(1.2);
+.media-card:hover {
+  transform: translateY(-10px) scale(1.02) rotate(0deg) !important;
+  z-index: 50 !important;
+}
+
+/* Ensure the media content is properly centered within the card */
+.media-card video,
+.media-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Add a subtle glow effect to the media cards */
+.media-card .border-[#ffd6c0] {
+  box-shadow: none !important;
+  transition: box-shadow 0.3s ease;
+}
+
+.media-card:hover .border-[#ffd6c0] {
+  box-shadow: none !important;
+}
+
+/* Ensure text is readable over the media cards */
+.welcome-section h1,
+.welcome-section p {
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 30;
+}
+
+/* Make the welcome text pop with enhanced styling */
+h1.scroll-animation-title.animate .letter {
+  animation: letterPop 0.5s forwards;
+  animation-delay: calc(var(--index) * 0.05s + 0.5s);
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8), 0 4px 8px rgba(255, 255, 255, 0.4), 0 8px 16px
+    rgba(255, 255, 255, 0.2);
+}
+
+@keyframes letterPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Add a subtle highlight effect behind the welcome text */
+.welcome-section h1::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -20px;
+  right: -20px;
+  bottom: -10px;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(15px);
+}
+
+/* Ensure black text color for welcome heading */
+.welcome-section h1 {
+  color: black !important;
+  font-weight: 800 !important;
+}
+
+/* Update the media cards to remove border and match background */
+.media-card .relative {
+  border: none !important; /* Remove border */
+  background-color: #ffd6c0; /* Match peach background */
+}
+
+/* Override any shadow effects for media cards */
+.media-card {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.media-card * {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+.media-card video,
+.media-card img {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.media-card .relative {
+  box-shadow: none !important;
+}
+
+/* Add these animation utilities at the end of the file */
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth fade-out animation */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Subtle scale animation */
+@keyframes subtleScale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Smooth page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+/* Optimize animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enhanced hover effects */
+.enhanced-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.enhanced-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.1), 0 8px 10px -6px rgba(255, 255, 255, 0.1);
+}
+
+/* Scroll reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered reveal for multiple items */
+.stagger-reveal > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.stagger-reveal > *:nth-child(1) {
+  transition-delay: 0.1s;
+}
+.stagger-reveal > *:nth-child(2) {
+  transition-delay: 0.2s;
+}
+.stagger-reveal > *:nth-child(3) {
+  transition-delay: 0.3s;
+}
+.stagger-reveal > *:nth-child(4) {
+  transition-delay: 0.4s;
+}
+.stagger-reveal > *:nth-child(5) {
+  transition-delay: 0.5s;
+}
+
+.stagger-reveal.active > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Subtle pulse animation for attention */
+@keyframes subtlePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse-animation {
+  animation: subtlePulse 2s infinite ease-in-out;
+}
+
+/* Improved button hover effects */
+.button-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.button-hover:hover::after {
+  transform: translateX(0);
+}
+
+/* Optimize images with blur-up technique */
+.blur-up {
+  filter: blur(5px);
+  transition: filter 0.3s ease-out;
+}
+
+.blur-up.loaded {
+  filter: blur(0);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Add these styles at the end of your globals.css file */
+
+/* Custom marker styles */
+.hai-marker-container {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hai-marker-circle {
+  width: 36px;
+  height: 36px;
+  background-color: #ffd6c0;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: 1;
+}
+
+.hai-marker-logo {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  position: relative;
+  z-index: 2;
+  font-family: "New Order", system-ui, sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.standard-marker-container {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.standard-marker-circle {
+  width: 26px;
+  height: 26px;
+  background-color: #a8d1e7;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: 1;
+}
+
+.standard-marker-icon {
+  color: white;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Popup styles */
+.hai-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background-color: white !important; /* Changed from #ffd6c0 to white */
+}
+
+.hai-popup .leaflet-popup-content {
+  margin: 0 !important;
+  width: auto !important;
+  min-width: 250px !important;
+  color: black !important; /* Changed from white to black */
+}
+
+.hai-popup .leaflet-popup-tip {
+  background-color: white !important; /* Changed from #ffd6c0 to white */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.hai-popup .leaflet-popup-close-button {
+  color: #666 !important;
+  font-size: 18px !important;
+  padding: 6px 6px 0 0 !important;
+  z-index: 10 !important;
+}
+
+.hai-popup .leaflet-popup-close-button:hover {
+  color: #333 !important;
+  background: none !important;
+}
+
+/* Dispensary popup styling */
+.dispensary-popup h3 {
+  color: black !important; /* Changed from white to black */
+  font-weight: 600 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.dispensary-popup p {
+  margin-bottom: 0.25rem !important;
+  color: black !important; /* Changed from white to black */
+}
+
+.dispensary-popup a {
+  color: black !important; /* Changed from white/blue to black */
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+.dispensary-popup a:hover {
+  color: #333 !important; /* Changed to dark gray on hover */
+  text-decoration: underline !important;
+}
+
+.dispensary-popup img {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1) !important; /* Changed to white */
+}
+
+/* Media crossfade transition styles */
+.media-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.media-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.media-item.active {
+  opacity: 1;
+  z-index: 2;
+  transform: scale(1);
+}
+
+.media-item.inactive {
+  opacity: 0;
+  z-index: 1;
+  transform: scale(1.05);
+}
+
+.media-item.fade-out {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.media-item.fade-in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Content overlay transition */
+.content-overlay {
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+}
+
+/* Ensure media items maintain aspect ratio */
+.media-item video,
+.media-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Add these styles at the end of your globals.css file */
+
+/* Media Card Styles */
+.media-card {
+  transition: transform 0.5s ease;
+  will-change: transform;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.media-card:hover {
+  transform: translateY(-10px) scale(1.02) rotate(0deg) !important;
+  z-index: 50 !important;
+}
+
+/* Ensure the media content is properly centered within the card */
+.media-card video,
+.media-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Add a subtle glow effect to the media cards */
+.media-card .border-[#ffd6c0] {
+  box-shadow: none !important;
+  transition: box-shadow 0.3s ease;
+}
+
+.media-card:hover .border-[#ffd6c0] {
+  box-shadow: none !important;
+}
+
+/* Ensure text is readable over the media cards */
+.welcome-section h1,
+.welcome-section p {
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 30;
+}
+
+/* Make the welcome text pop with enhanced styling */
+h1.scroll-animation-title.animate .letter {
+  animation: letterPop 0.5s forwards;
+  animation-delay: calc(var(--index) * 0.05s + 0.5s);
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8), 0 4px 8px rgba(255, 255, 255, 0.4), 0 8px 16px
+    rgba(255, 255, 255, 0.2);
+}
+
+@keyframes letterPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Add a subtle highlight effect behind the welcome text */
+.welcome-section h1::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -20px;
+  right: -20px;
+  bottom: -10px;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(15px);
+}
+
+/* Ensure black text color for welcome heading */
+.welcome-section h1 {
+  color: black !important;
+  font-weight: 800 !important;
+}
+
+/* Update the media cards to remove border and match background */
+.media-card .relative {
+  border: none !important; /* Remove border */
+  background-color: #ffd6c0; /* Match peach background */
+}
+
+/* Override any shadow effects for media cards */
+.media-card {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.media-card * {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+.media-card video,
+.media-card img {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.media-card .relative {
+  box-shadow: none !important;
+}
+
+/* Add these animation utilities at the end of the file */
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth fade-out animation */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Subtle scale animation */
+@keyframes subtleScale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Smooth page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+/* Optimize animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enhanced hover effects */
+.enhanced-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.enhanced-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.1), 0 8px 10px -6px rgba(255, 255, 255, 0.1);
+}
+
+/* Scroll reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered reveal for multiple items */
+.stagger-reveal > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.stagger-reveal > *:nth-child(1) {
+  transition-delay: 0.1s;
+}
+.stagger-reveal > *:nth-child(2) {
+  transition-delay: 0.2s;
+}
+.stagger-reveal > *:nth-child(3) {
+  transition-delay: 0.3s;
+}
+.stagger-reveal > *:nth-child(4) {
+  transition-delay: 0.4s;
+}
+.stagger-reveal > *:nth-child(5) {
+  transition-delay: 0.5s;
+}
+
+.stagger-reveal.active > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Subtle pulse animation for attention */
+@keyframes subtlePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse-animation {
+  animation: subtlePulse 2s infinite ease-in-out;
+}
+
+/* Improved button hover effects */
+.button-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.button-hover:hover::after {
+  transform: translateX(0);
+}
+
+/* Optimize images with blur-up technique */
+.blur-up {
+  filter: blur(5px);
+  transition: filter 0.3s ease-out;
+}
+
+.blur-up.loaded {
+  filter: blur(0);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Add these styles at the end of your globals.css file */
+
+/* Custom marker styles */
+.hai-marker-container {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hai-marker-circle {
+  width: 36px;
+  height: 36px;
+  background-color: #ffd6c0;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: 1;
+}
+
+.hai-marker-logo {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  position: relative;
+  z-index: 2;
+  font-family: "New Order", system-ui, sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.standard-marker-container {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.standard-marker-circle {
+  width: 26px;
+  height: 26px;
+  background-color: #a8d1e7;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: 1;
+}
+
+.standard-marker-icon {
+  color: white;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Popup styles */
+.hai-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background-color: white !important; /* Changed from #ffd6c0 to white */
+}
+
+.hai-popup .leaflet-popup-content {
+  margin: 0 !important;
+  width: auto !important;
+  min-width: 250px !important;
+  color: black !important; /* Changed from white to black */
+}
+
+.hai-popup .leaflet-popup-tip {
+  background-color: white !important; /* Changed from #ffd6c0 to white */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.hai-popup .leaflet-popup-close-button {
+  color: #666 !important;
+  font-size: 18px !important;
+  padding: 6px 6px 0 0 !important;
+  z-index: 10 !important;
+}
+
+.hai-popup .leaflet-popup-close-button:hover {
+  color: #333 !important;
+  background: none !important;
+}
+
+/* Dispensary popup styling */
+.dispensary-popup h3 {
+  color: black !important; /* Changed from white to black */
+  font-weight: 600 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.dispensary-popup p {
+  margin-bottom: 0.25rem !important;
+  color: black !important; /* Changed from white to black */
+}
+
+.dispensary-popup a {
+  color: black !important; /* Changed from white/blue to black */
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+.dispensary-popup a:hover {
+  color: #333 !important; /* Changed to dark gray on hover */
+  text-decoration: underline !important;
+}
+
+.dispensary-popup img {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1) !important; /* Changed to white */
+}
+
+/* Media crossfade transition styles */
+.media-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.media-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.media-item.active {
+  opacity: 1;
+  z-index: 2;
+  transform: scale(1);
+}
+
+.media-item.inactive {
+  opacity: 0;
+  z-index: 1;
+  transform: scale(1.05);
+}
+
+.media-item.fade-out {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.media-item.fade-in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Content overlay transition */
+.content-overlay {
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+}
+
+/* Ensure media items maintain aspect ratio */
+.media-item video,
+.media-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Add these styles at the end of your globals.css file */
+
+/* Media Card Styles */
+.media-card {
+  transition: transform 0.5s ease;
+  will-change: transform;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.media-card:hover {
+  transform: translateY(-10px) scale(1.02) rotate(0deg) !important;
+  z-index: 50 !important;
+}
+
+/* Ensure the media content is properly centered within the card */
+.media-card video,
+.media-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Add a subtle glow effect to the media cards */
+.media-card .border-[#ffd6c0] {
+  box-shadow: none !important;
+  transition: box-shadow 0.3s ease;
+}
+
+.media-card:hover .border-[#ffd6c0] {
+  box-shadow: none !important;
+}
+
+/* Ensure text is readable over the media cards */
+.welcome-section h1,
+.welcome-section p {
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 30;
+}
+
+/* Make the welcome text pop with enhanced styling */
+h1.scroll-animation-title.animate .letter {
+  animation: letterPop 0.5s forwards;
+  animation-delay: calc(var(--index) * 0.05s + 0.5s);
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8), 0 4px 8px rgba(255, 255, 255, 0.4), 0 8px 16px
+    rgba(255, 255, 255, 0.2);
+}
+
+@keyframes letterPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Add a subtle highlight effect behind the welcome text */
+.welcome-section h1::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -20px;
+  right: -20px;
+  bottom: -10px;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(15px);
+}
+
+/* Ensure black text color for welcome heading */
+.welcome-section h1 {
+  color: black !important;
+  font-weight: 800 !important;
+}
+
+/* Update the media cards to remove border and match background */
+.media-card .relative {
+  border: none !important; /* Remove border */
+  background-color: #ffd6c0; /* Match peach background */
+}
+
+/* Override any shadow effects for media cards */
+.media-card {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.media-card * {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+.media-card video,
+.media-card img {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.media-card .relative {
+  box-shadow: none !important;
+}
+
+/* Add these animation utilities at the end of the file */
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth fade-out animation */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Subtle scale animation */
+@keyframes subtleScale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Smooth page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+/* Optimize animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enhanced hover effects */
+.enhanced-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.enhanced-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.1), 0 8px 10px -6px rgba(255, 255, 255, 0.1);
+}
+
+/* Scroll reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered reveal for multiple items */
+.stagger-reveal > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.stagger-reveal > *:nth-child(1) {
+  transition-delay: 0.1s;
+}
+.stagger-reveal > *:nth-child(2) {
+  transition-delay: 0.2s;
+}
+.stagger-reveal > *:nth-child(3) {
+  transition-delay: 0.3s;
+}
+.stagger-reveal > *:nth-child(4) {
+  transition-delay: 0.4s;
+}
+.stagger-reveal > *:nth-child(5) {
+  transition-delay: 0.5s;
+}
+
+.stagger-reveal.active > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Subtle pulse animation for attention */
+@keyframes subtlePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse-animation {
+  animation: subtlePulse 2s infinite ease-in-out;
+}
+
+/* Improved button hover effects */
+.button-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.button-hover:hover::after {
+  transform: translateX(0);
+}
+
+/* Optimize images with blur-up technique */
+.blur-up {
+  filter: blur(5px);
+  transition: filter 0.3s ease-out;
+}
+
+.blur-up.loaded {
+  filter: blur(0);
 }

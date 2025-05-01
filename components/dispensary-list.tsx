@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Search } from "lucide-react"
+import { Search, MapPin, Phone, Globe } from "lucide-react"
 
 interface Dispensary {
   id: string
@@ -35,6 +35,7 @@ export default function DispensaryList({
 }: DispensaryListProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [showOnlyHaiProducts, setShowOnlyHaiProducts] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
@@ -46,6 +47,16 @@ export default function DispensaryList({
     if (onFilterChange) {
       onFilterChange(checked)
     }
+  }
+
+  const handleSelectDispensary = (dispensary: Dispensary) => {
+    console.log(`Selected dispensary: ${dispensary.name} at [${dispensary.lat}, ${dispensary.lng}]`)
+    setSelectedId(dispensary.id)
+
+    // Add a small delay to ensure the map has time to process the location change
+    setTimeout(() => {
+      onSelectDispensary(dispensary.lat, dispensary.lng)
+    }, 50)
   }
 
   const filteredDispensaries = dispensaries.filter((dispensary) => {
@@ -138,7 +149,7 @@ export default function DispensaryList({
           className={
             compact
               ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-              : "space-y-4 overflow-auto max-h-[500px] pr-2"
+              : "space-y-4 overflow-auto max-h-[500px] pr-2 dispensary-list"
           }
         >
           {filteredDispensaries.map((dispensary) => (
@@ -148,25 +159,46 @@ export default function DispensaryList({
                 compact ? "p-3" : "p-4"
               } bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
                 dispensary.has_hai_products ? "border-l-4 border-l-[#ffd6c0]" : ""
-              }`}
-              onClick={() => onSelectDispensary(dispensary.lat, dispensary.lng)}
+              } ${selectedId === dispensary.id ? "ring-2 ring-[#ffd6c0] bg-[#ffd6c0]/10" : ""}`}
+              onClick={() => handleSelectDispensary(dispensary)}
             >
               <div className="flex items-start gap-3">
-                {dispensary.image_url && !compact && (
-                  <img
-                    src={dispensary.image_url || "/placeholder.svg"}
-                    alt={dispensary.name}
-                    className="w-16 h-16 object-cover rounded-md"
-                  />
-                )}
+                <div
+                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${dispensary.has_hai_products ? "bg-[#ffd6c0]" : "bg-[#a8d1e7]"}`}
+                >
+                  {dispensary.has_hai_products ? (
+                    <span className="text-white font-bold text-xs">hai.</span>
+                  ) : (
+                    <MapPin className="h-4 w-4 text-white" />
+                  )}
+                </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className={`${compact ? "text-base" : "text-lg"} font-semibold text-[#0e7490] truncate`}>
+                  <h3 className={`${compact ? "text-base" : "text-lg"} font-semibold text-black truncate`}>
                     {dispensary.name}
                   </h3>
-                  <p className={`${compact ? "text-xs" : "text-sm"} text-gray-600 truncate`}>
+                  <p className={`${compact ? "text-xs" : "text-sm"} text-black truncate flex items-center`}>
+                    <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
                     {dispensary.address}, {dispensary.city}
                   </p>
-                  {dispensary.phone && !compact && <p className="text-sm text-gray-500">{dispensary.phone}</p>}
+                  {dispensary.phone && !compact && (
+                    <p className="text-sm text-black flex items-center">
+                      <Phone className="h-3 w-3 mr-1 flex-shrink-0" />
+                      {dispensary.phone}
+                    </p>
+                  )}
+                  {dispensary.website && !compact && (
+                    <p className="text-sm text-black flex items-center">
+                      <Globe className="h-3 w-3 mr-1 flex-shrink-0" />
+                      <a
+                        href={dispensary.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-black hover:underline truncate"
+                      >
+                        {dispensary.website.replace(/^https?:\/\/(www\.)?/, "")}
+                      </a>
+                    </p>
+                  )}
                   {dispensary.has_hai_products && (
                     <span className="inline-flex items-center px-2 py-1 mt-1 text-xs font-medium rounded-full bg-[#ffd6c0]/20 text-[#e76f51]">
                       hai. products available

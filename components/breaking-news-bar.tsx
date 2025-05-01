@@ -52,7 +52,6 @@ export default function BreakingNewsBar() {
 
     async function fetchBreakingNews() {
       try {
-        console.log("Fetching breaking news...")
         const { data, error } = await supabase
           .from("breaking_news")
           .select("*")
@@ -61,18 +60,15 @@ export default function BreakingNewsBar() {
           .single()
 
         if (error && error.code !== "PGRST116") {
-          console.error("Error fetching breaking news:", error)
+          // Silent error handling
           return
         }
 
         if (data) {
-          console.log("Breaking news fetched successfully:", data)
           setNewsText(data.text)
-        } else {
-          console.log("No breaking news found")
         }
       } catch (error) {
-        console.error("Unexpected error fetching breaking news:", error)
+        // Silent error handling
       } finally {
         setLoading(false)
       }
@@ -109,9 +105,9 @@ export default function BreakingNewsBar() {
   }
 
   return (
-    <div className="bg-[#a8d1e7] py-2 w-full overflow-hidden fixed top-0 left-0 right-0 z-[60] shadow-md breaking-news-bar">
+    <div className="bg-white py-2 w-full overflow-hidden fixed top-0 left-0 right-0 z-[60] shadow-md breaking-news-bar animate-fadeIn">
       <div className="marquee-container">
-        <div className="marquee text-white text-shadow">
+        <div className="marquee text-black">
           <span>{newsText}</span>
         </div>
       </div>

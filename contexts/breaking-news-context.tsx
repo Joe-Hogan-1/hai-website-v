@@ -19,7 +19,6 @@ export function BreakingNewsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function fetchBreakingNews() {
       try {
-        console.log("Fetching breaking news...")
         const { data, error } = await supabase
           .from("breaking_news")
           .select("*")
@@ -28,17 +27,14 @@ export function BreakingNewsProvider({ children }: { children: ReactNode }) {
           .single()
 
         if (error && error.code !== "PGRST116") {
-          console.error("Error fetching breaking news:", error)
           // Error fetching breaking news
         } else if (data) {
-          console.log("Breaking news fetched successfully:", data)
           setNewsText(data.text)
         } else {
-          console.log("No breaking news found")
+          // No breaking news found
         }
       } catch (error) {
-        console.error("Unexpected error fetching breaking news:", error)
-        // Error fetching breaking news
+        // Unexpected error fetching breaking news
       } finally {
         setIsLoading(false)
       }
@@ -71,8 +67,6 @@ export function BreakingNewsProvider({ children }: { children: ReactNode }) {
 
   const updateBreakingNews = async (text: string) => {
     try {
-      console.log("Updating breaking news to:", text)
-
       // If the text is empty, we'll use an empty string
       const newsText = text.trim() || ""
 
@@ -82,15 +76,12 @@ export function BreakingNewsProvider({ children }: { children: ReactNode }) {
         .select()
 
       if (error) {
-        console.error("Error updating breaking news:", error)
         throw error
       }
 
-      console.log("Breaking news updated successfully:", data)
       setNewsText(newsText)
       return data
     } catch (error) {
-      console.error("Failed to update breaking news:", error)
       throw error
     }
   }

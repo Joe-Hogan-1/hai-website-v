@@ -6,6 +6,7 @@ import dynamic from "next/dynamic"
 const BreakingNewsBar = dynamic(() => import("@/components/breaking-news-bar"), { ssr: false })
 const CookieConsent = dynamic(() => import("@/components/cookie-consent"), { ssr: false })
 const AnalyticsTracker = dynamic(() => import("@/components/analytics-tracker"), { ssr: false })
+const InteractionTracker = dynamic(() => import("@/components/analytics/interaction-tracker"), { ssr: false })
 
 export default function ClientComponents() {
   return (
@@ -13,6 +14,7 @@ export default function ClientComponents() {
       <BreakingNewsBar />
       <CookieConsent />
       <AnalyticsTracker />
+      <InteractionTracker />
     </>
   )
 }

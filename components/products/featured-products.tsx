@@ -3,20 +3,25 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/utils/supabase"
 import { useTilt } from "@/hooks/use-tilt"
+import { ChevronRight } from "lucide-react"
+import ProductDetailModal from "./product-detail-modal"
 
 interface Product {
   id: string
   name: string
   description: string
-  price: number
   image_url: string
   featured: boolean
+  category?: "Indica" | "Sativa" | "Hybrid" | null
+  product_category?: string | null
 }
 
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const { handleMouseMove, handleMouseEnter, handleMouseLeave, tiltRef } = useTilt()
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     async function fetchFeaturedProducts() {
@@ -31,7 +36,7 @@ export default function FeaturedProducts() {
         if (error) throw error
         setProducts(data || [])
       } catch (error) {
-        console.error("Error fetching featured products:", error)
+        // Silent error handling
       } finally {
         setLoading(false)
       }
@@ -39,6 +44,16 @@ export default function FeaturedProducts() {
 
     fetchFeaturedProducts()
   }, [])
+
+  const openProductModal = (product: Product) => {
+    setSelectedProduct(product)
+    setIsModalOpen(true)
+  }
+
+  const closeProductModal = () => {
+    setIsModalOpen(false)
+    setSelectedProduct(null)
+  }
 
   if (loading) {
     return (
@@ -61,35 +76,55 @@ export default function FeaturedProducts() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {products.map((product) => (
-        <div
-          key={product.id}
-          ref={tiltRef}
-          onMouseMove={handleMouseMove}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          className="bg-white/90 backdrop-blur-sm rounded-lg overflow-hidden transform-gpu transition-all duration-300 shadow-lg product-card border border-white/50"
-          style={{
-            transformStyle: "preserve-3d",
-            boxShadow: "0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <div className="h-48 overflow-hidden">
-            <img
-              src={product.image_url || "/placeholder.svg?height=200&width=300"}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-              style={{ transform: "translateZ(20px)" }}
-            />
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <div
+            key={product.id}
+            ref={tiltRef}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className="bg-white/90 backdrop-blur-sm rounded-lg overflow-hidden transform-gpu transition-all duration-300 shadow-lg product-card border border-white/50"
+            style={{
+              transformStyle: "preserve-3d",
+              boxShadow: "0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <div className="h-48 overflow-hidden">
+              <img
+                src={product.image_url || "/placeholder.svg?height=200&width=300"}
+                alt={product.name}
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                style={{ transform: "translateZ(20px)" }}
+              />
+            </div>
+            <div className="p-4" style={{ transform: "translateZ(30px)" }}>
+              {/* First line: Product name */}
+              <h2 className="text-xl font-semibold text-[#0e7490] line-clamp-1">{product.name}</h2>
+
+              {/* Second line: Short description (first sentence) */}
+              <p className="text-gray-700 text-sm mt-1 font-medium line-clamp-1">
+                {product.description.split(".")[0]}.
+              </p>
+
+              {/* Third line: Area for 3 lines of text with read more */}
+              <div className="mt-2 relative">
+                <p className="text-gray-700 text-sm font-medium line-clamp-3">{product.description}</p>
+                <button
+                  onClick={() => openProductModal(product)}
+                  className="mt-2 text-[#e76f51] hover:text-[#e76f51]/80 text-sm font-medium flex items-center"
+                >
+                  Read more <ChevronRight className="h-3 w-3 ml-1" />
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="p-4" style={{ transform: "translateZ(30px)" }}>
-            <h2 className="text-xl font-semibold mb-1 text-[#0e7490]">{product.name}</h2>
-            <p className="text-[#e76f51] font-bold mb-2">${product.price.toFixed(2)}</p>
-            <p className="text-gray-700 text-sm mb-4 font-medium">{product.description}</p>
-          </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      {/* Product Detail Modal */}
+      <ProductDetailModal product={selectedProduct} isOpen={isModalOpen} onClose={closeProductModal} />
+    </>
   )
 }

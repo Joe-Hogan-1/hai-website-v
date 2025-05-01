@@ -21,12 +21,16 @@ export default function CarouselVideoBanner({ position }: CarouselVideoBannerPro
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [nextIndex, setNextIndex] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [theaterMode, setTheaterMode] = useState(false)
   const [theaterVideoSrc, setTheaterVideoSrc] = useState<string | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
-  // Single video ref instead of two
-  const videoRef = useRef<HTMLVideoElement>(null)
+  // References for current and next video elements
+  const currentVideoRef = useRef<HTMLVideoElement>(null)
+  const nextVideoRef = useRef<HTMLVideoElement>(null)
+  const theaterVideoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     async function fetchVideos() {
@@ -75,47 +79,74 @@ export default function CarouselVideoBanner({ position }: CarouselVideoBannerPro
     }
   }, [position])
 
-  // Initialize video when it changes
+  // Initialize current video when it changes
   useEffect(() => {
-    if (videos.length > 0 && videoRef.current) {
-      videoRef.current.load()
-      videoRef.current.play().catch((err) => console.error("Error playing video:", err))
+    if (videos.length > 0 && currentVideoRef.current) {
+      currentVideoRef.current.load()
+      currentVideoRef.current.play().catch((err) => console.error("Error playing video:", err))
     }
   }, [videos, currentIndex])
 
-  // Function to go to the next video without fading
-  const goToNextVideo = useCallback(() => {
-    if (videos.length <= 1) return
+  // Play next video when transitioning
+  useEffect(() => {
+    if (isTransitioning && nextIndex !== null && videos.length > 0 && nextVideoRef.current) {
+      nextVideoRef.current.load()
+      nextVideoRef.current.play().catch((err) => console.error("Error playing next video:", err))
+    }
+  }, [isTransitioning, nextIndex, videos])
+
+  // Complete the transition after animation
+  useEffect(() => {
+    if (isTransitioning && nextIndex !== null) {
+      const timer = setTimeout(() => {
+        setCurrentIndex(nextIndex)
+        setNextIndex(null)
+        setIsTransitioning(false)
+      }, 800) // Match the CSS transition duration
+
+      return () => clearTimeout(timer)
+    }
+  }, [isTransitioning, nextIndex])
+
+  // Update the goToNextMedia function to implement crossfade
+  const goToNextMedia = useCallback(() => {
+    if (videos.length <= 1 || isTransitioning || nextIndex !== null) return
+
     const next = (currentIndex + 1) % videos.length
-    setCurrentIndex(next)
-  }, [currentIndex, videos.length])
+    setNextIndex(next)
+    setIsTransitioning(true)
+  }, [currentIndex, videos.length, isTransitioning, nextIndex])
 
-  // Function to go to the previous video without fading
-  const goToPrevVideo = useCallback(() => {
-    if (videos.length <= 1) return
+  // Update the goToPrevMedia function to implement crossfade
+  const goToPrevMedia = useCallback(() => {
+    if (videos.length <= 1 || isTransitioning || nextIndex !== null) return
+
     const prev = (currentIndex - 1 + videos.length) % videos.length
-    setCurrentIndex(prev)
-  }, [currentIndex, videos.length])
+    setNextIndex(prev)
+    setIsTransitioning(true)
+  }, [currentIndex, videos.length, isTransitioning, nextIndex])
 
-  // Function to go to a specific video
-  const goToVideo = useCallback(
+  // Update the goToMedia function to implement crossfade
+  const goToMedia = useCallback(
     (index: number) => {
-      if (index === currentIndex) return
-      setCurrentIndex(index)
+      if (index === currentIndex || isTransitioning || nextIndex !== null) return
+
+      setNextIndex(index)
+      setIsTransitioning(true)
     },
-    [currentIndex],
+    [currentIndex, isTransitioning, nextIndex],
   )
 
   // Auto-rotate videos
   useEffect(() => {
-    if (videos.length <= 1 || theaterMode) return
+    if (videos.length <= 1 || theaterMode || isTransitioning) return
 
     const rotationTimer = setInterval(() => {
-      goToNextVideo()
+      goToNextMedia()
     }, 4000) // Change video every 4 seconds
 
     return () => clearInterval(rotationTimer)
-  }, [videos.length, goToNextVideo, theaterMode])
+  }, [videos.length, goToNextMedia, theaterMode, isTransitioning])
 
   // Fallback videos in case no videos are found in the database
   function getFallbackVideos(): Video[] {
@@ -136,8 +167,8 @@ export default function CarouselVideoBanner({ position }: CarouselVideoBannerPro
     setTheaterVideoSrc(videoUrl)
 
     // Pause the current video to avoid having two videos playing at once
-    if (videoRef.current) {
-      videoRef.current.pause()
+    if (currentVideoRef.current) {
+      currentVideoRef.current.pause()
     }
 
     // Add the class after a small delay to avoid jittering
@@ -157,8 +188,8 @@ export default function CarouselVideoBanner({ position }: CarouselVideoBannerPro
       setTheaterVideoSrc(null)
 
       // Resume the current video if it was playing before
-      if (videoRef.current) {
-        videoRef.current.play().catch((err) => console.error("Error resuming video:", err))
+      if (currentVideoRef.current) {
+        currentVideoRef.current.play().catch((err) => console.error("Error resuming video:", err))
       }
     }, 10)
   }
@@ -180,36 +211,72 @@ export default function CarouselVideoBanner({ position }: CarouselVideoBannerPro
   }
 
   const currentVideo = videos[currentIndex]
+  const nextVideo = nextIndex !== null ? videos[nextIndex] : null
 
   return (
     <div className="relative h-full w-full carousel-video-banner">
-      {/* Current Video */}
+      {/* Media Container */}
       <div
         className="absolute inset-0 bg-black/20 backdrop-blur-sm rounded-lg overflow-hidden"
-        onClick={() => openTheaterMode(currentVideo.video_url)}
+        onClick={() => !isTransitioning && openTheaterMode(currentVideo.video_url)}
       >
-        <video
-          ref={videoRef}
-          src={currentVideo.video_url}
-          className="w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          onClick={(e) => {
-            e.stopPropagation() // Prevent double firing
-            openTheaterMode(currentVideo.video_url)
-          }}
-        />
+        <div className="media-container">
+          {/* Current Video */}
+          <div className={`media-item ${isTransitioning ? "fade-out" : "active"}`}>
+            <video
+              ref={currentVideoRef}
+              src={currentVideo.video_url}
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          </div>
+
+          {/* Next Video (only shown during transition) */}
+          {isTransitioning && nextVideo && (
+            <div className={`media-item ${isTransitioning ? "fade-in" : "inactive"}`}>
+              <video
+                ref={nextVideoRef}
+                src={nextVideo.video_url}
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Content overlay */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/70 to-transparent pointer-events-none">
+      {/* Content overlay for current video */}
+      <div
+        className={`absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/70 to-transparent pointer-events-none content-overlay ${
+          isTransitioning ? "opacity-0" : "opacity-100"
+        }`}
+      >
         <div>
           <h2 className="text-2xl md:text-3xl font-semibold text-white mb-2">{currentVideo.title}</h2>
           <p className="text-white/90 mb-4">{currentVideo.description}</p>
         </div>
       </div>
+
+      {/* Content overlay for next video (only shown during transition) */}
+      {isTransitioning && nextVideo && (
+        <div
+          className={`absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/70 to-transparent pointer-events-none content-overlay ${
+            isTransitioning ? "opacity-100" : "opacity-0"
+          }`}
+          style={{ transitionDelay: "200ms" }} // Slight delay for text to follow the video
+        >
+          <div>
+            <h2 className="text-2xl md:text-3xl font-semibold text-white mb-2">{nextVideo.title}</h2>
+            <p className="text-white/90 mb-4">{nextVideo.description}</p>
+          </div>
+        </div>
+      )}
 
       {/* Navigation buttons */}
       {videos.length > 1 && (
@@ -217,20 +284,22 @@ export default function CarouselVideoBanner({ position }: CarouselVideoBannerPro
           <button
             onClick={(e) => {
               e.stopPropagation() // Prevent opening theater mode
-              goToPrevVideo()
+              goToPrevMedia()
             }}
             className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors carousel-nav-button pointer-events-auto"
             aria-label="Previous video"
+            disabled={isTransitioning}
           >
             <ChevronLeft size={24} />
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation() // Prevent opening theater mode
-              goToNextVideo()
+              goToNextMedia()
             }}
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors carousel-nav-button pointer-events-auto"
             aria-label="Next video"
+            disabled={isTransitioning}
           >
             <ChevronRight size={24} />
           </button>
@@ -245,12 +314,13 @@ export default function CarouselVideoBanner({ position }: CarouselVideoBannerPro
               key={index}
               onClick={(e) => {
                 e.stopPropagation() // Prevent opening theater mode
-                goToVideo(index)
+                goToMedia(index)
               }}
               className={`w-3 h-3 rounded-full transition-colors ${
                 index === currentIndex ? "bg-white" : "bg-white/50 hover:bg-white/70"
               }`}
               aria-label={`Go to video ${index + 1}`}
+              disabled={isTransitioning}
             />
           ))}
         </div>
@@ -272,6 +342,7 @@ export default function CarouselVideoBanner({ position }: CarouselVideoBannerPro
               <X size={24} />
             </button>
             <video
+              ref={theaterVideoRef}
               src={theaterVideoSrc}
               className="w-full rounded-lg"
               controls

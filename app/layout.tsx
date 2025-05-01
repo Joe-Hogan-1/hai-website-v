@@ -8,6 +8,7 @@ import { Toaster } from "sonner"
 import { BreakingNewsProvider } from "@/contexts/breaking-news-context"
 import WhiteBackground from "@/components/white-background"
 import { FontLoader } from "@/components/font-loader"
+import PageTransition from "@/components/page-transition"
 
 // Import client components normally - they'll be rendered on the client
 import ClientComponents from "@/components/client-components"
@@ -38,7 +39,9 @@ export default function RootLayout({
           <BreakingNewsProvider>
             <ScrollToTop />
             <ClientComponents />
-            <main className="flex-grow">{children}</main>
+            <main className="flex-grow">
+              <PageTransition>{children}</PageTransition>
+            </main>
             <Footer />
             <Toaster position="top-right" />
           </BreakingNewsProvider>

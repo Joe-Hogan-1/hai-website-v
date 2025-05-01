@@ -2,22 +2,25 @@
 
 import { useState, useEffect } from "react"
 import { supabase } from "@/utils/supabase"
-import { PlusCircle, Edit, Trash2, Save, X, DollarSign, Star } from "lucide-react"
+import { PlusCircle, Edit, Trash2, Save, X, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import ImageUploader from "./image-uploader"
+import { Badge } from "@/components/ui/badge"
 
 interface Product {
   id: string
   name: string
   description: string
-  price: number
   image_url: string
   featured: boolean
+  category?: "Indica" | "Sativa" | "Hybrid" | null
+  product_category?: string | null
   created_at: string
   user_id: string
 }
@@ -33,12 +36,14 @@ export default function ProductManager({ userId }: ProductManagerProps) {
   const [currentProduct, setCurrentProduct] = useState<Partial<Product>>({
     name: "",
     description: "",
-    price: 0,
     image_url: "",
     featured: false,
+    category: null,
+    product_category: null,
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [filterCategory, setFilterCategory] = useState<string | null>(null)
 
   useEffect(() => {
     fetchProducts()
@@ -62,9 +67,10 @@ export default function ProductManager({ userId }: ProductManagerProps) {
     setCurrentProduct({
       name: "",
       description: "",
-      price: 0,
       image_url: "",
       featured: false,
+      category: null,
+      product_category: null,
     })
     setImageFile(null)
     setIsEditing(true)
@@ -81,9 +87,10 @@ export default function ProductManager({ userId }: ProductManagerProps) {
     setCurrentProduct({
       name: "",
       description: "",
-      price: 0,
       image_url: "",
       featured: false,
+      category: null,
+      product_category: null,
     })
     setImageFile(null)
   }
@@ -139,8 +146,8 @@ export default function ProductManager({ userId }: ProductManagerProps) {
 
   const handleSave = async () => {
     try {
-      if (!currentProduct.name || currentProduct.price === undefined) {
-        toast.error("Name and price are required")
+      if (!currentProduct.name) {
+        toast.error("Name is required")
         return
       }
 
@@ -174,9 +181,10 @@ export default function ProductManager({ userId }: ProductManagerProps) {
           .update({
             name: currentProduct.name,
             description: currentProduct.description,
-            price: currentProduct.price,
             image_url: imageUrl,
             featured: currentProduct.featured,
+            category: currentProduct.category,
+            product_category: currentProduct.product_category,
             updated_at: new Date().toISOString(),
           })
           .eq("id", currentProduct.id)
@@ -191,9 +199,10 @@ export default function ProductManager({ userId }: ProductManagerProps) {
         const { error } = await supabase.from("products").insert({
           name: currentProduct.name,
           description: currentProduct.description,
-          price: currentProduct.price,
           image_url: imageUrl,
           featured: currentProduct.featured || false,
+          category: currentProduct.category,
+          product_category: currentProduct.product_category,
           user_id: userId,
         })
 
@@ -208,9 +217,10 @@ export default function ProductManager({ userId }: ProductManagerProps) {
       setCurrentProduct({
         name: "",
         description: "",
-        price: 0,
         image_url: "",
         featured: false,
+        category: null,
+        product_category: null,
       })
       setImageFile(null)
     } catch (error) {
@@ -222,12 +232,51 @@ export default function ProductManager({ userId }: ProductManagerProps) {
     }
   }
 
+  // Helper function to get category badge color
+  const getCategoryColor = (category: string | null | undefined) => {
+    switch (category) {
+      case "Indica":
+        return "bg-purple-500 text-white"
+      case "Sativa":
+        return "bg-white text-black border border-gray-300"
+      case "Hybrid":
+        return "bg-yellow-400 text-black"
+      default:
+        return "bg-gray-200 text-gray-700"
+    }
+  }
+
+  // Helper function to get product category badge color
+  const getProductCategoryColor = (category: string | null | undefined) => {
+    switch (category) {
+      case "Flower":
+        return "bg-green-500 text-white"
+      case "Pre-Rolls":
+        return "bg-orange-500 text-white"
+      case "Edibles":
+        return "bg-pink-500 text-white"
+      case "Merch":
+        return "bg-blue-500 text-white"
+      case "Concentrates":
+        return "bg-purple-500 text-white"
+      case "Vapes":
+        return "bg-teal-500 text-white"
+      default:
+        return "bg-gray-200 text-gray-700"
+    }
+  }
+
+  // Filter products by category
+  const filteredProducts = filterCategory
+    ? products.filter((product) => product.product_category === filterCategory)
+    : products
+
   if (loading) {
     return <div className="text-center py-8">Loading products...</div>
   }
 
   return (
-    <div>
+    <div className="admin-panel">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">Products</h2>
         {!isEditing && (
@@ -272,24 +321,63 @@ export default function ProductManager({ userId }: ProductManagerProps) {
               />
             </div>
 
-            <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-                Price ($)
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <DollarSign className="h-4 w-4 text-gray-400" />
-                </div>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={currentProduct.price || ""}
-                  onChange={(e) => setCurrentProduct({ ...currentProduct, price: Number.parseFloat(e.target.value) })}
-                  placeholder="0.00"
-                  className="pl-10"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                  Strain Type
+                </label>
+                <Select
+                  value={currentProduct.category || ""}
+                  onValueChange={(value) =>
+                    setCurrentProduct({
+                      ...currentProduct,
+                      category: value as "Indica" | "Sativa" | "Hybrid" | null,
+                    })
+                  }
+                >
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder="Select a strain type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Indica">Indica</SelectItem>
+                    <SelectItem value="Sativa">Sativa</SelectItem>
+                    <SelectItem value="Hybrid">Hybrid</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label htmlFor="product_category" className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Category
+                </label>
+                <Select
+                  value={currentProduct.product_category || ""}
+                  onValueChange={(value) =>
+                    setCurrentProduct({
+                      ...currentProduct,
+                      product_category: value as
+                        | "Flower"
+                        | "Pre-Rolls"
+                        | "Edibles"
+                        | "Merch"
+                        | "Concentrates"
+                        | "Vapes"
+                        | null,
+                    })
+                  }
+                >
+                  <SelectTrigger id="product_category">
+                    <SelectValue placeholder="Select a product category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Flower">Flower</SelectItem>
+                    <SelectItem value="Pre-Rolls">Pre-Rolls</SelectItem>
+                    <SelectItem value="Edibles">Edibles</SelectItem>
+                    <SelectItem value="Merch">Merch</SelectItem>
+                    <SelectItem value="Concentrates">Concentrates</SelectItem>
+                    <SelectItem value="Vapes">Vapes</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -331,57 +419,101 @@ export default function ProductManager({ userId }: ProductManagerProps) {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <Card key={product.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="relative h-48">
-                      <img
-                        src={product.image_url || "/placeholder.svg?height=200&width=300"}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                      {product.featured && (
-                        <div className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full flex items-center">
-                          <Star className="h-3 w-3 mr-1" /> Featured
+            <>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Category</label>
+                <div className="flex flex-wrap gap-2">
+                  <Badge
+                    className={`cursor-pointer ${!filterCategory ? "bg-[#ffd6c0]" : "bg-gray-200 hover:bg-gray-300"}`}
+                    onClick={() => setFilterCategory(null)}
+                  >
+                    All
+                  </Badge>
+                  {["Flower", "Pre-Rolls", "Edibles", "Merch", "Concentrates", "Vapes"].map((category) => (
+                    <Badge
+                      key={category}
+                      className={`cursor-pointer ${
+                        filterCategory === category
+                          ? getProductCategoryColor(category)
+                          : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                      }`}
+                      onClick={() => setFilterCategory(category)}
+                    >
+                      {category}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <Card key={product.id} className="overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="relative h-48">
+                        <img
+                          src={product.image_url || "/placeholder.svg?height=200&width=300"}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                        {product.featured && (
+                          <div className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full flex items-center">
+                            <Star className="h-3 w-3 mr-1" /> Featured
+                          </div>
+                        )}
+                        <div className="absolute top-2 left-2 flex flex-col gap-1">
+                          {product.category && (
+                            <div
+                              className={`${getCategoryColor(product.category)} text-xs font-bold px-2 py-1 rounded-full`}
+                            >
+                              {product.category}
+                            </div>
+                          )}
+                          {product.product_category && (
+                            <div
+                              className={`${getProductCategoryColor(
+                                product.product_category,
+                              )} text-xs font-bold px-2 py-1 rounded-full`}
+                            >
+                              {product.product_category}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-lg font-semibold">{product.name}</h3>
-                        <span className="font-medium text-[#ffd6c0]">${product.price.toFixed(2)}</span>
                       </div>
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
-                      <div className="flex justify-between items-center">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className={product.featured ? "text-yellow-600" : "text-gray-500"}
-                          onClick={() => handleToggleFeatured(product)}
-                        >
-                          <Star className={`h-4 w-4 mr-1 ${product.featured ? "fill-yellow-400" : ""}`} />
-                          {product.featured ? "Featured" : "Feature"}
-                        </Button>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>
-                            <Edit className="h-4 w-4 mr-1" /> Edit
-                          </Button>
+                      <div className="p-4">
+                        <div className="mb-2">
+                          <h3 className="text-lg font-semibold">{product.name}</h3>
+                        </div>
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+                        <div className="flex justify-between items-center">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-red-500 hover:text-red-700"
-                            onClick={() => handleDelete(product.id)}
+                            className={product.featured ? "text-yellow-600" : "text-gray-500"}
+                            onClick={() => handleToggleFeatured(product)}
                           >
-                            <Trash2 className="h-4 w-4 mr-1" /> Delete
+                            <Star className={`h-4 w-4 mr-1 ${product.featured ? "fill-yellow-400" : ""}`} />
+                            {product.featured ? "Featured" : "Feature"}
                           </Button>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>
+                              <Edit className="h-4 w-4 mr-1" /> Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => handleDelete(product.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" /> Delete
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </>
           )}
         </>
       )}
