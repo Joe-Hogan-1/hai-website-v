@@ -13,6 +13,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Add momentum-based scrolling for iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Update these styles to remove extra white space above header */
@@ -1056,16 +1058,6 @@ body:not(.has-breaking-news) header {
 .video-banner-section {
   height: 60vh;
   min-height: 300px;
-}
-
-/* Improve section spacing */
-.welcome-section {
-  margin-bottom: 15vh;
-}
-
-.products-section {
-  padding-top: 20vh;
-  padding-bottom: 10vh;
 }
 
 /* Enhanced header animation and effects */
@@ -2684,4 +2676,94 @@ h1.scroll-animation-title.animate .letter {
 
 .blur-up.loaded {
   filter: blur(0);
+}
+
+/* Add these styles to the end of your globals.css file */
+
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+  /* Add momentum-based scrolling for iOS */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimize animations during scrolling */
+body.is-scrolling .scroll-animation,
+body.is-scrolling .fade-in-element,
+body.is-scrolling .stagger-reveal > *,
+body.is-scrolling .media-card,
+body.is-scrolling .river-container {
+  transition: none !important;
+  animation-play-state: paused !important;
+}
+
+/* Optimize performance for fixed elements */
+header,
+.breaking-news-bar {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Optimize animations with hardware acceleration */
+.scroll-animation,
+.fade-in-element,
+.stagger-reveal > *,
+.media-card,
+.river-container,
+.product-card,
+.button-hover {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Optimize scroll animations */
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-animation {
+    transition: opacity var(--scroll-duration, 800ms) var(--scroll-easing, cubic-bezier(0.23, 1, 0.32, 1)), transform
+      var(--scroll-duration, 800ms) var(--scroll-easing, cubic-bezier(0.23, 1, 0.32, 1));
+  }
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Optimize scrollbar appearance */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 214, 192, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 214, 192, 0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(255, 214, 192, 0.1);
 }

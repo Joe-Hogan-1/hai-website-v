@@ -9,6 +9,7 @@ import { BreakingNewsProvider } from "@/contexts/breaking-news-context"
 import WhiteBackground from "@/components/white-background"
 import { FontLoader } from "@/components/font-loader"
 import PageTransition from "@/components/page-transition"
+import ScrollOptimizer from "@/components/scroll-optimizer"
 
 // Import client components normally - they'll be rendered on the client
 import ClientComponents from "@/components/client-components"
@@ -38,6 +39,7 @@ export default function RootLayout({
         <AuthProvider>
           <BreakingNewsProvider>
             <ScrollToTop />
+            <ScrollOptimizer />
             <ClientComponents />
             <main className="flex-grow">
               <PageTransition>{children}</PageTransition>
