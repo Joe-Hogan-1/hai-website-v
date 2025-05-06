@@ -103,7 +103,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
             <div className="pt-4 pb-2 border-t border-gray-200">
               <button
                 onClick={onClose}
-                className="w-full py-2 px-4 bg-[#ffd6c0] hover:bg-[#ffcbb0] text-white rounded-md transition-colors"
+                className="w-full py-2 px-4 bg-black hover:bg-gray-800 text-white rounded-md transition-colors"
               >
                 Close
               </button>

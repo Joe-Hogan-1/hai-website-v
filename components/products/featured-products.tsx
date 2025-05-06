@@ -85,7 +85,7 @@ export default function FeaturedProducts() {
             onMouseMove={handleMouseMove}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className="bg-white/90 backdrop-blur-sm rounded-lg overflow-hidden transform-gpu transition-all duration-300 shadow-lg product-card border border-white/50"
+            className="bg-white rounded-lg overflow-hidden transform-gpu transition-all duration-300 shadow-lg product-card border border-gray-200"
             style={{
               transformStyle: "preserve-3d",
               boxShadow: "0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1)",
@@ -101,7 +101,7 @@ export default function FeaturedProducts() {
             </div>
             <div className="p-4" style={{ transform: "translateZ(30px)" }}>
               {/* First line: Product name */}
-              <h2 className="text-xl font-semibold text-[#0e7490] line-clamp-1">{product.name}</h2>
+              <h2 className="text-xl font-semibold text-black line-clamp-1">{product.name}</h2>
 
               {/* Second line: Short description (first sentence) */}
               <p className="text-gray-700 text-sm mt-1 font-medium line-clamp-1">
@@ -113,7 +113,7 @@ export default function FeaturedProducts() {
                 <p className="text-gray-700 text-sm font-medium line-clamp-3">{product.description}</p>
                 <button
                   onClick={() => openProductModal(product)}
-                  className="mt-2 text-[#e76f51] hover:text-[#e76f51]/80 text-sm font-medium flex items-center"
+                  className="mt-2 text-black hover:text-gray-700 text-sm font-medium flex items-center"
                 >
                   Read more <ChevronRight className="h-3 w-3 ml-1" />
                 </button>
