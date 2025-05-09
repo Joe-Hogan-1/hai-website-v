@@ -2,8 +2,18 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/utils/supabase"
-import DispensaryMap from "@/components/dispensary-map"
+import dynamic from "next/dynamic"
 import DispensaryList from "@/components/dispensary-list"
+
+// Dynamically import the map component with no SSR
+const DispensaryMap = dynamic(() => import("@/components/dispensary-map"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[600px] w-full flex items-center justify-center bg-gray-100 rounded-lg">
+      <div className="text-2xl font-bold text-gray-400">Loading Map...</div>
+    </div>
+  ),
+})
 
 // Define the Dispensary type
 interface Dispensary {
