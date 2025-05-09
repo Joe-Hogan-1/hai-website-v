@@ -76,39 +76,59 @@ self.addEventListener("sync", (event) => {
 
 // Function to sync stored forms
 async function syncForms() {
-  const cache = await caches.open("form-submissions")
-  const requests = await cache.keys()
+  try {
+    const cache = await caches.open("form-submissions")
+    const requests = await cache.keys()
 
-  for (const request of requests) {
-    if (request.url.includes("offline-submission")) {
-      const response = await cache.match(request)
-      const submission = await response.json()
+    for (const request of requests) {
+      if (request.url.includes("offline-submission")) {
+        try {
+          const response = await cache.match(request)
+          if (!response) {
+            console.warn("No response found for request:", request.url)
+            continue
+          }
 
-      // Create a new FormData object
-      const formData = new FormData()
-      for (const [key, value] of Object.entries(submission.formData)) {
-        formData.append(key, value)
-      }
+          let submission
+          try {
+            submission = await response.json()
+          } catch (jsonError) {
+            console.error("Error parsing JSON from cache:", jsonError, "Request URL:", request.url)
+            await cache.delete(request) // Delete unparseable entry
+            continue
+          }
 
-      // Try to submit the form
-      try {
-        const headers = new Headers()
-        submission.headers.forEach(([key, value]) => {
-          headers.append(key, value)
-        })
+          // Create a new FormData object
+          const formData = new FormData()
+          for (const [key, value] of Object.entries(submission.formData)) {
+            formData.append(key, value)
+          }
 
-        await fetch(submission.url, {
-          method: submission.method,
-          body: formData,
-          headers,
-        })
+          // Try to submit the form
+          try {
+            const headers = new Headers()
+            submission.headers.forEach(([key, value]) => {
+              headers.append(key, value)
+            })
 
-        // If successful, remove from cache
-        await cache.delete(request)
-      } catch (error) {
-        // If still offline, keep in cache
-        console.error("Failed to sync form:", error)
+            await fetch(submission.url, {
+              method: submission.method,
+              body: formData,
+              headers,
+            })
+
+            // If successful, remove from cache
+            await cache.delete(request)
+          } catch (error) {
+            // If still offline, keep in cache
+            console.error("Failed to sync form:", error)
+          }
+        } catch (innerError) {
+          console.error("Error processing request:", request.url, innerError)
+        }
       }
     }
+  } catch (outerError) {
+    console.error("Error in syncForms:", outerError)
   }
 }

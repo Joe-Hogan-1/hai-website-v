@@ -1,4 +1,51 @@
-"\"use server"
+"\"use client"
+
+import { useCallback, useEffect, useState } from "react"
+
+interface ReCAPTCHAProps {
+  siteKey: string
+  onChange: (token: string) => void
+}
+
+export const ReCAPTCHA = ({ siteKey, onChange }: ReCAPTCHAProps) => {
+  const [scriptLoaded, setScriptLoaded] = useState(false)
+
+  const handleVerify = useCallback(() => {
+    if (window.grecaptcha && typeof window.grecaptcha.execute === "function") {
+      window.grecaptcha
+        .execute(siteKey, { action: "submit" })
+        .then((token: string) => {
+          onChange(token)
+        })
+        .catch((error: any) => {
+          console.error("reCAPTCHA error:", error)
+        })
+    }
+  }, [onChange, siteKey])
+
+  useEffect(() => {
+    const script = document.createElement("script")
+    script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`
+    script.async = true
+    script.defer = true
+    script.onload = () => setScriptLoaded(true)
+    script.onerror = () => console.error("reCAPTCHA script failed to load")
+
+    document.head.appendChild(script)
+
+    return () => {
+      document.head.removeChild(script)
+    }
+  }, [siteKey])
+
+  useEffect(() => {
+    if (scriptLoaded) {
+      handleVerify()
+    }
+  }, [scriptLoaded, handleVerify])
+
+  return null
+}
 
 export async function verifyRecaptchaToken(token: string): Promise<boolean> {
   if (!token) return false
