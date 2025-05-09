@@ -2,7 +2,7 @@
 
 export async function verifyRecaptchaToken(token: string): Promise<boolean> {
   // If it's a development token, always return true
-  if (token.startsWith("dev-mode-fake-token-")) {
+  if (token && token.startsWith("dev-mode-fake-token-")) {
     console.warn("Using development mode reCAPTCHA verification")
     return true
   }

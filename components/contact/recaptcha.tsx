@@ -1,6 +1,16 @@
-"\"use client"
+"use client"
 
 import { useCallback, useEffect, useState } from "react"
+
+// Add TypeScript declarations for global reCAPTCHA
+declare global {
+  interface Window {
+    grecaptcha: {
+      ready: (callback: () => void) => void
+      execute: (siteKey: string, options: { action: string }) => Promise<string>
+    }
+  }
+}
 
 interface ReCAPTCHAProps {
   siteKey: string
@@ -72,5 +82,3 @@ export async function verifyRecaptchaToken(token: string): Promise<boolean> {
     return false
   }
 }
-\
-"
