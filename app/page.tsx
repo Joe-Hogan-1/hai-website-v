@@ -61,7 +61,7 @@ export default function HomePage() {
                       </p>
                       <Link
                         href="/products"
-                        className="inline-flex px-6 py-3 bg-[#ffd6c0] text-white rounded-md border border-white/20 hover:bg-[#ffd6c0]/90 transition-colors font-medium"
+                        className="inline-flex px-6 py-3 bg-black text-white rounded-md border border-white/20 hover:bg-gray-800 transition-colors font-medium"
                       >
                         explore products
                       </Link>

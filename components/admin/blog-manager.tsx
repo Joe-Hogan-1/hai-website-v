@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { supabase } from "@/utils/supabase"
-import { PlusCircle, Edit, Trash2, Save, X } from "lucide-react"
+import { PlusCircle, Edit, Trash2, Save, X, Eye, EyeOff, Star, StarOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import ImageUploader from "./image-uploader"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface BlogPost {
   id: string
@@ -16,7 +18,12 @@ interface BlogPost {
   summary: string
   content: string
   image_url: string
+  slug: string
+  published: boolean
+  featured: boolean
+  view_count: number
   created_at: string
+  updated_at: string
   user_id: string
 }
 
@@ -33,9 +40,13 @@ export default function BlogManager({ userId }: BlogManagerProps) {
     summary: "",
     content: "",
     image_url: "",
+    slug: "",
+    published: false,
+    featured: false,
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [activeTab, setActiveTab] = useState("all")
 
   useEffect(() => {
     fetchBlogPosts()
@@ -49,7 +60,8 @@ export default function BlogManager({ userId }: BlogManagerProps) {
       if (error) throw error
       setBlogPosts(data || [])
     } catch (error) {
-      // Error fetching blog posts
+      console.error("Error fetching blog posts:", error)
+      toast.error("Failed to load blog posts")
     } finally {
       setLoading(false)
     }
@@ -61,6 +73,9 @@ export default function BlogManager({ userId }: BlogManagerProps) {
       summary: "",
       content: "",
       image_url: "",
+      slug: "",
+      published: false,
+      featured: false,
     })
     setImageFile(null)
     setIsEditing(true)
@@ -79,6 +94,9 @@ export default function BlogManager({ userId }: BlogManagerProps) {
       summary: "",
       content: "",
       image_url: "",
+      slug: "",
+      published: false,
+      featured: false,
     })
     setImageFile(null)
   }
@@ -106,7 +124,36 @@ export default function BlogManager({ userId }: BlogManagerProps) {
       toast.success("Blog post deleted successfully")
       fetchBlogPosts()
     } catch (error) {
+      console.error("Error deleting blog post:", error)
       toast.error("Failed to delete blog post")
+    }
+  }
+
+  const handleTogglePublish = async (blog: BlogPost) => {
+    try {
+      const { error } = await supabase.from("blog_posts").update({ published: !blog.published }).eq("id", blog.id)
+
+      if (error) throw error
+
+      toast.success(`Blog post ${!blog.published ? "published" : "unpublished"} successfully`)
+      fetchBlogPosts()
+    } catch (error) {
+      console.error("Error toggling publish status:", error)
+      toast.error("Failed to update publish status")
+    }
+  }
+
+  const handleToggleFeatured = async (blog: BlogPost) => {
+    try {
+      const { error } = await supabase.from("blog_posts").update({ featured: !blog.featured }).eq("id", blog.id)
+
+      if (error) throw error
+
+      toast.success(`Blog post ${!blog.featured ? "featured" : "unfeatured"} successfully`)
+      fetchBlogPosts()
+    } catch (error) {
+      console.error("Error toggling featured status:", error)
+      toast.error("Failed to update featured status")
     }
   }
 
@@ -149,6 +196,9 @@ export default function BlogManager({ userId }: BlogManagerProps) {
             summary: currentBlog.summary,
             content: currentBlog.content,
             image_url: imageUrl,
+            slug: currentBlog.slug,
+            published: currentBlog.published,
+            featured: currentBlog.featured,
             updated_at: new Date().toISOString(),
           })
           .eq("id", currentBlog.id)
@@ -167,6 +217,9 @@ export default function BlogManager({ userId }: BlogManagerProps) {
             summary: currentBlog.summary,
             content: currentBlog.content,
             image_url: imageUrl,
+            slug: currentBlog.slug,
+            published: currentBlog.published,
+            featured: currentBlog.featured,
             user_id: userId,
           })
           .select()
@@ -184,16 +237,31 @@ export default function BlogManager({ userId }: BlogManagerProps) {
         summary: "",
         content: "",
         image_url: "",
+        slug: "",
+        published: false,
+        featured: false,
       })
       setImageFile(null)
     } catch (error) {
       if (error instanceof Error) {
+        console.error("Error saving blog post:", error)
         toast.error(`Failed to save blog post: ${error.message}`)
       } else {
         toast.error("Failed to save blog post")
       }
     }
   }
+
+  const filteredPosts =
+    activeTab === "all"
+      ? blogPosts
+      : activeTab === "published"
+        ? blogPosts.filter((post) => post.published)
+        : activeTab === "draft"
+          ? blogPosts.filter((post) => !post.published)
+          : activeTab === "featured"
+            ? blogPosts.filter((post) => post.featured)
+            : blogPosts
 
   if (loading) {
     return <div className="text-center py-8">Loading blog posts...</div>
@@ -220,16 +288,31 @@ export default function BlogManager({ userId }: BlogManagerProps) {
           </div>
 
           <div className="space-y-6">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Title
-              </label>
-              <Input
-                id="title"
-                value={currentBlog.title || ""}
-                onChange={(e) => setCurrentBlog({ ...currentBlog, title: e.target.value })}
-                placeholder="Enter blog title"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                  Title *
+                </label>
+                <Input
+                  id="title"
+                  value={currentBlog.title || ""}
+                  onChange={(e) => setCurrentBlog({ ...currentBlog, title: e.target.value })}
+                  placeholder="Enter blog title"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+                  Slug (optional)
+                </label>
+                <Input
+                  id="slug"
+                  value={currentBlog.slug || ""}
+                  onChange={(e) => setCurrentBlog({ ...currentBlog, slug: e.target.value })}
+                  placeholder="Enter URL slug (or leave blank to generate from title)"
+                />
+              </div>
             </div>
 
             <div>
@@ -246,7 +329,7 @@ export default function BlogManager({ userId }: BlogManagerProps) {
 
             <div>
               <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-                Content
+                Content *
               </label>
               <Textarea
                 id="content"
@@ -254,6 +337,7 @@ export default function BlogManager({ userId }: BlogManagerProps) {
                 onChange={(e) => setCurrentBlog({ ...currentBlog, content: e.target.value })}
                 placeholder="Write your blog content here..."
                 className="min-h-[250px]"
+                required
               />
             </div>
 
@@ -264,6 +348,38 @@ export default function BlogManager({ userId }: BlogManagerProps) {
                 onImageSelected={setImageFile}
                 uploadProgress={uploadProgress}
               />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <Checkbox
+                    id="published"
+                    checked={currentBlog.published || false}
+                    onCheckedChange={(checked) => setCurrentBlog({ ...currentBlog, published: checked as boolean })}
+                  />
+                  <label
+                    htmlFor="published"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Published
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="featured"
+                    checked={currentBlog.featured || false}
+                    onCheckedChange={(checked) => setCurrentBlog({ ...currentBlog, featured: checked as boolean })}
+                  />
+                  <label
+                    htmlFor="featured"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Featured
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div className="flex justify-end pt-4">
@@ -283,46 +399,87 @@ export default function BlogManager({ userId }: BlogManagerProps) {
               </Button>
             </div>
           ) : (
-            <div className="space-y-6">
-              {blogPosts.map((blog) => (
-                <Card key={blog.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="flex flex-col md:flex-row">
-                      {blog.image_url && (
-                        <div className="w-full md:w-1/4 h-48 md:h-auto">
-                          <img
-                            src={blog.image_url || "/placeholder.svg"}
-                            alt={blog.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
-                      <div className="p-6 flex-1">
-                        <h3 className="text-xl font-semibold mb-2">{blog.title}</h3>
-                        <p className="text-gray-600 mb-4">{blog.summary}</p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-500">
-                            {new Date(blog.created_at).toLocaleDateString()}
-                          </span>
-                          <div className="space-x-2">
-                            <Button variant="outline" size="sm" onClick={() => handleEdit(blog)}>
-                              <Edit className="h-4 w-4 mr-1" /> Edit
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-red-500 hover:text-red-700"
-                              onClick={() => handleDelete(blog.id)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-1" /> Delete
-                            </Button>
+            <div>
+              <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
+                <TabsList>
+                  <TabsTrigger value="all">All Posts ({blogPosts.length})</TabsTrigger>
+                  <TabsTrigger value="published">Published ({blogPosts.filter((p) => p.published).length})</TabsTrigger>
+                  <TabsTrigger value="draft">Drafts ({blogPosts.filter((p) => !p.published).length})</TabsTrigger>
+                  <TabsTrigger value="featured">Featured ({blogPosts.filter((p) => p.featured).length})</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              <div className="space-y-6">
+                {filteredPosts.map((blog) => (
+                  <Card key={blog.id} className="overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="flex flex-col md:flex-row">
+                        {blog.image_url && (
+                          <div className="w-full md:w-1/4 h-48 md:h-auto">
+                            <img
+                              src={blog.image_url || "/placeholder.svg"}
+                              alt={blog.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="p-6 flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="text-xl font-semibold">{blog.title}</h3>
+                            <div className="flex space-x-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleTogglePublish(blog)}
+                                title={blog.published ? "Unpublish" : "Publish"}
+                              >
+                                {blog.published ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleToggleFeatured(blog)}
+                                title={blog.featured ? "Remove from featured" : "Add to featured"}
+                              >
+                                {blog.featured ? (
+                                  <Star className="h-4 w-4 text-yellow-500" />
+                                ) : (
+                                  <StarOff className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                          <p className="text-gray-600 mb-4">{blog.summary}</p>
+
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="text-sm text-gray-500 mr-4">
+                                {new Date(blog.created_at).toLocaleDateString()}
+                              </span>
+                              {blog.view_count > 0 && (
+                                <span className="text-sm text-gray-500">{blog.view_count} views</span>
+                              )}
+                            </div>
+                            <div className="space-x-2">
+                              <Button variant="outline" size="sm" onClick={() => handleEdit(blog)}>
+                                <Edit className="h-4 w-4 mr-1" /> Edit
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-red-500 hover:text-red-700"
+                                onClick={() => handleDelete(blog.id)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-1" /> Delete
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           )}
         </>

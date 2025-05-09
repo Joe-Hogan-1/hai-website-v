@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Logo from "./logo"
 import { useAuth } from "@/contexts/auth-context"
-import { User, Map, Menu, X } from "lucide-react"
+import { User, Menu, X } from "lucide-react"
 import { useBreakingNews } from "@/contexts/breaking-news-context"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
@@ -34,21 +34,21 @@ export default function Header() {
       transition: { duration: 0.3, ease: "easeInOut" },
     },
     hidden: {
-      y: 0, // Changed from -100 to 0 to keep it visible
-      opacity: 1, // Changed from 0 to 1 to keep it visible
+      y: 0,
+      opacity: 1,
       transition: { duration: 0.3, ease: "easeInOut" },
     },
   }
 
   return (
     <motion.header
-      className={`px-8 bg-[#ffd6c0] shadow-sm fixed left-0 right-0 z-50 h-24 flex items-center ${hasBreakingNews ? "top-8" : "top-0"}`}
+      className={`px-4 bg-[#ffd6c0] shadow-sm fixed left-0 right-0 z-50 h-16 flex items-center ${hasBreakingNews ? "top-[32px]" : "top-0"}`}
       variants={headerVariants}
-      animate="visible" // Always visible regardless of scroll position
+      animate="visible"
       initial="visible"
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center w-full">
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center">
           <Logo />
         </div>
         <div className="flex items-center">
@@ -57,9 +57,9 @@ export default function Header() {
             <ul className="flex space-x-8 items-center mr-8">
               {[
                 { name: "products", path: "/products" },
-                { name: "lifestyle", path: "/blog" },
-                { name: "store locator", path: "/map", icon: <Map className="mr-1 h-4 w-4" /> },
+                { name: "lifestyle", path: "/lifestyle" },
                 { name: "contact", path: "/contact" },
+                { name: "store locator", path: "/map" },
               ].map((item, index) => (
                 <motion.li
                   key={item.name}
@@ -69,9 +69,8 @@ export default function Header() {
                 >
                   <Link
                     href={item.path}
-                    className="header-link button-hover text-black text-lg font-medium flex items-center hover:text-[#000000]"
+                    className="header-link text-black text-lg font-medium flex items-center hover:text-[#000000]"
                   >
-                    {item.icon}
                     {item.name}
                   </Link>
                 </motion.li>
@@ -89,7 +88,7 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="bg-[#ffd6c0] border-none p-0 w-[300px]">
                 <div className="flex flex-col h-full">
-                  <div className="p-6 border-b border-white/20">
+                  <div className="p-4 border-b border-white/20">
                     <div className="flex justify-between items-center">
                       <Logo />
                       <button
@@ -105,17 +104,16 @@ export default function Header() {
                     <ul className="space-y-6">
                       {[
                         { name: "products", path: "/products" },
-                        { name: "lifestyle", path: "/blog" },
-                        { name: "store locator", path: "/map", icon: <Map className="mr-2 h-5 w-5" /> },
+                        { name: "lifestyle", path: "/lifestyle" },
                         { name: "contact", path: "/contact" },
+                        { name: "store locator", path: "/map" },
                       ].map((item) => (
                         <li key={item.name}>
                           <Link
                             href={item.path}
-                            className="text-black text-xl font-medium flex items-center hover:text-[#000000] transition-colors"
+                            className="mobile-nav-link text-black text-xl font-medium flex items-center hover:text-[#000000] transition-colors"
                             onClick={() => setIsOpen(false)}
                           >
-                            {item.icon}
                             {item.name}
                           </Link>
                         </li>

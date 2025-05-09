@@ -1,30 +1,29 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { toast } from "sonner"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { useBreakingNews } from "@/contexts/breaking-news-context"
-import { Megaphone, X } from "lucide-react"
+import { Megaphone, X, AlertCircle, RefreshCw } from "lucide-react"
 
 export default function BreakingNewsManager() {
-  const { newsText, updateBreakingNews, isLoading } = useBreakingNews()
+  const { newsText, updateBreakingNews, isLoading, error, debugInfo } = useBreakingNews()
   const [text, setText] = useState(newsText)
   const [isSaving, setIsSaving] = useState(false)
 
-  const handleSave = async () => {
-    if (!text.trim()) {
-      toast.error("Breaking news text cannot be empty")
-      return
-    }
+  // Update local state when context changes
+  useEffect(() => {
+    setText(newsText)
+  }, [newsText])
 
+  const handleSave = async () => {
     setIsSaving(true)
     try {
-      await updateBreakingNews(text.trim())
-      toast.success("Breaking news updated successfully")
+      await updateBreakingNews(text)
     } catch (error) {
-      toast.error("Failed to update breaking news")
+      // Error is already handled in the context
+      console.error("Error in handleSave:", error)
     } finally {
       setIsSaving(false)
     }
@@ -37,16 +36,25 @@ export default function BreakingNewsManager() {
     try {
       await updateBreakingNews("")
       setText("")
-      toast.success("Breaking news removed")
     } catch (error) {
-      toast.error("Failed to remove breaking news")
+      // Error is already handled in the context
+      console.error("Error in handleClear:", error)
     } finally {
       setIsSaving(false)
     }
   }
 
   if (isLoading) {
-    return <div className="text-center py-4">Loading...</div>
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center py-4">
+            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+            <span>Loading breaking news...</span>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -62,6 +70,16 @@ export default function BreakingNewsManager() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md flex items-start">
+              <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Error</p>
+                <p className="text-sm">{error}</p>
+              </div>
+            </div>
+          )}
+
           <div>
             <label htmlFor="breaking-news" className="block text-sm font-medium text-gray-700 mb-1">
               Breaking News Text
@@ -95,6 +113,18 @@ export default function BreakingNewsManager() {
           </div>
         </div>
       </CardContent>
+      <CardFooter className="border-t pt-4 text-xs text-gray-500">
+        <div className="w-full">
+          <p>
+            Connection status:{" "}
+            <span className={debugInfo.connectionStatus === "connected" ? "text-green-600" : "text-red-600"}>
+              {debugInfo.connectionStatus}
+            </span>
+          </p>
+          {debugInfo.lastFetch && <p>Last fetch: {debugInfo.lastFetch.toLocaleTimeString()}</p>}
+          {debugInfo.lastUpdate && <p>Last update attempt: {debugInfo.lastUpdate.toLocaleTimeString()}</p>}
+        </div>
+      </CardFooter>
     </Card>
   )
 }

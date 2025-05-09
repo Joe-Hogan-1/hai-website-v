@@ -11,13 +11,13 @@ interface BlogPostPageProps {
   }
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
+export default function LifestylePostPage({ params }: BlogPostPageProps) {
   return (
     <>
       <WaterBackground />
       <Header />
       <div className="page-container">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6 pt-8">
           <Suspense fallback={<BlogPostSkeleton />}>
             <BlogPostContent id={params.id} />
           </Suspense>

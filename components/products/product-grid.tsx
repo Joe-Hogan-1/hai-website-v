@@ -84,61 +84,7 @@ export default function ProductGrid() {
 
   // Add this function to provide fallback data
   function getFallbackProducts(): Product[] {
-    return [
-      {
-        id: "1",
-        name: "Relaxing Tincture",
-        description:
-          "A calming blend for relaxation and stress relief. This premium tincture is crafted with care to help you unwind after a long day. Our proprietary blend combines natural ingredients to create a soothing experience that promotes relaxation without sedation.",
-        image_url: "/placeholder.svg?height=200&width=300",
-        category: "Indica",
-        product_category: "Flower",
-      },
-      {
-        id: "2",
-        name: "Energizing Gummies",
-        description:
-          "Boost your day with these energizing treats. Each gummy is infused with a precise blend of ingredients designed to enhance focus and energy. Perfect for creative professionals or anyone needing a productivity boost without the jitters of caffeine.",
-        image_url: "/placeholder.svg?height=200&width=300",
-        category: "Sativa",
-        product_category: "Edibles",
-      },
-      {
-        id: "3",
-        name: "Balance Vape",
-        description:
-          "Find your perfect balance with this hybrid blend. Our Balance Vape offers a harmonious experience that combines the best of both worlds. The sleek design and premium materials ensure a consistent and enjoyable experience every time.",
-        image_url: "/placeholder.svg?height=200&width=300",
-        category: "Hybrid",
-        product_category: "Vapes",
-      },
-      {
-        id: "4",
-        name: "Sleep Aid Drops",
-        description:
-          "Gentle support for a restful night's sleep. These carefully formulated drops help you fall asleep naturally and wake up refreshed. Each bottle contains a month's supply of our proprietary blend, designed to promote healthy sleep patterns.",
-        image_url: "/placeholder.svg?height=200&width=300",
-        category: "Indica",
-        product_category: "Concentrates",
-      },
-      {
-        id: "5",
-        name: "Classic Pre-Roll Pack",
-        description:
-          "Premium pre-rolled joints for convenience. Each pre-roll is hand-crafted using only the finest ingredients to ensure a smooth and consistent experience. Our Classic Pack includes five individually wrapped pre-rolls, perfect for sharing or solo enjoyment.",
-        image_url: "/placeholder.svg?height=200&width=300",
-        category: "Hybrid",
-        product_category: "Pre-Rolls",
-      },
-      {
-        id: "6",
-        name: "hai. Logo T-Shirt",
-        description:
-          "Comfortable cotton t-shirt with embroidered logo. Made from 100% organic cotton, this shirt is both stylish and sustainable. The minimalist design features our signature logo embroidered with precision. Available in multiple sizes.",
-        image_url: "/placeholder.svg?height=200&width=300",
-        product_category: "Merch",
-      },
-    ]
+    return []
   }
 
   // Filter products by category

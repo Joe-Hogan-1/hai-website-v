@@ -180,7 +180,7 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 40;
+  z-index: 50;
   transition: opacity 0.3s ease;
   background-color: #ffd6c0;
   color: black;
@@ -215,18 +215,18 @@ body.theater-mode-active .breaking-news-bar {
   }
 }
 
-.store-popup {
-  width: 100%;
-  max-width: 200px;
-}
-
+/* Update button-hover class */
 .button-hover {
   transition: all 0.3s ease;
+  background-color: black !important;
+  color: white !important;
+  border-color: black !important;
 }
 
 .button-hover:hover {
   transform: translateY(-2px);
-  animation: holographicPulse 2s infinite;
+  background-color: #333333 !important;
+  color: white !important;
 }
 
 /* New styles for header animations */
@@ -372,7 +372,7 @@ body.theater-mode-active .breaking-news-bar {
 /* Update the white outline frame styles to remove side borders */
 /* Adjust page container to account for header height */
 .page-container {
-  padding-top: 6rem;
+  padding-top: 2rem; /* Changed from 3rem to 2rem */
   min-height: 100vh;
   background: transparent;
   margin: 0;
@@ -383,7 +383,7 @@ body.theater-mode-active .breaking-news-bar {
 /* Add this new style for extra top padding on mobile */
 @media (max-width: 768px) {
   .page-container {
-    padding-top: 7rem;
+    padding-top: 3rem; /* Changed from 4rem to 3rem */
   }
 }
 
@@ -504,12 +504,12 @@ body.has-breaking-news {
 
 /* Adjust page container to account for breaking news bar */
 .has-breaking-news .page-container {
-  padding-top: calc(8rem + 2rem); /* Add height of breaking news bar */
+  padding-top: calc(2rem + 2rem); /* Changed from 3rem + 2rem */
 }
 
 @media (max-width: 768px) {
   .has-breaking-news .page-container {
-    padding-top: calc(7rem + 2rem); /* Add height of breaking news bar */
+    padding-top: calc(3rem + 2rem); /* Changed from 4rem + 2rem */
   }
 }
 
@@ -1222,4 +1222,168 @@ h1.scroll-animation-title.animate .letter {
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) rgba(255, 214, 192, 0.1);
+}
+
+/* Add these button styles to override all buttons to black */
+button,
+.button,
+.btn,
+[type="button"],
+[type="submit"],
+[type="reset"] {
+  background-color: black !important;
+  color: white !important;
+  border-color: black !important;
+}
+
+button:hover,
+.button:hover,
+.btn:hover,
+[type="button"]:hover,
+[type="submit"]:hover,
+[type="reset"]:hover {
+  background-color: #333333 !important;
+  color: white !important;
+}
+
+/* Override shadcn button styles */
+.bg-\[#ffd6c0\],
+.bg-\[#a8d1e7\],
+.bg-\[#ffcbb0\],
+\
+.bg-\[#97c0d6\] {
+  background-color: black !important;
+  color: white !important;
+}
+
+.hover\:bg-\[#ffcbb0\]:hover,
+.hover\:bg-\[#97c0d6\]:hover {
+  background-color: #333333 !important;
+  color: white !important;
+}
+
+/* Make sure text is visible on black buttons */
+button span,
+.button span,
+.btn span,
+[type="button"] span,
+[type="submit"] span,
+[type="reset"] span {
+  color: white !important;
+}
+
+/* Ensure icons in buttons are visible */
+button svg,
+.button svg,
+.btn svg,
+[type="button"] svg,
+[type="submit"] svg,
+[type="reset"] svg {
+  color: white !important;
+}
+
+/* Override button styles for navigation links */
+header a,
+header a:hover,
+.header-link,
+.header-link:hover {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: black !important;
+  transform: none;
+}
+
+/* Restore the hover effect for header links */
+.header-link:hover {
+  transform: translateY(-2px);
+}
+
+/* Make sure mobile navigation links are not affected by button styles */
+.mobile-nav-link,
+.mobile-nav-link:hover {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: black !important;
+}
+
+/* Override button styles for footer links */
+.footer-link,
+.footer-link:hover {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: black !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* Ensure footer links maintain proper styling */
+footer a,
+footer button {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: black !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Add these styles to override the cookie preferences and newsletter buttons */
+.cookie-switch {
+  background-color: transparent !important;
+}
+
+.cookie-button,
+.cookie-button-outline {
+  background-color: transparent !important;
+  color: black !important;
+  border: 1px solid black !important;
+}
+
+.cookie-button:hover,
+.cookie-button-outline:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: black !important;
+}
+
+.newsletter-close-btn {
+  background-color: transparent !important;
+  color: black !important;
+}
+
+.newsletter-close-btn:hover {
+  background-color: transparent !important;
+  color: #333 !important;
+}
+
+.newsletter-submit-btn {
+  background-color: black !important;
+  color: white !important;
+}
+
+.newsletter-submit-btn:hover {
+  background-color: #333 !important;
+}
+
+/* NEW STYLES FOR FOOTER SPACING AND NEWSLETTER X BUTTON */
+/* Increase spacing between footer navigation links */
+footer .hidden.md\:flex.items-center.space-x-8 {
+  column-gap: 3rem !important; /* Equivalent to space-x-12 */
+}
+
+footer .flex.space-x-6 {
+  column-gap: 2.5rem !important; /* Equivalent to space-x-10 */
+}
+
+/* Make newsletter X button black */
+.newsletter-popup-shadow .newsletter-close-btn svg {
+  color: black !important;
+  stroke: black !important;
+  fill: black !important;
 }

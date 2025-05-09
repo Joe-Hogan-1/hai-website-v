@@ -29,7 +29,7 @@ export default function BlogPost({ post }: BlogPostProps) {
 
   return (
     <article className="max-w-3xl mx-auto bg-white/90 backdrop-blur-sm p-8 rounded-lg shadow-md">
-      <Link href="/blog" className="inline-flex items-center text-[#a8d1e7] hover:text-[#97c0d6] mb-6">
+      <Link href="/lifestyle" className="inline-flex items-center text-black hover:text-gray-700 mb-6">
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to all posts
       </Link>
 

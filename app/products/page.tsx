@@ -1,24 +1,15 @@
-import { Suspense } from "react"
 import Header from "@/components/header"
-import WaterBackground from "@/components/water-background"
 import ProductGrid from "@/components/products/product-grid"
 
+// Add more padding at the top of the page
 export default function ProductsPage() {
   return (
     <>
-      <WaterBackground />
       <Header />
       <div className="page-container">
-        <div className="container mx-auto px-4 py-8">
-          <h1 className="text-5xl font-bold mb-6 text-black">our products</h1>
-          <p className="text-xl mb-8 text-black">discover our premium products for your wellness journey</p>
-
-          {/* Added lighter pink background container */}
-          <div className="bg-[#fff0e8] rounded-lg p-8 shadow-sm">
-            <Suspense fallback={<ProductLoadingSkeleton />}>
-              <ProductGrid />
-            </Suspense>
-          </div>
+        <div className="container mx-auto px-4 py-6 pt-8">
+          <h1 className="text-4xl font-bold mb-4 text-center">Our Products</h1>
+          <ProductGrid />
         </div>
       </div>
     </>

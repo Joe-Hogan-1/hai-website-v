@@ -12,13 +12,16 @@ import BreakingNewsManager from "@/components/admin/breaking-news-manager"
 import MediaManager from "@/components/admin/media-manager"
 import DispensaryManager from "@/components/admin/dispensary-manager"
 import NewsletterManager from "@/components/admin/newsletter-manager"
-import MediaTextEditor from "@/components/admin/media-text-editor"
 import GridImageManager from "@/components/admin/grid-image-manager"
 import CategoryManager from "@/components/admin/category-manager"
 import Header from "@/components/header"
 import WaterBackground from "@/components/water-background"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
+import VideoManager from "@/components/admin/video-manager"
+import DatabaseDebug from "@/components/admin/database-debug"
+import StorageBucketDiagnostic from "@/components/admin/storage-bucket-diagnostic"
+import LifestyleBannerManager from "@/components/admin/lifestyle-banner-manager"
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null)
@@ -82,13 +85,16 @@ export default function AdminDashboard() {
 
   const tabItems = [
     { id: "media", label: "Homepage Carousel" },
+    { id: "lifestyle-banner", label: "Lifestyle Banner" },
     { id: "grid-images", label: "Photo Grid" },
-    { id: "media-text", label: "Text Overlays" },
     { id: "blogs", label: "Blog Management" },
     { id: "products", label: "Product Management" },
     { id: "categories", label: "Categories" },
     { id: "dispensaries", label: "Dispensary Locations" },
     { id: "newsletter", label: "Newsletter" },
+    { id: "videos", label: "Videos" },
+    { id: "database-debug", label: "Database Debug" },
+    { id: "storage-diagnostic", label: "Storage Diagnostic" },
   ]
 
   return (
@@ -190,12 +196,12 @@ export default function AdminDashboard() {
                   <MediaManager userId={user.id} />
                 </TabsContent>
 
-                <TabsContent value="grid-images">
-                  <GridImageManager userId={user.id} />
+                <TabsContent value="lifestyle-banner">
+                  <LifestyleBannerManager userId={user.id} />
                 </TabsContent>
 
-                <TabsContent value="media-text">
-                  <MediaTextEditor />
+                <TabsContent value="grid-images">
+                  <GridImageManager userId={user.id} />
                 </TabsContent>
 
                 <TabsContent value="blogs">
@@ -217,19 +223,34 @@ export default function AdminDashboard() {
                 <TabsContent value="newsletter">
                   <NewsletterManager />
                 </TabsContent>
+
+                <TabsContent value="videos">
+                  <VideoManager userId={user.id} />
+                </TabsContent>
+
+                <TabsContent value="database-debug">
+                  <DatabaseDebug />
+                </TabsContent>
+
+                <TabsContent value="storage-diagnostic">
+                  <StorageBucketDiagnostic />
+                </TabsContent>
               </Tabs>
             </div>
 
             {/* Mobile tab content - shown based on active tab */}
             <div className="md:hidden">
               {activeTab === "media" && <MediaManager userId={user.id} />}
+              {activeTab === "lifestyle-banner" && <LifestyleBannerManager userId={user.id} />}
               {activeTab === "grid-images" && <GridImageManager userId={user.id} />}
-              {activeTab === "media-text" && <MediaTextEditor />}
               {activeTab === "blogs" && <BlogManager userId={user.id} />}
               {activeTab === "products" && <ProductManager userId={user.id} />}
               {activeTab === "categories" && <CategoryManager />}
               {activeTab === "dispensaries" && <DispensaryManager userId={user.id} />}
               {activeTab === "newsletter" && <NewsletterManager />}
+              {activeTab === "videos" && <VideoManager userId={user.id} />}
+              {activeTab === "database-debug" && <DatabaseDebug />}
+              {activeTab === "storage-diagnostic" && <StorageBucketDiagnostic />}
             </div>
           </div>
         </div>

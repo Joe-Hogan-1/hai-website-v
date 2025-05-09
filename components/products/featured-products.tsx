@@ -113,7 +113,7 @@ export default function FeaturedProducts() {
                 <p className="text-gray-700 text-sm font-medium line-clamp-3">{product.description}</p>
                 <button
                   onClick={() => openProductModal(product)}
-                  className="mt-2 text-black hover:text-gray-700 text-sm font-medium flex items-center"
+                  className="mt-2 text-white bg-black hover:bg-gray-700 text-sm font-medium flex items-center px-3 py-1 rounded"
                 >
                   Read more <ChevronRight className="h-3 w-3 ml-1" />
                 </button>

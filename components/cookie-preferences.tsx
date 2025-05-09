@@ -126,7 +126,7 @@ export default function CookiePreferences({ open, onOpenChange }: CookiePreferen
                   These cookies are necessary for the website to function properly. They cannot be disabled.
                 </p>
               </div>
-              <Switch checked={preferences.essential} disabled />
+              <Switch checked={preferences.essential} disabled className="cookie-switch" />
             </div>
 
             <Separator />
@@ -143,6 +143,7 @@ export default function CookiePreferences({ open, onOpenChange }: CookiePreferen
                 id="analytics"
                 checked={preferences.analytics}
                 onCheckedChange={(checked) => setPreferences({ ...preferences, analytics: checked })}
+                className="cookie-switch"
               />
             </div>
 
@@ -159,6 +160,7 @@ export default function CookiePreferences({ open, onOpenChange }: CookiePreferen
                 id="functional"
                 checked={preferences.functional}
                 onCheckedChange={(checked) => setPreferences({ ...preferences, functional: checked })}
+                className="cookie-switch"
               />
             </div>
 
@@ -176,19 +178,20 @@ export default function CookiePreferences({ open, onOpenChange }: CookiePreferen
                 id="targeting"
                 checked={preferences.targeting}
                 onCheckedChange={(checked) => setPreferences({ ...preferences, targeting: checked })}
+                className="cookie-switch"
               />
             </div>
           </div>
 
           <div className="flex flex-col space-y-2 mt-8">
-            <Button onClick={handleSavePreferences} className="bg-[#ffd6c0] hover:bg-[#ffcbb0] text-black">
+            <Button onClick={handleSavePreferences} className="cookie-button">
               Save Preferences
             </Button>
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={handleAcceptAll}>
+              <Button variant="outline" onClick={handleAcceptAll} className="cookie-button-outline">
                 Accept All
               </Button>
-              <Button variant="outline" onClick={handleRejectAll}>
+              <Button variant="outline" onClick={handleRejectAll} className="cookie-button-outline">
                 Essential Only
               </Button>
             </div>
@@ -197,7 +200,7 @@ export default function CookiePreferences({ open, onOpenChange }: CookiePreferen
           <div className="text-xs text-gray-500 mt-4">
             <p>
               For more information about how we use cookies, please see our{" "}
-              <a href="/privacy-policy" className="text-[#ffd6c0] hover:underline">
+              <a href="/privacy-policy" className="text-black hover:underline">
                 Privacy Policy
               </a>
               .

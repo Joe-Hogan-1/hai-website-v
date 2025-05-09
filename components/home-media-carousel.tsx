@@ -4,11 +4,15 @@ import { useState, useEffect, useRef } from "react"
 import { supabase } from "@/utils/supabase"
 
 interface MediaItem {
-  id: string
+  id: number
   title: string
   description: string
   media_url: string
   media_type: "video" | "image"
+  text_overlay: string | null
+  text_position: string
+  is_active: boolean
+  display_order: number
   created_at: string
 }
 
@@ -18,7 +22,9 @@ export default function HomeMediaCarousel() {
   const [error, setError] = useState<string | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [autoplayEnabled, setAutoplayEnabled] = useState(true)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [debugInfo, setDebugInfo] = useState<string>("")
 
   useEffect(() => {
     fetchMediaItems()
@@ -26,10 +32,14 @@ export default function HomeMediaCarousel() {
     // Subscribe to changes in the banner_media table
     const channel = supabase
       .channel("banner_media_changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "banner_media" }, () => {
+      .on("postgres_changes", { event: "*", schema: "public", table: "banner_media" }, (payload) => {
+        console.log("Banner media change detected:", payload)
         fetchMediaItems()
       })
-      .subscribe()
+      .subscribe((status) => {
+        console.log("Subscription status:", status)
+        setDebugInfo((prev) => prev + `\nSubscription status: ${JSON.stringify(status)}`)
+      })
 
     return () => {
       supabase.removeChannel(channel)
@@ -42,81 +52,39 @@ export default function HomeMediaCarousel() {
   const fetchMediaItems = async () => {
     try {
       setLoading(true)
+      setDebugInfo((prev) => prev + `\nFetching media items...`)
 
-      // Try to fetch from banner_media table
-      const { data, error } = await supabase.from("banner_media").select("*").order("created_at", { ascending: false })
+      // Fetch from banner_media table
+      const { data, error } = await supabase
+        .from("banner_media")
+        .select("*")
+        .eq("is_active", true)
+        .order("display_order", { ascending: true })
 
       if (error) {
         console.error("Error fetching media items:", error)
-
-        // If the table doesn't exist, try to fetch from banner_videos as fallback
-        if (error.message.includes("does not exist")) {
-          const { data: videoData, error: videoError } = await supabase
-            .from("banner_videos")
-            .select("*")
-            .order("created_at", { ascending: false })
-
-          if (videoError) {
-            setError("Failed to load carousel items")
-            setMediaItems(getFallbackItems())
-          } else {
-            // Convert video data to media format
-            const convertedItems =
-              videoData?.map((video) => ({
-                id: video.id,
-                title: video.title,
-                description: video.description,
-                media_url: video.video_url,
-                media_type: "video" as const,
-                created_at: video.created_at,
-              })) || []
-
-            setMediaItems(convertedItems.length > 0 ? convertedItems : getFallbackItems())
-          }
-        } else {
-          setError("Failed to load carousel items")
-          setMediaItems(getFallbackItems())
-        }
-      } else {
-        setMediaItems(data && data.length > 0 ? data : getFallbackItems())
+        setDebugInfo((prev) => prev + `\nError: ${error.message}`)
+        setError(`Failed to load carousel items: ${error.message}`)
+        return
       }
-    } catch (error) {
+
+      console.log("Fetched media items:", data)
+      setDebugInfo((prev) => prev + `\nFetched ${data?.length || 0} items`)
+
+      if (data && data.length > 0) {
+        setMediaItems(data)
+      } else {
+        setMediaItems([])
+        setDebugInfo((prev) => prev + `\nNo items found`)
+      }
+    } catch (error: any) {
       console.error("Unexpected error fetching media items:", error)
+      setDebugInfo((prev) => prev + `\nUnexpected error: ${error.message}`)
       setError("An unexpected error occurred")
-      setMediaItems(getFallbackItems())
+      setMediaItems([])
     } finally {
       setLoading(false)
     }
-  }
-
-  // Fallback items if no media items are found
-  const getFallbackItems = (): MediaItem[] => {
-    return [
-      {
-        id: "fallback-1",
-        title: "Welcome to hai.",
-        description: "Discover our premium products for your wellness journey",
-        media_url: "/placeholder.svg?height=800&width=1200",
-        media_type: "image",
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: "fallback-2",
-        title: "Premium Products",
-        description: "Explore our selection of high-quality products",
-        media_url: "/placeholder.svg?height=800&width=1200",
-        media_type: "image",
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: "fallback-3",
-        title: "Join Our Community",
-        description: "Connect with like-minded individuals",
-        media_url: "/placeholder.svg?height=800&width=1200",
-        media_type: "image",
-        created_at: new Date().toISOString(),
-      },
-    ]
   }
 
   // Function to go to the next slide
@@ -145,9 +113,14 @@ export default function HomeMediaCarousel() {
     }, 500)
   }
 
+  // Toggle autoplay
+  const toggleAutoplay = () => {
+    setAutoplayEnabled(!autoplayEnabled)
+  }
+
   // Set up automatic slide rotation
   useEffect(() => {
-    if (mediaItems.length <= 1) return
+    if (!autoplayEnabled || mediaItems.length <= 1) return
 
     // Clear any existing timeout
     if (timeoutRef.current) {
@@ -165,12 +138,12 @@ export default function HomeMediaCarousel() {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [currentIndex, isTransitioning, mediaItems.length])
+  }, [currentIndex, isTransitioning, mediaItems.length, autoplayEnabled])
 
   if (loading) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-[#fff5f0]">
-        <div className="text-[#ffd6c0] text-xl animate-pulse">Loading...</div>
+        <div className="text-[#ffd6c0] text-xl animate-pulse">Loading carousel...</div>
       </div>
     )
   }
@@ -193,6 +166,32 @@ export default function HomeMediaCarousel() {
 
   const currentItem = mediaItems[currentIndex]
 
+  // Function to get text position classes
+  const getTextPositionClasses = (position: string) => {
+    switch (position) {
+      case "top-left":
+        return "top-6 left-6 text-left"
+      case "top-center":
+        return "top-6 left-1/2 -translate-x-1/2 text-center"
+      case "top-right":
+        return "top-6 right-6 text-right"
+      case "middle-left":
+        return "top-1/2 -translate-y-1/2 left-6 text-left"
+      case "middle-center":
+        return "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
+      case "middle-right":
+        return "top-1/2 -translate-y-1/2 right-6 text-right"
+      case "bottom-left":
+        return "bottom-6 left-6 text-left"
+      case "bottom-center":
+        return "bottom-6 left-1/2 -translate-x-1/2 text-center"
+      case "bottom-right":
+        return "bottom-6 right-6 text-right"
+      default:
+        return "bottom-6 left-6 text-left"
+    }
+  }
+
   return (
     <div className="w-full h-full relative overflow-hidden bg-[#fff5f0]">
       <div className="absolute inset-4 bg-[#ffd6c0] rounded-sm overflow-hidden">
@@ -210,14 +209,52 @@ export default function HomeMediaCarousel() {
               <img src={item.media_url || "/placeholder.svg"} alt={item.title} className="w-full h-full object-cover" />
             )}
 
-            {/* Content Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 text-white">
-              <h2 className="text-2xl font-bold mb-2">{item.title}</h2>
-              <p className="text-sm md:text-base">{item.description}</p>
-            </div>
+            {/* Text Overlay */}
+            {item.text_overlay && (
+              <div
+                className={`absolute ${getTextPositionClasses(item.text_position)} p-4 bg-black/30 rounded text-white max-w-md`}
+              >
+                <h2 className="text-2xl font-bold mb-2">{item.text_overlay}</h2>
+                {item.description && <p className="text-sm md:text-base">{item.description}</p>}
+              </div>
+            )}
           </div>
         ))}
+
+        {/* Dots Indicator */}
+        {mediaItems.length > 1 && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+            {mediaItems.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setIsTransitioning(true)
+                  setCurrentIndex(index)
+                  setTimeout(() => setIsTransitioning(false), 500)
+                }}
+                className={`w-3 h-3 rounded-full ${index === currentIndex ? "bg-white" : "bg-white/50"}`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Autoplay Toggle */}
+        <button
+          onClick={toggleAutoplay}
+          className="absolute top-4 right-4 bg-black/30 text-white p-2 rounded-full hover:bg-black/50 z-20 text-xs"
+          aria-label={autoplayEnabled ? "Pause autoplay" : "Start autoplay"}
+        >
+          {autoplayEnabled ? "Pause" : "Play"}
+        </button>
       </div>
+
+      {/* Debug info - only visible in development */}
+      {process.env.NODE_ENV === "development" && (
+        <div className="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-2 text-xs z-50 max-h-32 overflow-auto">
+          <pre>{debugInfo}</pre>
+        </div>
+      )}
     </div>
   )
 }

@@ -69,10 +69,13 @@ export default function DispensaryMapClient() {
 
   // Function to handle selecting a dispensary from the list
   const handleSelectDispensary = (lat: number, lng: number) => {
-    // Add a small delay to ensure the component has fully rendered
-    setTimeout(() => {
-      setSelectedLocation([lat, lng])
-    }, 100)
+    // Only update if the coordinates are different to prevent unnecessary re-renders
+    setSelectedLocation((prev) => {
+      if (!prev || prev[0] !== lat || prev[1] !== lng) {
+        return [lat, lng]
+      }
+      return prev
+    })
   }
 
   // Handle filter change

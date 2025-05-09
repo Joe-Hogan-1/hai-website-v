@@ -3,7 +3,7 @@
 import { Suspense } from "react"
 import Header from "@/components/header"
 import WaterBackground from "@/components/water-background"
-import MapPageClient from "@/components/map-page-client"
+import DispensaryMapClient from "@/components/dispensary-map-client"
 import { motion } from "framer-motion"
 
 function MapLoadingSkeleton() {
@@ -45,7 +45,7 @@ export default function MapPage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 pt-24 pb-8">
           <motion.h1
             className="text-5xl font-bold mb-6 text-black"
             initial={{ opacity: 0, y: -20 }}
@@ -64,7 +64,7 @@ export default function MapPage() {
           </motion.p>
 
           <Suspense fallback={<MapLoadingSkeleton />}>
-            <MapPageClient />
+            <DispensaryMapClient />
           </Suspense>
         </div>
       </motion.div>

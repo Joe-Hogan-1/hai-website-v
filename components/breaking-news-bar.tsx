@@ -1,12 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/utils/supabase"
+import { useBreakingNews } from "@/contexts/breaking-news-context"
 import { usePathname } from "next/navigation"
 
 export default function BreakingNewsBar() {
-  const [newsText, setNewsText] = useState<string>("")
-  const [loading, setLoading] = useState(true)
+  const { newsText, isLoading } = useBreakingNews()
   const [shouldShow, setShouldShow] = useState(false)
   const pathname = usePathname()
 
@@ -43,69 +42,13 @@ export default function BreakingNewsBar() {
     }
   }, [pathname])
 
-  useEffect(() => {
-    // Only fetch news if we're going to show it
-    if (!shouldShow) {
-      setLoading(false)
-      return
-    }
-
-    async function fetchBreakingNews() {
-      try {
-        const { data, error } = await supabase
-          .from("breaking_news")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .single()
-
-        if (error && error.code !== "PGRST116") {
-          // Silent error handling
-          return
-        }
-
-        if (data) {
-          setNewsText(data.text)
-        }
-      } catch (error) {
-        // Silent error handling
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchBreakingNews()
-
-    // Subscribe to changes in the breaking_news table
-    const channel = supabase
-      .channel("breaking_news_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "breaking_news",
-        },
-        (payload) => {
-          if (payload.new) {
-            setNewsText((payload.new as any).text)
-          }
-        },
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [shouldShow])
-
   // Don't render anything if loading, no news text, or shouldn't show
-  if (loading || !newsText || !shouldShow) {
+  if (isLoading || !newsText || !shouldShow) {
     return null
   }
 
   return (
-    <div className="bg-white py-2 w-full overflow-hidden fixed top-0 left-0 right-0 z-[60] shadow-md breaking-news-bar animate-fadeIn">
+    <div className="bg-white h-[32px] w-full overflow-hidden fixed top-0 left-0 right-0 z-[60] shadow-md breaking-news-bar animate-fadeIn flex items-center">
       <div className="marquee-container">
         <div className="marquee text-black">
           <span>{newsText}</span>

@@ -12,6 +12,8 @@ interface GridImage {
   id: string
   image_url: string
   position: number
+  title?: string
+  description?: string
   created_at: string
   user_id: string
 }
@@ -27,32 +29,70 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
   const [currentImage, setCurrentImage] = useState<Partial<GridImage>>({
     image_url: "",
     position: 0,
+    title: "",
+    description: "",
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [usePhotoGrid, setUsePhotoGrid] = useState(true)
 
   useEffect(() => {
+    checkTables()
     fetchGridImages()
-  }, [])
+  }, [usePhotoGrid])
+
+  const checkTables = async () => {
+    try {
+      // Check if photo_grid table exists
+      const { error: photoGridError } = await supabase.from("photo_grid").select("id").limit(1).maybeSingle()
+
+      if (photoGridError && photoGridError.message.includes("does not exist")) {
+        // Fall back to grid_images
+        setUsePhotoGrid(false)
+
+        // Check if grid_images exists
+        const { error: gridImagesError } = await supabase.from("grid_images").select("id").limit(1).maybeSingle()
+
+        if (gridImagesError && gridImagesError.message.includes("does not exist")) {
+          // Create grid_images table
+          await createGridImagesTable()
+        }
+      } else {
+        setUsePhotoGrid(true)
+      }
+    } catch (error) {
+      console.error("Error checking tables:", error)
+      setUsePhotoGrid(false)
+    }
+  }
 
   const fetchGridImages = async () => {
     try {
       setLoading(true)
 
-      // Check if the table exists first
-      const { error: checkError } = await supabase.from("grid_images").select("id").limit(1).maybeSingle()
+      if (usePhotoGrid) {
+        // Fetch from photo_grid table
+        const { data, error } = await supabase.from("photo_grid").select("*").order("position", { ascending: true })
 
-      if (checkError && checkError.message.includes("does not exist")) {
-        // Table doesn't exist yet, create it
-        await createGridImagesTable()
+        if (error) throw error
+        setImages(data || [])
+      } else {
+        // Fetch from grid_images table
+        const { data, error } = await supabase.from("grid_images").select("*").order("position", { ascending: true })
+
+        if (error) throw error
+
+        // Map to match photo_grid structure
+        const mappedData = (data || []).map((img) => ({
+          ...img,
+          title: undefined,
+          description: undefined,
+        }))
+
+        setImages(mappedData)
       }
-
-      const { data, error } = await supabase.from("grid_images").select("*").order("position", { ascending: true })
-
-      if (error) throw error
-      setImages(data || [])
     } catch (error) {
-      console.error("Error fetching grid images:", error)
+      console.error(`Error fetching from ${usePhotoGrid ? "photo_grid" : "grid_images"}:`, error)
       toast.error("Failed to load grid images")
     } finally {
       setLoading(false)
@@ -61,19 +101,14 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
 
   const createGridImagesTable = async () => {
     try {
-      // Create the table using RPC (requires a stored procedure on Supabase)
-      // This is a simplified approach - in a real app, you'd use migrations
+      // Create the table using RPC
       const { error } = await supabase.rpc("create_grid_images_table")
 
       if (error && !error.message.includes("already exists")) {
         throw error
       }
-
-      // If the RPC fails (which it might if not set up), we'll handle it silently
-      // The user will just see an empty grid until they add images
     } catch (error) {
       console.error("Error creating grid_images table:", error)
-      // Silent error - we'll just show an empty state
     }
   }
 
@@ -84,6 +119,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
     setCurrentImage({
       image_url: "",
       position: nextPosition,
+      title: "",
+      description: "",
     })
     setImageFile(null)
     setIsEditing(true)
@@ -100,6 +137,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
     setCurrentImage({
       image_url: "",
       position: 0,
+      title: "",
+      description: "",
     })
     setImageFile(null)
   }
@@ -108,11 +147,14 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
     if (!confirm("Are you sure you want to delete this image?")) return
 
     try {
+      const tableName = usePhotoGrid ? "photo_grid" : "grid_images"
+      const bucketName = usePhotoGrid ? "photo-grid" : "grid-images"
+
       // First, get the image to check if it has an image URL
-      const { data: image } = await supabase.from("grid_images").select("image_url").eq("id", id).single()
+      const { data: image } = await supabase.from(tableName).select("image_url").eq("id", id).single()
 
       // Delete the image record
-      const { error } = await supabase.from("grid_images").delete().eq("id", id)
+      const { error } = await supabase.from(tableName).delete().eq("id", id)
 
       if (error) throw error
 
@@ -120,7 +162,7 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
       if (image?.image_url) {
         const imagePath = image.image_url.split("/").pop()
         if (imagePath) {
-          await supabase.storage.from("grid-images").remove([imagePath])
+          await supabase.storage.from(bucketName).remove([imagePath])
         }
       }
 
@@ -139,6 +181,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
       }
 
       let imageUrl = currentImage.image_url
+      const tableName = usePhotoGrid ? "photo_grid" : "grid_images"
+      const bucketName = usePhotoGrid ? "photo-grid" : "grid-images"
 
       // Upload image if a new one is selected
       if (imageFile) {
@@ -147,7 +191,16 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
         const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`
         const filePath = `${fileName}`
 
-        const { error: uploadError, data } = await supabase.storage.from("grid-images").upload(filePath, imageFile, {
+        // Fix bucket permissions if using photo-grid
+        if (usePhotoGrid) {
+          try {
+            await supabase.rpc("fix_photo_grid_bucket")
+          } catch (error) {
+            console.error("Error fixing photo-grid bucket:", error)
+          }
+        }
+
+        const { error: uploadError, data } = await supabase.storage.from(bucketName).upload(filePath, imageFile, {
           cacheControl: "3600",
           upsert: false,
           onUploadProgress: (progress) => {
@@ -158,7 +211,7 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
         if (uploadError) throw uploadError
 
         // Get the public URL
-        const { data: urlData } = supabase.storage.from("grid-images").getPublicUrl(filePath)
+        const { data: urlData } = supabase.storage.from(bucketName).getPublicUrl(filePath)
 
         imageUrl = urlData.publicUrl
       }
@@ -170,13 +223,21 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
 
       if (currentImage.id) {
         // Update existing image
+        const updateData: any = {
+          image_url: imageUrl,
+          position: currentImage.position,
+          updated_at: new Date().toISOString(),
+        }
+
+        // Add title and description if using photo_grid
+        if (usePhotoGrid) {
+          updateData.title = currentImage.title || null
+          updateData.description = currentImage.description || null
+        }
+
         const { error } = await supabase
-          .from("grid_images")
-          .update({
-            image_url: imageUrl,
-            position: currentImage.position,
-            updated_at: new Date().toISOString(),
-          })
+          .from(tableName)
+          .update(updateData)
           .eq("id", currentImage.id)
           .eq("user_id", userId)
 
@@ -184,11 +245,19 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
         toast.success("Image updated successfully")
       } else {
         // Create new image
-        const { error } = await supabase.from("grid_images").insert({
+        const insertData: any = {
           image_url: imageUrl,
           position: currentImage.position,
           user_id: userId,
-        })
+        }
+
+        // Add title and description if using photo_grid
+        if (usePhotoGrid) {
+          insertData.title = currentImage.title || null
+          insertData.description = currentImage.description || null
+        }
+
+        const { error } = await supabase.from(tableName).insert(insertData)
 
         if (error) throw error
         toast.success("Image added successfully")
@@ -199,6 +268,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
       setCurrentImage({
         image_url: "",
         position: 0,
+        title: "",
+        description: "",
       })
       setImageFile(null)
     } catch (error) {
@@ -211,12 +282,13 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
     if (index === 0) return // Already at the top
 
     try {
+      const tableName = usePhotoGrid ? "photo_grid" : "grid_images"
       const prevImage = images[index - 1]
 
       // Swap positions
-      await supabase.from("grid_images").update({ position: prevImage.position }).eq("id", image.id)
+      await supabase.from(tableName).update({ position: prevImage.position }).eq("id", image.id)
 
-      await supabase.from("grid_images").update({ position: image.position }).eq("id", prevImage.id)
+      await supabase.from(tableName).update({ position: image.position }).eq("id", prevImage.id)
 
       fetchGridImages()
     } catch (error) {
@@ -228,12 +300,13 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
     if (index === images.length - 1) return // Already at the bottom
 
     try {
+      const tableName = usePhotoGrid ? "photo_grid" : "grid_images"
       const nextImage = images[index + 1]
 
       // Swap positions
-      await supabase.from("grid_images").update({ position: nextImage.position }).eq("id", image.id)
+      await supabase.from(tableName).update({ position: nextImage.position }).eq("id", image.id)
 
-      await supabase.from("grid_images").update({ position: image.position }).eq("id", nextImage.id)
+      await supabase.from(tableName).update({ position: image.position }).eq("id", nextImage.id)
 
       fetchGridImages()
     } catch (error) {
@@ -261,6 +334,9 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
           Manage the 2x2 image grid displayed on the homepage. You can add up to 4 images.
           {images.length >= 4 && " You have reached the maximum number of images."}
         </p>
+        <p className="text-sm text-gray-600 mt-1">
+          Currently using: <span className="font-semibold">{usePhotoGrid ? "photo_grid" : "grid_images"}</span> table
+        </p>
       </div>
 
       {isEditing ? (
@@ -287,6 +363,32 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
                 Position determines where the image appears in the grid (0-3).
               </p>
             </div>
+
+            {usePhotoGrid && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Title (Optional)</label>
+                  <input
+                    type="text"
+                    value={currentImage.title || ""}
+                    onChange={(e) => setCurrentImage({ ...currentImage, title: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    placeholder="Enter image title"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+                  <textarea
+                    value={currentImage.description || ""}
+                    onChange={(e) => setCurrentImage({ ...currentImage, description: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    rows={3}
+                    placeholder="Enter image description"
+                  />
+                </div>
+              </>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
@@ -322,7 +424,7 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
                       <div className="w-full h-48 bg-gray-100 relative">
                         <img
                           src={image.image_url || "/placeholder.svg"}
-                          alt={`Grid image ${index + 1}`}
+                          alt={image.title || `Grid image ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -360,6 +462,12 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
                           </Button>
                         </div>
                       </div>
+                      {usePhotoGrid && image.title && (
+                        <div className="px-4 pb-3">
+                          <h3 className="font-medium">{image.title}</h3>
+                          {image.description && <p className="text-sm text-gray-600 mt-1">{image.description}</p>}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

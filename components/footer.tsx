@@ -3,7 +3,7 @@
 import type React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Instagram, Map } from "lucide-react"
+import { Instagram } from "lucide-react"
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import CookiePreferences from "./cookie-preferences"
@@ -51,35 +51,37 @@ export default function Footer() {
           transition={{ duration: 0.8, delay: 0.3 }}
         ></motion.div>
 
-        <div className="max-w-6xl mx-auto flex justify-between items-center relative z-10">
+        <div className="max-w-7xl mx-auto flex justify-between items-center relative z-10">
           {/* Left section with logo and navigation links */}
           <motion.div variants={itemVariants} className="flex items-center">
             {/* Logo */}
-            <Link href="/" className="transition-all duration-300 hover:filter hover:drop-shadow-glow mr-6">
+            <Link
+              href="/"
+              className="transition-all duration-300 hover:filter hover:drop-shadow-glow flex items-center justify-center"
+            >
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hai_logo_transparent_black-83ImGs5RWDRJ4m77zReENm6jy5pGP3.png"
                 alt="hai."
-                width={99}
-                height={50}
+                width={120}
+                height={120}
                 priority
-                className="" /* Remove the "invert" class */
+                className="w-[120px] h-[120px] object-contain"
               />
             </Link>
 
-            {/* Navigation links moved next to logo */}
-            <div className="hidden md:flex items-center space-x-6">
+            {/* Navigation links moved next to logo with increased spacing */}
+            <div className="hidden md:flex items-center ml-8" style={{ columnGap: "3rem" }}>
               <Link href="/products" className="text-black text-sm font-medium hover:underline">
                 products
               </Link>
-              <Link href="/blog" className="text-black text-sm font-medium hover:underline">
+              <Link href="/lifestyle" className="text-black text-sm font-medium hover:underline">
                 lifestyle
-              </Link>
-              <Link href="/map" className="text-black text-sm font-medium hover:underline flex items-center">
-                <Map className="mr-1 h-3 w-3" />
-                store locator
               </Link>
               <Link href="/contact" className="text-black text-sm font-medium hover:underline">
                 contact
+              </Link>
+              <Link href="/map" className="text-black text-sm font-medium hover:underline">
+                store locator
               </Link>
             </div>
           </motion.div>
@@ -117,7 +119,7 @@ export default function Footer() {
 
         {/* Terms links at the bottom */}
         <motion.div className="max-w-6xl mx-auto mt-2 flex justify-center relative z-10" variants={itemVariants}>
-          <div className="flex space-x-4 text-xs text-black font-medium">
+          <div className="flex text-xs text-black font-medium" style={{ columnGap: "2.5rem" }}>
             <Link href="/user-agreement" className="hover:text-black transition-colors">
               user agreement
             </Link>
@@ -126,7 +128,7 @@ export default function Footer() {
             </Link>
             <button
               onClick={() => setCookiePreferencesOpen(true)}
-              className="hover:text-black transition-colors text-black text-xs font-medium cursor-pointer"
+              className="hover:text-black transition-colors text-black text-xs font-medium cursor-pointer footer-link"
             >
               cookies preferences
             </button>

@@ -24,8 +24,8 @@ module.exports = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "black", // Changed to black
+          foreground: "white", // Changed to white for contrast
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -54,6 +54,7 @@ module.exports = {
         ffd6c0: "#ffd6c0",
         a8d1e7: "#a8d1e7",
         white: "#ffffff",
+        black: "#000000", // Added black
       },
       borderRadius: {
         lg: "var(--radius)",

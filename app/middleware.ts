@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { botProtectionMiddleware } from "@/middleware/bot-protection"
 
-// Update the middleware to handle the age verification cookie
+// Update the middleware to handle the age verification cookie and bot protection
 export function middleware(request: NextRequest) {
+  // First, check for bot protection
+  const botProtectionResponse = botProtectionMiddleware(request)
+  if (botProtectionResponse.status !== 200) {
+    return botProtectionResponse
+  }
+
   // Check if the user is visiting a page that should bypass age verification
   const url = request.nextUrl.clone()
   const bypassPaths = [

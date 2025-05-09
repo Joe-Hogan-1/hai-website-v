@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-import WaterRipple from "./water-ripple"
 import { motion } from "framer-motion"
 
 const WaterBackground: React.FC = () => {
@@ -19,7 +18,6 @@ const WaterBackground: React.FC = () => {
           repeatType: "reverse",
         }}
       ></motion.div>
-      <WaterRipple />
     </div>
   )
 }

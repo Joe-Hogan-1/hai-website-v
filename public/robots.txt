@@ -1,0 +1,29 @@
+User-agent: *
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /signin/
+
+# Block bad bots
+User-agent: PetalBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+# Allow good bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://yourdomain.com/sitemap.xml

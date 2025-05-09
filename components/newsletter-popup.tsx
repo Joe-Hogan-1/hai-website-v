@@ -187,7 +187,7 @@ export default function NewsletterPopup() {
             exit="hidden"
             variants={formVariants}
           >
-            <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-l-lg overflow-hidden border-l-4 border-[#ffd6c0] newsletter-popup-shadow">
+            <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-l-lg overflow-hidden newsletter-popup-shadow">
               <div className="p-5">
                 <motion.div
                   className="flex justify-between items-start mb-3"
@@ -199,10 +199,11 @@ export default function NewsletterPopup() {
                   <h3 className="text-lg font-semibold text-[#0e7490]">Join the hai. community</h3>
                   <button
                     onClick={handleClose}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="newsletter-close-btn"
                     aria-label="Close newsletter popup"
+                    style={{ color: "black", backgroundColor: "transparent" }}
                   >
-                    <X size={20} />
+                    <X size={20} style={{ color: "black" }} />
                   </button>
                 </motion.div>
 
@@ -223,7 +224,7 @@ export default function NewsletterPopup() {
                       placeholder="Your Name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="bg-white/50 border-transparent focus:border-[#ffd6c0] focus:ring-[#ffd6c0]"
+                      className="bg-white/50 border-transparent focus:border-black focus:ring-black"
                       required
                     />
                   </motion.div>
@@ -233,16 +234,12 @@ export default function NewsletterPopup() {
                       placeholder="Your Email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="bg-white/50 border-transparent focus:border-[#ffd6c0] focus:ring-[#ffd6c0]"
+                      className="bg-white/50 border-transparent focus:border-black focus:ring-black"
                       required
                     />
                   </motion.div>
                   <motion.div variants={formElementsVariants} initial="hidden" animate="visible" custom={4}>
-                    <Button
-                      type="submit"
-                      className="w-full bg-[#ffd6c0] hover:bg-[#ffcbb0] text-white"
-                      disabled={isSubmitting}
-                    >
+                    <Button type="submit" className="w-full newsletter-submit-btn" disabled={isSubmitting}>
                       {isSubmitting ? "Subscribing..." : "Subscribe"}
                     </Button>
                   </motion.div>
@@ -261,7 +258,7 @@ export default function NewsletterPopup() {
             onMouseLeave={handleMouseLeave}
           >
             <button
-              className="bg-[#ffd6c0] hover:bg-[#ffcbb0] text-white py-2 px-3 rounded-l-lg shadow-lg transform transition-transform hover:scale-105"
+              className="bg-black hover:bg-[#333333] text-white py-2 px-3 rounded-l-lg shadow-lg transform transition-transform hover:scale-105"
               style={{ transform: "scale(0.9)" }} // Make the tab 10% smaller
             >
               <span className="block writing-mode-vertical">Newsletter</span>

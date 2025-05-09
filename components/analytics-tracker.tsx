@@ -11,13 +11,19 @@ export default function AnalyticsTracker() {
   useEffect(() => {
     // Only track if user has consented to cookies
     if (document.cookie.includes("cookie_consent=true")) {
-      // Track page view in cookies
-      trackPageView(pathname)
+      try {
+        // Track page view in cookies
+        trackPageView(pathname)
 
-      // Track page view in Supabase
-      trackPageViewInSupabase(pathname).catch(() => {
-        // Silent error handling
-      })
+        // Track page view in Supabase with error handling
+        trackPageViewInSupabase(pathname).catch((err) => {
+          // Silent error handling - errors are already logged in the function
+          console.warn("Failed to track page view, continuing without analytics")
+        })
+      } catch (error) {
+        // Catch any unexpected errors to prevent breaking the app
+        console.error("Unexpected error in analytics tracking:", error)
+      }
     }
   }, [pathname])
 
