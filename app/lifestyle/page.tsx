@@ -1,6 +1,13 @@
 import Header from "@/components/header"
-import LifestyleBanner from "@/components/lifestyle/lifestyle-banner"
-import { BlogList } from "@/components/blog/blog-list"
+import dynamic from "next/dynamic"
+
+// Import the client components properly
+const LifestyleBanner = dynamic(() => import("@/components/lifestyle/lifestyle-banner"), {
+  ssr: true, // Change from false to true
+})
+
+// Use a client wrapper for BlogList if it contains client-only features
+import { BlogListWrapper } from "@/components/blog/blog-list-wrapper"
 
 export const metadata = {
   title: "Lifestyle | hai",
@@ -24,7 +31,7 @@ export default function LifestylePage() {
               <div className="bg-[#ffd6c0]/50 rounded-lg p-4">
                 <h2 className="text-2xl font-semibold mb-4">Latest Articles</h2>
                 <div className="h-[700px] overflow-y-auto pr-2 custom-scrollbar">
-                  <BlogList limit={10} showExcerpt={true} className="space-y-4" />
+                  <BlogListWrapper limit={10} showExcerpt={true} className="space-y-4" />
                 </div>
               </div>
             </div>
