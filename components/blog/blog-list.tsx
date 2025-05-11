@@ -56,7 +56,7 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="space-y-6">
         {[1, 2, 3].map((i) => (
           <div key={i} className="bg-white/30 backdrop-blur-sm p-6 rounded-lg shadow-md animate-pulse">
             <div className="h-40 bg-white/40 rounded mb-4"></div>
@@ -94,7 +94,7 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
       {blogPosts.map((post) => (
         <div
           key={post.id}
-          className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl border border-white/30 mb-4"
+          className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl border border-white/30"
         >
           {post.image_url && (
             <div className="mb-4 overflow-hidden rounded-lg mx-auto w-full flex items-center justify-center">
@@ -102,7 +102,7 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
                 src={post.image_url || "/placeholder.svg"}
                 alt={post.title}
                 className="w-full object-cover transition-transform duration-300 hover:scale-105"
-                style={{ maxHeight: "150px" }}
+                style={{ maxHeight: "180px" }}
               />
             </div>
           )}
@@ -119,7 +119,7 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
               </span>
               <Link
                 href={`/lifestyle/${post.id}`}
-                className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold"
+                className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold underline"
               >
                 Read more <ArrowRight className="ml-1 h-4 w-4" />
               </Link>

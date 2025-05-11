@@ -1,7 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import type React from "react"
+
+import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/utils/supabase"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface LifestyleBanner {
   id: string
@@ -12,79 +15,198 @@ interface LifestyleBanner {
 }
 
 export default function LifestyleBanner() {
-  const [banner, setBanner] = useState<LifestyleBanner | null>(null)
+  const [banners, setBanners] = useState<LifestyleBanner[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const [touchStart, setTouchStart] = useState(0)
 
+  // Fetch banners from Supabase
   useEffect(() => {
-    async function fetchBanner() {
+    async function fetchBanners() {
       try {
         setLoading(true)
-
-        // Try to fetch from Supabase
         const { data, error } = await supabase
           .from("lifestyle_banner")
           .select("*")
           .eq("is_active", true)
           .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle()
 
-        if (error && !error.message.includes("No rows found")) {
-          setError(`Failed to load banner: ${error.message}`)
-          setBanner(null)
+        if (error) {
+          console.error("Error fetching lifestyle banners:", error)
+          setBanners([])
         } else {
-          setBanner(data)
+          setBanners(data || [])
         }
       } catch (error) {
-        setError("An unexpected error occurred while loading the banner")
-        setBanner(null)
+        console.error("Unexpected error:", error)
+        setBanners([])
       } finally {
         setLoading(false)
       }
     }
 
-    fetchBanner()
+    fetchBanners()
   }, [])
 
-  // Fallback image if no banner is found
-  const fallbackImage = "/serene-landscape.png"
+  // Auto-rotate banners
+  useEffect(() => {
+    if (banners.length <= 1 || isPaused) return
 
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length)
+    }, 5000) // Change banner every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [banners.length, isPaused])
+
+  // Resume auto-rotation after 10 seconds of inactivity
+  useEffect(() => {
+    if (!isPaused) return
+
+    const timeout = setTimeout(() => {
+      setIsPaused(false)
+    }, 10000) // Resume after 10 seconds
+
+    return () => clearTimeout(timeout)
+  }, [isPaused])
+
+  const goToPrevious = useCallback(() => {
+    setIsPaused(true)
+    setCurrentIndex((prevIndex) => (prevIndex === 0 ? banners.length - 1 : prevIndex - 1))
+  }, [banners.length])
+
+  const goToNext = useCallback(() => {
+    setIsPaused(true)
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length)
+  }, [banners.length])
+
+  const goToSlide = useCallback((index: number) => {
+    setIsPaused(true)
+    setCurrentIndex(index)
+  }, [])
+
+  // Touch event handlers for mobile swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX)
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touchEnd = e.changedTouches[0].clientX
+    const diff = touchStart - touchEnd
+
+    // If the swipe is significant enough (more than 50px)
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        // Swipe left, go to next
+        goToNext()
+      } else {
+        // Swipe right, go to previous
+        goToPrevious()
+      }
+    }
+  }
+
+  // If no banners or still loading, show placeholder
   if (loading) {
     return (
-      <div className="w-full h-full bg-[#ffd6c0]/30 rounded-lg animate-pulse flex items-center justify-center">
-        <p className="text-black/50">Loading banner...</p>
+      <div className="w-full h-[750px] bg-gray-100 animate-pulse flex items-center justify-center">
+        <p className="text-gray-400">Loading banner...</p>
       </div>
     )
   }
 
-  if (error) {
+  if (banners.length === 0) {
     return (
-      <div className="w-full h-full bg-[#ffd6c0]/30 rounded-lg flex items-center justify-center p-6">
-        <p className="text-red-500">{error}</p>
+      <div className="w-full h-[750px] bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-400">No banner available</p>
       </div>
     )
   }
 
-  return (
-    <div className="w-full h-full relative rounded-lg overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
-      <div className="relative w-full h-full">
-        <img
-          src={banner?.image_url || fallbackImage}
-          alt={banner?.alt_text || "Lifestyle Banner"}
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-        {banner?.title && <h2 className="text-3xl font-bold text-white drop-shadow-lg">{banner.title}</h2>}
-        {!banner?.title && <h2 className="text-3xl font-bold text-white drop-shadow-lg">Explore Our Lifestyle</h2>}
-        {banner?.description && <p className="text-white/90 mt-2 drop-shadow-md max-w-md">{banner.description}</p>}
-        {!banner?.description && (
-          <p className="text-white/90 mt-2 drop-shadow-md max-w-md">
-            Discover articles, tips, and stories about cannabis culture and lifestyle.
-          </p>
+  // If only one banner, show it without carousel controls
+  if (banners.length === 1) {
+    const banner = banners[0]
+    return (
+      <div className="relative w-full h-[750px] overflow-hidden rounded-lg">
+        <div className="absolute inset-0">
+          <img
+            src={banner.image_url || "/placeholder.svg"}
+            alt={banner.alt_text || "Lifestyle Banner"}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        {(banner.title || banner.description) && (
+          <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
+            {banner.title && <h2 className="text-4xl font-bold mb-3">{banner.title}</h2>}
+            {banner.description && <p className="text-xl max-w-3xl">{banner.description}</p>}
+          </div>
         )}
+      </div>
+    )
+  }
+
+  // Multiple banners, show carousel
+  return (
+    <div
+      className="relative w-full h-[750px] overflow-hidden rounded-lg"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Banner images */}
+      <div className="h-full">
+        {banners.map((banner, index) => (
+          <div
+            key={banner.id}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
+          >
+            <img
+              src={banner.image_url || "/placeholder.svg"}
+              alt={banner.alt_text || "Lifestyle Banner"}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            {(banner.title || banner.description) && (
+              <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
+                {banner.title && <h2 className="text-4xl font-bold mb-3">{banner.title}</h2>}
+                {banner.description && <p className="text-xl max-w-3xl">{banner.description}</p>}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Navigation arrows */}
+      <button
+        onClick={goToPrevious}
+        className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-4 rounded-full focus:outline-none transition-colors"
+        aria-label="Previous banner"
+      >
+        <ChevronLeft size={32} />
+      </button>
+      <button
+        onClick={goToNext}
+        className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-4 rounded-full focus:outline-none transition-colors"
+        aria-label="Next banner"
+      >
+        <ChevronRight size={32} />
+      </button>
+
+      {/* Indicator dots */}
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-4">
+        {banners.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`w-4 h-4 rounded-full focus:outline-none transition-colors ${
+              index === currentIndex ? "bg-white" : "bg-white/50 hover:bg-white/70"
+            }`}
+            aria-label={`Go to banner ${index + 1}`}
+          />
+        ))}
       </div>
     </div>
   )

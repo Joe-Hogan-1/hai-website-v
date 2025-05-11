@@ -484,24 +484,32 @@ export default function ProductManager({ userId }: ProductManagerProps) {
                           <h3 className="text-lg font-semibold">{product.name}</h3>
                         </div>
                         <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
-                        <div className="flex justify-between items-center">
+
+                        {/* Updated button layout to prevent cutoff */}
+                        <div className="flex flex-col space-y-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            className={product.featured ? "text-yellow-600" : "text-gray-500"}
+                            className={`w-full justify-center ${product.featured ? "text-yellow-600" : "text-gray-500"}`}
                             onClick={() => handleToggleFeatured(product)}
                           >
                             <Star className={`h-4 w-4 mr-1 ${product.featured ? "fill-yellow-400" : ""}`} />
                             {product.featured ? "Featured" : "Feature"}
                           </Button>
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-center"
+                              onClick={() => handleEdit(product)}
+                            >
                               <Edit className="h-4 w-4 mr-1" /> Edit
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-red-500 hover:text-red-700"
+                              className="w-full justify-center text-red-500 hover:text-red-700"
                               onClick={() => handleDelete(product.id)}
                             >
                               <Trash2 className="h-4 w-4 mr-1" /> Delete

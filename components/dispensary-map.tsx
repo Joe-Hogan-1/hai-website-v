@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useEffect, useRef, useState, useMemo } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 
@@ -26,17 +26,15 @@ interface DispensaryMapProps {
 }
 
 export default function DispensaryMap({
-  dispensaries,
+  dispensaries = [],
   loading = false,
-  selectedLocation,
+  selectedLocation = null,
   showOnlyHaiProducts = false,
 }: DispensaryMapProps) {
-  const [isMapLoaded, setIsMapLoaded] = useState(false)
-  const tileProviderIndex = 0 // Always use Carto Light (index 0)
   const mapRef = useRef<L.Map | null>(null)
-  const mapContainerRef = useRef<HTMLDivElement>(null)
   const markersRef = useRef<Record<string, L.Marker>>({})
-  const popupsRef = useRef<Record<string, L.Popup>>({})
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const [isMapInitialized, setIsMapInitialized] = useState(false)
   const [prevSelectedLocation, setPrevSelectedLocation] = useState<[number, number] | null>(null)
 
   // Filter dispensaries based on hai products flag if needed
@@ -53,36 +51,6 @@ export default function DispensaryMap({
     [40.4774, -79.7624], // Southwest corner
     [45.0153, -71.7517], // Northeast corner
   ]
-
-  // Tile providers for fallback
-  const TILE_PROVIDERS = useMemo(
-    () => [
-      {
-        url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        name: "Carto Light",
-      },
-      {
-        url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        name: "Carto Voyager",
-      },
-      {
-        url: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
-        attribution:
-          '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-        name: "Stadia Alidade Smooth",
-      },
-      {
-        url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        name: "OpenStreetMap Standard",
-      },
-    ],
-    [],
-  )
 
   // Create custom icons for markers
   const createHaiIcon = () => {
@@ -118,52 +86,55 @@ export default function DispensaryMap({
 
   // Initialize map when component mounts
   useEffect(() => {
-    if (mapContainerRef.current && !mapRef.current) {
-      try {
-        // Initialize map
-        const map = L.map(mapContainerRef.current, {
-          center: NY_CENTER,
-          zoom: 7,
-          zoomControl: false,
-          maxBounds: NY_BOUNDS,
-          maxBoundsViscosity: 1.0,
-          minZoom: 6,
-          maxZoom: 18,
-          scrollWheelZoom: true,
-        })
+    if (!mapContainerRef.current || mapRef.current || isMapInitialized) {
+      return
+    }
 
-        // Add zoom control to bottom right
-        L.control.zoom({ position: "bottomright" }).addTo(map)
+    try {
+      // Fix Leaflet's icon paths
+      delete (L.Icon.Default.prototype as any)._getIconUrl
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: "/marker-icon-2x.png",
+        iconUrl: "/marker-icon.png",
+        shadowUrl: "/marker-shadow.png",
+      })
 
-        // Add tile layer
-        const currentProvider = TILE_PROVIDERS[tileProviderIndex]
-        L.tileLayer(currentProvider.url, {
-          attribution: currentProvider.attribution,
-          maxZoom: 19,
-        }).addTo(map)
+      // Initialize map
+      const map = L.map(mapContainerRef.current, {
+        center: NY_CENTER,
+        zoom: 7,
+        zoomControl: false,
+        maxBounds: NY_BOUNDS,
+        maxBoundsViscosity: 1.0,
+        minZoom: 6,
+        maxZoom: 18,
+        scrollWheelZoom: true,
+      })
 
-        // Store map reference
-        mapRef.current = map
+      // Add zoom control to bottom right
+      L.control.zoom({ position: "bottomright" }).addTo(map)
 
-        // Handle map events
-        map.on("load", () => {
-          setIsMapLoaded(true)
-        })
+      // Add tile layer
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 19,
+      }).addTo(map)
 
-        // Set map as loaded after a short delay if the load event doesn't fire
-        setTimeout(() => {
-          if (!isMapLoaded) {
-            setIsMapLoaded(true)
-          }
-        }, 1000)
+      // Store map reference
+      mapRef.current = map
 
-        // Prevent scroll propagation
+      // Set map as initialized
+      setIsMapInitialized(true)
+
+      // Prevent scroll propagation
+      if (mapContainerRef.current) {
         mapContainerRef.current.addEventListener("wheel", (e) => {
           e.stopPropagation()
         })
-      } catch (error) {
-        console.error("Error initializing map:", error)
       }
+    } catch (error) {
+      console.error("Error initializing map:", error)
     }
 
     // Cleanup function
@@ -171,187 +142,174 @@ export default function DispensaryMap({
       if (mapRef.current) {
         mapRef.current.remove()
         mapRef.current = null
+        setIsMapInitialized(false)
       }
     }
-  }, [tileProviderIndex, TILE_PROVIDERS, isMapLoaded])
+  }, []) // Empty dependency array - only run once on mount
 
   // Add markers when dispensaries change or map is loaded
   useEffect(() => {
-    if (mapRef.current && isMapLoaded && filteredDispensaries.length > 0) {
-      try {
-        // Clear existing markers that are no longer in the dispensaries list
-        Object.keys(markersRef.current).forEach((id) => {
-          const stillExists = filteredDispensaries.some((d) => d.id === id)
-          if (!stillExists) {
-            markersRef.current[id].remove()
-            delete markersRef.current[id]
-            delete popupsRef.current[id]
-          }
-        })
-
-        // Add markers for dispensaries
-        filteredDispensaries.forEach((dispensary) => {
-          try {
-            // Validate coordinates
-            if (isNaN(dispensary.lat) || isNaN(dispensary.lng)) {
-              console.warn(
-                `Invalid coordinates for dispensary ${dispensary.name}: [${dispensary.lat}, ${dispensary.lng}]`,
-              )
-              return
-            }
-
-            // Skip if marker already exists
-            if (markersRef.current[dispensary.id]) {
-              return
-            }
-
-            // Create marker with appropriate icon
-            const marker = L.marker([dispensary.lat, dispensary.lng], {
-              icon: dispensary.has_hai_products ? createHaiIcon() : createStandardIcon(),
-              riseOnHover: true,
-              riseOffset: 250,
-            })
-
-            // Create popup content with structured information
-            const popupContent = document.createElement("div")
-            popupContent.className = "dispensary-popup"
-            popupContent.innerHTML = `
-              <div style="padding: 0; background-color: white; color: #333; border-radius: 8px; overflow: hidden;">
-                <h3 style="font-size: 18px; font-weight: 600; margin: 0; padding: 15px 15px 10px; color: black; border-bottom: 1px solid #f0f0f0;">${dispensary.name}</h3>
-                
-                <div style="padding: 10px 15px;">
-                  <div style="margin-bottom: 12px;">
-                    <h4 style="font-size: 12px; text-transform: uppercase; font-weight: 600; margin: 0 0 4px; color: #666;">Address</h4>
-                    <p style="font-size: 14px; margin: 0 0 4px; color: black;">${dispensary.address}</p>
-                    <p style="font-size: 14px; margin: 0 0 4px; color: black;">${dispensary.city}, NY</p>
-                  </div>
-                  
-                  ${
-                    dispensary.phone
-                      ? `
-                  <div style="margin-bottom: 12px;">
-                    <h4 style="font-size: 12px; text-transform: uppercase; font-weight: 600; margin: 0 0 4px; color: #666;">Phone</h4>
-                    <p style="font-size: 14px; margin: 0 0 4px; color: black;">
-                      <a href="tel:${dispensary.phone}" style="color: black; text-decoration: none;">
-                        ${dispensary.phone}
-                      </a>
-                    </p>
-                  </div>
-                  `
-                      : ""
-                  }
-                  
-                  ${
-                    dispensary.website
-                      ? `
-                  <div style="margin-bottom: 12px;">
-                    <h4 style="font-size: 12px; text-transform: uppercase; font-weight: 600; margin: 0 0 4px; color: #666;">Website</h4>
-                    <p style="font-size: 14px; margin: 0 0 4px; color: black;">
-                      <a href="${dispensary.website}" target="_blank" rel="noopener noreferrer" style="color: black; text-decoration: none;">
-                        Visit Website
-                      </a>
-                    </p>
-                  </div>
-                  `
-                      : ""
-                  }
-                </div>
-                
-                ${
-                  dispensary.image_url
-                    ? `
-              <div style="width: 100%; height: 150px; overflow: hidden; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;">
-                <img src="${dispensary.image_url}" alt="${dispensary.name}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" onerror="this.onerror=null; this.src='/placeholder.svg?height=150&width=150';">
-              </div>
-              `
-                    : ""
-                }
-                
-                <div style="display: flex; align-items: center; padding: 10px 15px; font-size: 14px; font-weight: 500; ${
-                  dispensary.has_hai_products
-                    ? "background-color: rgba(255, 214, 192, 0.2); color: #e76f51;"
-                    : "background-color: #f5f5f5; color: #666;"
-                }">
-                  <span>${dispensary.has_hai_products ? "hai. products available" : "No hai. products available"}</span>
-                </div>
-              </div>
-            `
-
-            // Create popup with custom options
-            const popup = L.popup({
-              maxWidth: 300,
-              minWidth: 250,
-              closeButton: true,
-              autoClose: true,
-              closeOnEscapeKey: true,
-              autoPan: true,
-              autoPanPadding: [50, 50],
-              keepInView: true,
-              className: "dispensary-popup-container",
-            }).setContent(popupContent)
-
-            // Bind popup to marker
-            marker.bindPopup(popup)
-
-            // Add marker to map
-            marker.addTo(mapRef.current!)
-
-            // Store marker and popup references
-            markersRef.current[dispensary.id] = marker
-            popupsRef.current[dispensary.id] = popup
-          } catch (error) {
-            console.error("Error adding marker:", error)
-          }
-        })
-
-        // If we have markers, fit the map to show all of them
-        // Only do this once when markers are first added
-        if (Object.keys(markersRef.current).length > 0 && !mapRef.current._loaded) {
-          try {
-            const markers = Object.values(markersRef.current)
-            const group = L.featureGroup(markers)
-            const bounds = group.getBounds()
-
-            // Check if bounds are valid before fitting
-            if (bounds.isValid()) {
-              mapRef.current.fitBounds(bounds, {
-                padding: [50, 50],
-                maxZoom: 12,
-                animate: false,
-              })
-            }
-          } catch (error) {
-            console.error("Error fitting bounds:", error)
-          }
-        }
-      } catch (error) {
-        console.error("Error in marker management:", error)
-      }
+    if (!mapRef.current || !isMapInitialized || filteredDispensaries.length === 0) {
+      return
     }
 
-    return () => {
-      // Close any open popups before cleaning up
-      if (mapRef.current) {
-        mapRef.current.closePopup()
-      }
-
-      // Clear existing markers
-      Object.values(markersRef.current).forEach((marker) => {
-        if (marker) {
-          marker.remove()
+    try {
+      // Clear existing markers that are no longer in the dispensaries list
+      Object.keys(markersRef.current).forEach((id) => {
+        const stillExists = filteredDispensaries.some((d) => d.id === id)
+        if (!stillExists && markersRef.current[id]) {
+          markersRef.current[id].remove()
+          delete markersRef.current[id]
         }
       })
 
-      // Reset marker references
-      markersRef.current = {}
-      popupsRef.current = {}
+      // Add markers for dispensaries
+      filteredDispensaries.forEach((dispensary) => {
+        try {
+          // Validate coordinates
+          if (isNaN(dispensary.lat) || isNaN(dispensary.lng)) {
+            console.warn(
+              `Invalid coordinates for dispensary ${dispensary.name}: [${dispensary.lat}, ${dispensary.lng}]`,
+            )
+            return
+          }
+
+          // Skip if marker already exists
+          if (markersRef.current[dispensary.id]) {
+            return
+          }
+
+          // Create marker with appropriate icon
+          const marker = L.marker([dispensary.lat, dispensary.lng], {
+            icon: dispensary.has_hai_products ? createHaiIcon() : createStandardIcon(),
+            riseOnHover: true,
+            riseOffset: 250,
+          })
+
+          // Create popup content with structured information
+          const popupContent = document.createElement("div")
+          popupContent.className = "dispensary-popup"
+          popupContent.innerHTML = `
+            <div style="padding: 0; background-color: white; color: #333; border-radius: 8px; overflow: hidden;">
+              <h3 style="font-size: 18px; font-weight: 600; margin: 0; padding: 15px 15px 10px; color: black; border-bottom: 1px solid #f0f0f0;">${dispensary.name}</h3>
+              
+              <div style="padding: 10px 15px;">
+                <div style="margin-bottom: 12px;">
+                  <h4 style="font-size: 12px; text-transform: uppercase; font-weight: 600; margin: 0 0 4px; color: #666;">Address</h4>
+                  <p style="font-size: 14px; margin: 0 0 4px; color: black;">${dispensary.address}</p>
+                  <p style="font-size: 14px; margin: 0 0 4px; color: black;">${dispensary.city}, NY</p>
+                </div>
+                
+                ${
+                  dispensary.phone
+                    ? `
+                <div style="margin-bottom: 12px;">
+                  <h4 style="font-size: 12px; text-transform: uppercase; font-weight: 600; margin: 0 0 4px; color: #666;">Phone</h4>
+                  <p style="font-size: 14px; margin: 0 0 4px; color: black;">
+                    <a href="tel:${dispensary.phone}" style="color: black; text-decoration: none;">
+                      ${dispensary.phone}
+                    </a>
+                  </p>
+                </div>
+                `
+                    : ""
+                }
+                
+                ${
+                  dispensary.website
+                    ? `
+                <div style="margin-bottom: 12px;">
+                  <h4 style="font-size: 12px; text-transform: uppercase; font-weight: 600; margin: 0 0 4px; color: #666;">Website</h4>
+                  <p style="font-size: 14px; margin: 0 0 4px; color: black;">
+                    <a href="${dispensary.website}" target="_blank" rel="noopener noreferrer" style="color: black; text-decoration: none;">
+                      Visit Website
+                    </a>
+                  </p>
+                </div>
+                `
+                    : ""
+                }
+              </div>
+              
+              ${
+                dispensary.image_url
+                  ? `
+            <div style="width: 100%; height: 150px; overflow: hidden; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;">
+              <img src="${dispensary.image_url}" alt="${dispensary.name}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" onerror="this.onerror=null; this.src='/placeholder.svg?height=150&width=150';">
+            </div>
+            `
+                  : ""
+              }
+              
+              <div style="display: flex; align-items: center; padding: 10px 15px; font-size: 14px; font-weight: 500; ${
+                dispensary.has_hai_products
+                  ? "background-color: rgba(255, 214, 192, 0.2); color: #e76f51;"
+                  : "background-color: #f5f5f5; color: #666;"
+              }">
+                <span>${dispensary.has_hai_products ? "hai. products available" : "No hai. products available"}</span>
+              </div>
+            </div>
+          `
+
+          // Create popup with custom options
+          const popup = L.popup({
+            maxWidth: 300,
+            minWidth: 250,
+            closeButton: true,
+            autoClose: true,
+            closeOnEscapeKey: true,
+            autoPan: true,
+            autoPanPadding: [50, 50],
+            keepInView: true,
+            className: "dispensary-popup-container",
+          }).setContent(popupContent)
+
+          // Bind popup to marker
+          marker.bindPopup(popup)
+
+          // Add marker to map
+          if (mapRef.current) {
+            marker.addTo(mapRef.current)
+          }
+
+          // Store marker reference
+          markersRef.current[dispensary.id] = marker
+        } catch (error) {
+          console.error("Error adding marker:", error)
+        }
+      })
+
+      // If we have markers, fit the map to show all of them
+      // Only do this once when markers are first added
+      if (Object.keys(markersRef.current).length > 0 && mapRef.current) {
+        try {
+          const markers = Object.values(markersRef.current)
+          const group = L.featureGroup(markers)
+          const bounds = group.getBounds()
+
+          // Check if bounds are valid before fitting
+          if (bounds.isValid()) {
+            mapRef.current.fitBounds(bounds, {
+              padding: [50, 50],
+              maxZoom: 12,
+              animate: false,
+            })
+          }
+        } catch (error) {
+          console.error("Error fitting bounds:", error)
+        }
+      }
+    } catch (error) {
+      console.error("Error in marker management:", error)
     }
-  }, [filteredDispensaries, isMapLoaded])
+  }, [filteredDispensaries, isMapInitialized]) // Only run when filteredDispensaries or isMapInitialized changes
 
   // Handle selected location changes
   useEffect(() => {
     // Skip if no map, not loaded, or no selected location
-    if (!mapRef.current || !isMapLoaded || !selectedLocation) return
+    if (!mapRef.current || !isMapInitialized || !selectedLocation) {
+      return
+    }
 
     // Skip if the selected location is the same as the previous one
     if (
@@ -371,7 +329,6 @@ export default function DispensaryMap({
       // Find the marker closest to the selected location
       let closestMarker: L.Marker | null = null
       let closestDistance = Number.POSITIVE_INFINITY
-      let closestId = ""
 
       Object.entries(markersRef.current).forEach(([id, marker]) => {
         const markerLatLng = marker.getLatLng()
@@ -380,15 +337,14 @@ export default function DispensaryMap({
         if (distance < closestDistance) {
           closestDistance = distance
           closestMarker = marker
-          closestId = id
         }
       })
 
-      if (closestMarker) {
+      if (closestMarker && mapRef.current) {
         // Get the marker's position
         const position = closestMarker.getLatLng()
 
-        // Use flyTo instead of setView for smoother animation and to avoid recursion
+        // Use flyTo instead of setView for smoother animation
         mapRef.current.flyTo(position, 15, {
           animate: true,
           duration: 1,
@@ -396,7 +352,7 @@ export default function DispensaryMap({
 
         // Open the popup after the animation completes
         setTimeout(() => {
-          if (closestMarker && mapRef.current) {
+          if (closestMarker) {
             closestMarker.openPopup()
           }
         }, 1000)
@@ -404,34 +360,11 @@ export default function DispensaryMap({
     } catch (error) {
       console.error("Error handling selected location:", error)
     }
-  }, [selectedLocation, isMapLoaded, prevSelectedLocation])
-
-  // Handle tile provider change
-  useEffect(() => {
-    if (mapRef.current) {
-      try {
-        // Remove existing tile layers
-        mapRef.current.eachLayer((layer) => {
-          if (layer instanceof L.TileLayer) {
-            mapRef.current?.removeLayer(layer)
-          }
-        })
-
-        // Add new tile layer
-        const currentProvider = TILE_PROVIDERS[tileProviderIndex]
-        L.tileLayer(currentProvider.url, {
-          attribution: currentProvider.attribution,
-          maxZoom: 19,
-        }).addTo(mapRef.current)
-      } catch (error) {
-        console.error("Error changing tile provider:", error)
-      }
-    }
-  }, [tileProviderIndex, TILE_PROVIDERS])
+  }, [selectedLocation, isMapInitialized, prevSelectedLocation]) // Only run when selectedLocation, isMapInitialized, or prevSelectedLocation changes
 
   return (
     <div className="h-[600px] w-full relative rounded-lg overflow-hidden map-wrapper">
-      {(!isMapLoaded || loading) && (
+      {(!isMapInitialized || loading) && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-[1000]">
           <div className="text-2xl font-bold text-gray-400">Loading Map...</div>
         </div>
@@ -443,7 +376,7 @@ export default function DispensaryMap({
         <p>Data provided by hai. Locations may change. Please call ahead to confirm availability.</p>
       </div>
 
-      {filteredDispensaries.length === 0 && !loading && (
+      {filteredDispensaries.length === 0 && !loading && isMapInitialized && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-[999]">
           <div className="text-center p-4 bg-white rounded-lg shadow-lg">
             <p className="text-xl font-bold text-gray-700 mb-2">No Dispensaries Found</p>

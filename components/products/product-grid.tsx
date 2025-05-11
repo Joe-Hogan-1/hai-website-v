@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/utils/supabase"
 import { useTilt } from "@/hooks/use-tilt"
 import { Badge } from "@/components/ui/badge"
-import { ChevronRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import ProductDetailModal from "./product-detail-modal"
 
 interface Product {
@@ -225,9 +225,9 @@ export default function ProductGrid() {
             <p className="text-gray-700 text-sm font-medium line-clamp-3">{product.description}</p>
             <button
               onClick={() => openProductModal(product)}
-              className="mt-2 text-black hover:text-gray-700 text-sm font-medium flex items-center"
+              className="read-more-link mt-2 text-black hover:text-gray-700 text-sm font-medium flex items-center underline"
             >
-              Read more <ChevronRight className="h-3 w-3 ml-1" />
+              Read more <ArrowRight className="ml-1 h-3 w-3" />
             </button>
           </div>
         </div>

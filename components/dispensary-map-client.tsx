@@ -46,23 +46,31 @@ export default function DispensaryMapClient() {
       const { data, error } = await supabase.from("dispensaries").select("*").order("name")
 
       if (error) {
-        // If the table doesn't exist, use fallback data
+        console.error("Error fetching dispensaries:", error)
+
+        // If the table doesn't exist, use fallback data without showing an error
         if (error.message.includes("does not exist")) {
+          console.log("Dispensaries table doesn't exist, using fallback data")
           const fallbackData = getFallbackDispensaryData()
           setDispensaries(fallbackData)
         } else {
+          // For other errors, show the error message
           setError(`Failed to load dispensary locations: ${error.message}`)
+          // Still use fallback data
           setDispensaries(getFallbackDispensaryData())
         }
       } else {
         if (data && data.length > 0) {
           setDispensaries(data)
         } else {
+          // If no data returned, use fallback
+          console.log("No dispensaries found in database, using fallback data")
           const fallbackData = getFallbackDispensaryData()
           setDispensaries(fallbackData)
         }
       }
     } catch (error) {
+      console.error("Unexpected error in fetchDispensaries:", error)
       setError("An unexpected error occurred while loading dispensary data")
 
       // Always use fallback data on error
@@ -165,15 +173,6 @@ export default function DispensaryMapClient() {
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-lg p-6 map-container-wrapper w-full">
-        <DispensaryMap
-          dispensaries={dispensaries}
-          loading={loading}
-          selectedLocation={selectedLocation}
-          showOnlyHaiProducts={showOnlyHaiProducts}
-        />
-      </div>
-
       <div className="bg-white rounded-lg shadow-lg p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold text-[#a8d1e7]">Dispensary Locations</h2>
@@ -197,6 +196,15 @@ export default function DispensaryMapClient() {
           loading={loading}
           onFilterChange={handleFilterChange}
           compact={true}
+        />
+      </div>
+
+      <div className="bg-white rounded-lg shadow-lg p-6 map-container-wrapper w-full">
+        <DispensaryMap
+          dispensaries={dispensaries}
+          loading={loading}
+          selectedLocation={selectedLocation}
+          showOnlyHaiProducts={showOnlyHaiProducts}
         />
       </div>
     </div>

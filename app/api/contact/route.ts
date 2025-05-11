@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { verifyRecaptchaToken } from "@/components/contact/recaptcha"
 
 // Rate limiting
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000 // 1 hour
@@ -59,14 +58,6 @@ export async function POST(request: NextRequest) {
     if (submissionTime > 0 && timeDiff < 3000) {
       // Too fast, likely a bot - silently reject with fake success
       return NextResponse.json({ success: true })
-    }
-
-    // Verify reCAPTCHA
-    const recaptchaToken = formData.get("g-recaptcha-response") as string
-    const isValidRecaptcha = await verifyRecaptchaToken(recaptchaToken)
-
-    if (!isValidRecaptcha) {
-      return NextResponse.json({ error: "reCAPTCHA verification failed. Please try again." }, { status: 400 })
     }
 
     // Forward to Formspree

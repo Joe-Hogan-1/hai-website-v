@@ -6,7 +6,6 @@ import { useState, useRef, useEffect } from "react"
 import Header from "@/components/header"
 import { validateForm, required, email, phone, minLength } from "@/components/contact/form-validator"
 import { Honeypot, validateHoneypot } from "@/components/contact/honeypot"
-import { ReCAPTCHA } from "@/components/contact/recaptcha"
 import { submitContactForm } from "@/app/actions/contact-form-actions"
 
 // Fingerprinting to detect bots
@@ -41,16 +40,10 @@ export default function ContactPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<{ [key: string]: string }>({})
-  const [recaptchaToken, setRecaptchaToken] = useState("")
   const [fingerprint, setFingerprint] = useState("")
-  const [recaptchaError, setRecaptchaError] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const submissionAttempts = useRef(0)
-
-  // Google's official test key - safe to use in client code
-  // For production, replace with your actual site key
-  const recaptchaSiteKey = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
 
   useEffect(() => {
     // Generate fingerprint on component mount
@@ -160,18 +153,6 @@ export default function ContactPage() {
       return
     }
 
-    // Check if reCAPTCHA is completed (skip if there was an error loading reCAPTCHA)
-    if (!recaptchaToken && !recaptchaError) {
-      setErrors({ form: "Please complete the reCAPTCHA verification." })
-      setIsSubmitting(false)
-      return
-    }
-
-    // Add reCAPTCHA token if available
-    if (recaptchaToken) {
-      formData.append("g-recaptcha-response", recaptchaToken)
-    }
-
     // Validate form
     const validation = validateForm(formData, validationRules)
     if (!validation.isValid) {
@@ -210,16 +191,6 @@ export default function ContactPage() {
         setSubmitted(true)
         form.reset()
         setFormData({})
-        setRecaptchaToken("")
-
-        // Reset reCAPTCHA if available
-        try {
-          if (window.grecaptcha?.reset) {
-            window.grecaptcha.reset()
-          }
-        } catch (error) {
-          console.error("Error resetting reCAPTCHA:", error)
-        }
       } else {
         setErrors({ form: result.error || "Form submission failed. Please try again." })
       }
@@ -351,11 +322,6 @@ export default function ContactPage() {
                   {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
                 </div>
 
-                {/* reCAPTCHA */}
-                <div className="flex justify-center">
-                  <ReCAPTCHA siteKey={recaptchaSiteKey} onChange={setRecaptchaToken} />
-                </div>
-
                 {errors.form && (
                   <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-sm">
                     {errors.form}
@@ -365,7 +331,7 @@ export default function ContactPage() {
                 <div className="flex justify-center">
                   <button
                     type="submit"
-                    disabled={isSubmitting || (!recaptchaToken && !recaptchaError)}
+                    disabled={isSubmitting}
                     className="bg-black text-white px-8 py-3 rounded-sm hover:bg-opacity-80 transition-all disabled:opacity-50 relative"
                   >
                     {isSubmitting ? (
@@ -401,8 +367,7 @@ export default function ContactPage() {
                 </div>
 
                 <p className="text-xs text-center text-gray-600 mt-4">
-                  This form is protected by reCAPTCHA and Formspree. Your information will never be sold or used for
-                  spam.
+                  Your information will never be sold or used for spam.
                 </p>
               </form>
             )}

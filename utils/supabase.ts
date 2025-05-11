@@ -35,32 +35,12 @@ export async function checkSupabaseConnection() {
   }
 }
 
-// Helper function to check storage bucket access
-export async function checkStorageBucket(bucketName = "banner-images") {
+// Simplified helper function to check storage bucket access
+export async function checkStorageBucket(bucketName = "dispensary-images") {
   try {
-    // First check if bucket exists
-    const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets()
-
-    if (bucketsError) {
-      console.error("Error listing buckets:", bucketsError)
-      return { exists: false, error: bucketsError.message }
-    }
-
-    // Case-insensitive search for the bucket
-    const bucket = buckets.find((b) => b.name.toLowerCase() === bucketName.toLowerCase())
-
-    if (!bucket) {
-      return { exists: false, error: "Bucket not found" }
-    }
-
-    // Try to list files to check access
-    const { error: listError } = await supabase.storage.from(bucket.name).list()
-
-    if (listError) {
-      return { exists: true, accessible: false, error: listError.message, bucketName: bucket.name }
-    }
-
-    return { exists: true, accessible: true, bucketName: bucket.name }
+    // Simply try to list files in the bucket
+    const { error } = await supabase.storage.from(bucketName).list("", { limit: 1 })
+    return { exists: !error, accessible: !error, error: error?.message }
   } catch (err) {
     console.error("Error checking storage bucket:", err)
     return { exists: false, error: err.message }

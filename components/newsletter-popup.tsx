@@ -199,11 +199,11 @@ export default function NewsletterPopup() {
                   <h3 className="text-lg font-semibold text-[#0e7490]">Join the hai. community</h3>
                   <button
                     onClick={handleClose}
-                    className="newsletter-close-btn"
+                    className="newsletter-close-btn p-1 rounded-full hover:bg-gray-100"
                     aria-label="Close newsletter popup"
-                    style={{ color: "black", backgroundColor: "transparent" }}
+                    style={{ backgroundColor: "transparent", border: "none", boxShadow: "none" }}
                   >
-                    <X size={20} style={{ color: "black" }} />
+                    <X size={20} className="text-black" />
                   </button>
                 </motion.div>
 

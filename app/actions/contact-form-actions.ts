@@ -1,7 +1,5 @@
 "use server"
 
-import { verifyRecaptchaToken } from "./recaptcha-actions"
-
 type FormSubmissionResult = {
   success: boolean
   message?: string
@@ -10,17 +8,6 @@ type FormSubmissionResult = {
 
 export async function submitContactForm(formData: FormData): Promise<FormSubmissionResult> {
   try {
-    // Verify reCAPTCHA token
-    const recaptchaToken = formData.get("g-recaptcha-response") as string
-    const isRecaptchaValid = await verifyRecaptchaToken(recaptchaToken)
-
-    if (!isRecaptchaValid) {
-      return {
-        success: false,
-        error: "reCAPTCHA verification failed. Please try again.",
-      }
-    }
-
     // Get form data
     const name = formData.get("name") as string
     const email = formData.get("email") as string
@@ -33,6 +20,16 @@ export async function submitContactForm(formData: FormData): Promise<FormSubmiss
       return {
         success: false,
         error: "Please fill out all required fields.",
+      }
+    }
+
+    // Check for honeypot fields (if filled, it's likely a bot)
+    if (formData.get("website") || formData.get("email_confirm") || formData.get("phone_confirm")) {
+      console.warn("Honeypot field filled - likely a bot submission")
+      // Return success but don't actually submit
+      return {
+        success: true,
+        message: "Thank you for your submission.",
       }
     }
 

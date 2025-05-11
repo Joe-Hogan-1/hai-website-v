@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { supabase } from "@/utils/supabase"
 import Link from "next/link"
-import { ArrowRight, ChevronUp, ChevronDown } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { ArrowRight, ChevronDown } from "lucide-react"
 
 interface BlogPost {
   id: string
@@ -19,7 +18,8 @@ export default function VerticalBlogCarousel() {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     async function fetchBlogPosts() {
@@ -52,6 +52,41 @@ export default function VerticalBlogCarousel() {
     fetchBlogPosts()
   }, [])
 
+  // Check if we need to show the scroll indicator
+  useEffect(() => {
+    if (blogPosts.length > 3) {
+      setShowScrollIndicator(true)
+    } else {
+      setShowScrollIndicator(false)
+    }
+  }, [blogPosts])
+
+  // Handle scroll events to hide indicator when user has scrolled down
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollContainerRef.current) {
+        const { scrollTop } = scrollContainerRef.current
+        // Hide indicator when user has scrolled down
+        if (scrollTop > 10) {
+          setShowScrollIndicator(false)
+        } else {
+          setShowScrollIndicator(blogPosts.length > 3)
+        }
+      }
+    }
+
+    const scrollContainer = scrollContainerRef.current
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll)
+    }
+
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", handleScroll)
+      }
+    }
+  }, [blogPosts.length])
+
   // Add this function to provide fallback data
   function getFallbackBlogPosts(): BlogPost[] {
     return [
@@ -79,31 +114,48 @@ export default function VerticalBlogCarousel() {
         image_url: "/placeholder.svg",
         created_at: new Date().toISOString(),
       },
+      {
+        id: "4",
+        title: "Understanding Different Cannabis Strains",
+        summary: "A guide to indica, sativa, and hybrid strains and their effects.",
+        content: "Lorem ipsum dolor sit amet...",
+        image_url: "/placeholder.svg",
+        created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: "5",
+        title: "The History of Cannabis Cultivation",
+        summary: "Tracing the origins and spread of cannabis cultivation throughout human history.",
+        content: "Lorem ipsum dolor sit amet...",
+        image_url: "/placeholder.svg",
+        created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      },
     ]
   }
 
-  const navigateCarousel = (direction: "up" | "down") => {
-    if (direction === "up") {
-      setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev))
-    } else {
-      setCurrentIndex((prev) => (prev < blogPosts.length - 1 ? prev + 1 : prev))
+  // Handle scroll to reveal more articles
+  const scrollToMore = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollTop + 200,
+        behavior: "smooth",
+      })
     }
   }
 
   if (loading) {
     return (
-      <div className="h-full flex flex-col justify-center items-center bg-[#ffd6c0]/50 rounded-lg p-6">
+      <div className="h-full flex flex-col justify-center items-center">
         <div className="w-full h-32 bg-white/40 rounded mb-4 animate-pulse"></div>
         <div className="w-3/4 h-6 bg-white/40 rounded mb-3 animate-pulse"></div>
         <div className="w-full h-4 bg-white/40 rounded mb-2 animate-pulse"></div>
-        <div className="w-5/6 h-4 bg-white/40 rounded mb-4 animate-pulse"></div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="h-full flex flex-col justify-center items-center bg-[#ffd6c0]/50 rounded-lg p-6">
+      <div className="h-full flex flex-col justify-center items-center">
         <p className="text-red-500 mb-4">{error}</p>
         <p className="text-black">Unable to load lifestyle articles</p>
       </div>
@@ -112,94 +164,127 @@ export default function VerticalBlogCarousel() {
 
   if (blogPosts.length === 0) {
     return (
-      <div className="h-full flex flex-col justify-center items-center bg-[#ffd6c0]/50 rounded-lg p-6">
+      <div className="h-full flex flex-col justify-center items-center">
         <p className="text-xl text-black">No lifestyle articles available yet.</p>
         <p className="text-black mt-2">Check back soon for updates!</p>
       </div>
     )
   }
 
-  return (
-    <div className="h-full flex flex-col bg-[#ffd6c0]/50 rounded-lg p-4 relative">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold">Latest Articles</h2>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => navigateCarousel("up")}
-            disabled={currentIndex === 0}
-            className="p-2 rounded-full bg-black text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Previous article"
-          >
-            <ChevronUp size={20} />
-          </button>
-          <button
-            onClick={() => navigateCarousel("down")}
-            disabled={currentIndex === blogPosts.length - 1}
-            className="p-2 rounded-full bg-black text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Next article"
-          >
-            <ChevronDown size={20} />
-          </button>
-        </div>
-      </div>
+  // Get only the first 3 posts to display initially
+  const visiblePosts = blogPosts.slice(0, 3)
+  const remainingPosts = blogPosts.slice(3)
 
-      <div className="flex-1 overflow-hidden relative">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="h-full"
-          >
-            <div className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md border border-white/30 h-full flex flex-col">
-              {blogPosts[currentIndex].image_url && (
-                <div className="mb-4 overflow-hidden rounded-lg mx-auto w-full max-w-md flex items-center justify-center">
+  return (
+    <div className="h-full flex flex-col">
+      {/* Container for the first 3 articles - these are always visible */}
+      <div className="space-y-4 mb-2">
+        {visiblePosts.map((post) => (
+          <div key={post.id}>
+            <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30">
+              {post.image_url && (
+                <div className="mb-3 overflow-hidden rounded-lg">
                   <img
-                    src={blogPosts[currentIndex].image_url || "/placeholder.svg"}
-                    alt={blogPosts[currentIndex].title}
-                    className="w-full object-cover transition-transform duration-300 hover:scale-105"
-                    style={{ maxHeight: "200px" }}
+                    src={post.image_url || "/placeholder.svg"}
+                    alt={post.title}
+                    className="w-full h-32 object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
               )}
-              <div className="flex-1 flex flex-col">
-                <h2 className="text-2xl font-semibold mb-3 text-black">{blogPosts[currentIndex].title}</h2>
-                <p className="text-gray-700 mb-4 flex-1 font-medium">{blogPosts[currentIndex].summary}</p>
-                <div className="flex justify-between items-center mt-auto">
-                  <span className="text-sm text-gray-500">
-                    {new Date(blogPosts[currentIndex].created_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </span>
-                  <Link
-                    href={`/lifestyle/${blogPosts[currentIndex].id}`}
-                    className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold"
-                  >
-                    Read more <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </div>
+              <h3 className="text-lg font-semibold mb-2 text-black">{post.title}</h3>
+              <p className="text-gray-700 mb-3 text-sm line-clamp-2">{post.summary}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-500">
+                  {new Date(post.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+                <Link
+                  href={`/lifestyle/${post.id}`}
+                  className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm"
+                >
+                  Read more <ArrowRight className="ml-1 h-3 w-3" />
+                </Link>
               </div>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        ))}
       </div>
 
-      <div className="mt-4 flex justify-center">
-        <div className="flex space-x-2">
-          {blogPosts.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full ${index === currentIndex ? "bg-black" : "bg-black/30"}`}
-              aria-label={`Go to article ${index + 1}`}
-            />
-          ))}
+      {/* Scroll indicator and container for remaining articles */}
+      {remainingPosts.length > 0 && (
+        <div className="relative">
+          {/* Scroll indicator */}
+          {showScrollIndicator && (
+            <div className="flex justify-center mb-2 animate-bounce cursor-pointer" onClick={scrollToMore}>
+              <div className="bg-white/80 rounded-full p-1 shadow-md">
+                <ChevronDown className="h-5 w-5 text-gray-600" />
+              </div>
+            </div>
+          )}
+
+          {/* Scrollable container for remaining articles */}
+          <div
+            ref={scrollContainerRef}
+            className="overflow-y-auto pr-1 max-h-40 hide-scrollbar"
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(0, 0, 0, 0.2) transparent",
+            }}
+          >
+            <div className="space-y-4">
+              {remainingPosts.map((post) => (
+                <div key={post.id}>
+                  <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30">
+                    {post.image_url && (
+                      <div className="mb-3 overflow-hidden rounded-lg">
+                        <img
+                          src={post.image_url || "/placeholder.svg"}
+                          alt={post.title}
+                          className="w-full h-32 object-cover transition-transform duration-300 hover:scale-105"
+                        />
+                      </div>
+                    )}
+                    <h3 className="text-lg font-semibold mb-2 text-black">{post.title}</h3>
+                    <p className="text-gray-700 mb-3 text-sm line-clamp-2">{post.summary}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">
+                        {new Date(post.created_at).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                      <Link
+                        href={`/lifestyle/${post.id}`}
+                        className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm"
+                      >
+                        Read more <ArrowRight className="ml-1 h-3 w-3" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Add some custom styles for the scrollbar */}
+      <style jsx global>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .hide-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar-thumb {
+          background-color: rgba(0, 0, 0, 0.2);
+          border-radius: 20px;
+        }
+      `}</style>
     </div>
   )
 }
