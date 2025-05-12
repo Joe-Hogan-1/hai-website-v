@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { supabase } from "@/utils/supabase"
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 interface MediaItem {
   id: number
@@ -25,6 +26,10 @@ export default function HomeMediaCarousel() {
   const [autoplayEnabled, setAutoplayEnabled] = useState(true)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [debugInfo, setDebugInfo] = useState<string>("")
+
+  // Add media query hooks for responsive design
+  const isMobile = useMediaQuery("(max-width: 640px)")
+  const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)")
 
   useEffect(() => {
     fetchMediaItems()
@@ -168,6 +173,54 @@ export default function HomeMediaCarousel() {
 
   // Function to get text position classes
   const getTextPositionClasses = (position: string) => {
+    // Adjust text positioning for mobile
+    if (isMobile) {
+      // On mobile, we want to ensure text is more readable and positioned better
+      switch (position) {
+        case "top-left":
+        case "top-center":
+        case "top-right":
+          return "top-2 left-2 right-2 text-center"
+        case "middle-left":
+        case "middle-center":
+        case "middle-right":
+          return "top-1/2 -translate-y-1/2 left-2 right-2 text-center"
+        case "bottom-left":
+        case "bottom-center":
+        case "bottom-right":
+          return "bottom-2 left-2 right-2 text-center"
+        default:
+          return "bottom-2 left-2 right-2 text-center"
+      }
+    }
+
+    // Tablet adjustments
+    if (isTablet) {
+      switch (position) {
+        case "top-left":
+          return "top-4 left-4 text-left"
+        case "top-center":
+          return "top-4 left-1/2 -translate-x-1/2 text-center"
+        case "top-right":
+          return "top-4 right-4 text-right"
+        case "middle-left":
+          return "top-1/2 -translate-y-1/2 left-4 text-left"
+        case "middle-center":
+          return "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
+        case "middle-right":
+          return "top-1/2 -translate-y-1/2 right-4 text-right"
+        case "bottom-left":
+          return "bottom-4 left-4 text-left"
+        case "bottom-center":
+          return "bottom-4 left-1/2 -translate-x-1/2 text-center"
+        case "bottom-right":
+          return "bottom-4 right-4 text-right"
+        default:
+          return "bottom-4 left-4 text-left"
+      }
+    }
+
+    // Desktop positioning (original)
     switch (position) {
       case "top-left":
         return "top-6 left-6 text-left"
@@ -204,26 +257,81 @@ export default function HomeMediaCarousel() {
             }`}
           >
             {item.media_type === "video" ? (
-              <video src={item.media_url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+              <video
+                src={item.media_url}
+                className="w-full h-full object-contain md:object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
             ) : (
-              <img src={item.media_url || "/placeholder.svg"} alt={item.title} className="w-full h-full object-cover" />
+              <div className="relative w-full h-full">
+                <img
+                  src={item.media_url || "/placeholder.svg"}
+                  alt={item.title}
+                  className="w-full h-full object-contain md:object-cover"
+                  style={{
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                  }}
+                />
+              </div>
             )}
 
-            {/* Text Overlay */}
+            {/* Text Overlay with responsive adjustments */}
             {item.text_overlay && (
               <div
-                className={`absolute ${getTextPositionClasses(item.text_position)} p-4 bg-black/30 rounded text-white max-w-md`}
+                className={`absolute ${getTextPositionClasses(item.text_position)} p-2 sm:p-4 bg-black/30 rounded text-white max-w-full sm:max-w-md`}
               >
-                <h2 className="text-2xl font-bold mb-2">{item.text_overlay}</h2>
-                {item.description && <p className="text-sm md:text-base">{item.description}</p>}
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{item.text_overlay}</h2>
+                {item.description && (
+                  <p className="text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-none">{item.description}</p>
+                )}
               </div>
             )}
           </div>
         ))}
 
-        {/* Dots Indicator */}
+        {/* Navigation Arrows - Responsive positioning */}
         {mediaItems.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+          <>
+            <button
+              onClick={goToPrevSlide}
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1 sm:p-2 z-20"
+              aria-label="Previous slide"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 sm:h-6 sm:w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={goToNextSlide}
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1 sm:p-2 z-20"
+              aria-label="Next slide"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 sm:h-6 sm:w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
+
+        {/* Dots Indicator - Responsive positioning */}
+        {mediaItems.length > 1 && (
+          <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex space-x-1 sm:space-x-2 z-20">
             {mediaItems.map((_, index) => (
               <button
                 key={index}
@@ -232,17 +340,17 @@ export default function HomeMediaCarousel() {
                   setCurrentIndex(index)
                   setTimeout(() => setIsTransitioning(false), 500)
                 }}
-                className={`w-3 h-3 rounded-full ${index === currentIndex ? "bg-white" : "bg-white/50"}`}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${index === currentIndex ? "bg-white" : "bg-white/50"}`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
         )}
 
-        {/* Autoplay Toggle */}
+        {/* Autoplay Toggle - Responsive positioning */}
         <button
           onClick={toggleAutoplay}
-          className="absolute top-4 right-4 bg-black/30 text-white p-2 rounded-full hover:bg-black/50 z-20 text-xs"
+          className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black/30 text-white p-1 sm:p-2 rounded-full hover:bg-black/50 z-20 text-xs sm:text-sm"
           aria-label={autoplayEnabled ? "Pause autoplay" : "Start autoplay"}
         >
           {autoplayEnabled ? "Pause" : "Play"}

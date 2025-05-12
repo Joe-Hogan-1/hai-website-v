@@ -50,7 +50,6 @@ export default function DispensaryList({
   }
 
   const handleSelectDispensary = (dispensary: Dispensary) => {
-    console.log(`Selected dispensary: ${dispensary.name} at [${dispensary.lat}, ${dispensary.lng}]`)
     setSelectedId(dispensary.id)
 
     // Add a small delay to ensure the map has time to process the location change

@@ -83,6 +83,9 @@ export default function Footer() {
               <Link href="/map" className="text-black text-sm font-medium hover:underline">
                 store locator
               </Link>
+              <Link href="/wholesale" className="text-black text-sm font-medium hover:underline">
+                wholesale
+              </Link>
             </div>
           </motion.div>
 

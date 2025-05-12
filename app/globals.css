@@ -561,11 +561,13 @@ body.has-breaking-news {
 /* Adjust header position when breaking news is present */
 body.has-breaking-news header {
   top: var(--breaking-news-height);
+  margin-top: 0; /* Remove any margin */
 }
 
 /* Ensure breaking news bar doesn't add extra space when not present */
 body:not(.has-breaking-news) header {
   top: 0;
+  margin-top: 0; /* Remove any margin */
 }
 
 /* Video Banner Section Styles */

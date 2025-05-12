@@ -1,5 +1,7 @@
 "use server"
 
+import { isLikelySpam } from "@/utils/anti-spam"
+
 type FormSubmissionResult = {
   success: boolean
   message?: string
@@ -13,7 +15,10 @@ export async function submitContactForm(formData: FormData): Promise<FormSubmiss
     const email = formData.get("email") as string
     const message = formData.get("message") as string
     const phone = formData.get("phone") as string
-    const company = formData.get("company") as string
+
+    // Get anti-spam data
+    const formStartTime = Number.parseInt((formData.get("formStartTime") as string) || "0")
+    const formToken = formData.get("formToken") as string
 
     // Basic validation
     if (!name || !email || !message) {
@@ -23,13 +28,20 @@ export async function submitContactForm(formData: FormData): Promise<FormSubmiss
       }
     }
 
-    // Check for honeypot fields (if filled, it's likely a bot)
-    if (formData.get("website") || formData.get("email_confirm") || formData.get("phone_confirm")) {
-      console.warn("Honeypot field filled - likely a bot submission")
-      // Return success but don't actually submit
+    // Anti-spam check
+    const spamCheck = isLikelySpam(formData, formStartTime, formToken)
+    if (spamCheck.isSpam) {
+      // For certain types of spam, we silently accept but don't process
+      if (spamCheck.reason === "submitted-too-quickly" || spamCheck.reason === "invalid-token") {
+        return {
+          success: true,
+          message: "Thank you for your submission.",
+        }
+      }
+
       return {
-        success: true,
-        message: "Thank you for your submission.",
+        success: false,
+        error: "Your submission was flagged as potential spam. Please try again.",
       }
     }
 
@@ -39,12 +51,11 @@ export async function submitContactForm(formData: FormData): Promise<FormSubmiss
     formspreeData.append("email", email)
     formspreeData.append("message", message)
     if (phone) formspreeData.append("phone", phone)
-    if (company) formspreeData.append("company", company)
+    formspreeData.append("form", "contact") // Add form identifier
 
     // Submit to Formspree
-    const formspreeEndpoint = process.env.FORMSPREE_ENDPOINT
+    const formspreeEndpoint = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT
     if (!formspreeEndpoint) {
-      console.error("Missing FORMSPREE_ENDPOINT environment variable")
       return {
         success: false,
         error: "Server configuration error. Please try again later.",
@@ -59,22 +70,20 @@ export async function submitContactForm(formData: FormData): Promise<FormSubmiss
       },
     })
 
-    const result = await response.json()
-
-    if (response.ok) {
-      return {
-        success: true,
-        message: "Your message has been sent successfully!",
-      }
-    } else {
-      console.error("Formspree error:", result)
+    if (!response.ok) {
       return {
         success: false,
-        error: "Failed to send message. Please try again later.",
+        error: `Failed to send message. Status: ${response.status}`,
       }
     }
+
+    const result = await response.json()
+
+    return {
+      success: true,
+      message: "Your message has been sent successfully!",
+    }
   } catch (error) {
-    console.error("Error submitting form:", error)
     return {
       success: false,
       error: "An unexpected error occurred. Please try again later.",

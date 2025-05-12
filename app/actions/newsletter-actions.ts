@@ -22,10 +22,8 @@ export async function subscribeToNewsletter(name: string, email: string) {
     const { error: tableCheckError } = await supabase.from("newsletter_subscribers").select("id").limit(1)
 
     if (tableCheckError) {
-      console.error("Table check error:", tableCheckError)
       // If the table doesn't exist, create it
       if (tableCheckError.message.includes("does not exist")) {
-        console.log("Attempting to create newsletter_subscribers table...")
         // We can't create tables from the client, so return a more helpful error
         return {
           success: false,
@@ -43,7 +41,6 @@ export async function subscribeToNewsletter(name: string, email: string) {
       .maybeSingle()
 
     if (existingCheckError) {
-      console.error("Error checking existing subscriber:", existingCheckError)
       return { success: false, message: `Error checking existing subscriber: ${existingCheckError.message}` }
     }
 
@@ -59,8 +56,6 @@ export async function subscribeToNewsletter(name: string, email: string) {
     })
 
     if (insertError) {
-      console.error("Error inserting subscriber:", insertError)
-
       // Check for common errors
       if (insertError.code === "23505") {
         // Unique violation
@@ -77,7 +72,6 @@ export async function subscribeToNewsletter(name: string, email: string) {
 
     return { success: true, message: "Successfully subscribed to the newsletter!" }
   } catch (error) {
-    console.error("Unexpected error in newsletter subscription:", error)
     return {
       success: false,
       message: "An unexpected error occurred",
@@ -100,13 +94,11 @@ export async function getNewsletterSubscribers(searchTerm = "") {
     const { data, error } = await query
 
     if (error) {
-      console.error("Error fetching newsletter subscribers:", error)
       return { success: false, subscribers: [], message: "Failed to fetch subscribers" }
     }
 
     return { success: true, subscribers: data || [] }
   } catch (error) {
-    console.error("Unexpected error fetching newsletter subscribers:", error)
     return { success: false, subscribers: [], message: "An unexpected error occurred" }
   }
 }
@@ -118,13 +110,11 @@ export async function deleteNewsletterSubscriber(id: string) {
     const { error } = await supabase.from("newsletter_subscribers").delete().eq("id", id)
 
     if (error) {
-      console.error("Error deleting newsletter subscriber:", error)
       return { success: false, message: "Failed to delete subscriber" }
     }
 
     return { success: true }
   } catch (error) {
-    console.error("Unexpected error deleting newsletter subscriber:", error)
     return { success: false, message: "An unexpected error occurred" }
   }
 }

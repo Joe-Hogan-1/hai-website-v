@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/utils/supabase"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 interface LifestyleBanner {
   id: string
@@ -20,6 +21,10 @@ export default function LifestyleBanner() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [touchStart, setTouchStart] = useState(0)
+
+  // Use media queries for responsive design
+  const isMobile = useMediaQuery("(max-width: 640px)")
+  const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)")
 
   // Fetch banners from Supabase
   useEffect(() => {
@@ -133,14 +138,26 @@ export default function LifestyleBanner() {
           <img
             src={banner.image_url || "/placeholder.svg"}
             alt={banner.alt_text || "Lifestyle Banner"}
-            className="w-full h-full object-cover"
+            className={`w-full h-full ${isMobile ? "object-contain" : "object-cover"}`}
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         {(banner.title || banner.description) && (
-          <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
-            {banner.title && <h2 className="text-4xl font-bold mb-3">{banner.title}</h2>}
-            {banner.description && <p className="text-xl max-w-3xl">{banner.description}</p>}
+          <div
+            className={`absolute bottom-0 left-0 right-0 ${isMobile ? "p-6" : isTablet ? "p-8" : "p-10"} text-white`}
+          >
+            {banner.title && (
+              <h2
+                className={`${isMobile ? "text-2xl" : isTablet ? "text-3xl" : "text-4xl"} font-bold mb-${isMobile ? "2" : "3"}`}
+              >
+                {banner.title}
+              </h2>
+            )}
+            {banner.description && (
+              <p className={`${isMobile ? "text-base line-clamp-3" : isTablet ? "text-lg" : "text-xl"} max-w-3xl`}>
+                {banner.description}
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -166,13 +183,25 @@ export default function LifestyleBanner() {
             <img
               src={banner.image_url || "/placeholder.svg"}
               alt={banner.alt_text || "Lifestyle Banner"}
-              className="w-full h-full object-cover"
+              className={`w-full h-full ${isMobile ? "object-contain" : "object-cover"}`}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             {(banner.title || banner.description) && (
-              <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
-                {banner.title && <h2 className="text-4xl font-bold mb-3">{banner.title}</h2>}
-                {banner.description && <p className="text-xl max-w-3xl">{banner.description}</p>}
+              <div
+                className={`absolute bottom-0 left-0 right-0 ${isMobile ? "p-6" : isTablet ? "p-8" : "p-10"} text-white`}
+              >
+                {banner.title && (
+                  <h2
+                    className={`${isMobile ? "text-2xl" : isTablet ? "text-3xl" : "text-4xl"} font-bold mb-${isMobile ? "2" : "3"}`}
+                  >
+                    {banner.title}
+                  </h2>
+                )}
+                {banner.description && (
+                  <p className={`${isMobile ? "text-base line-clamp-3" : isTablet ? "text-lg" : "text-xl"} max-w-3xl`}>
+                    {banner.description}
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -182,26 +211,32 @@ export default function LifestyleBanner() {
       {/* Navigation arrows */}
       <button
         onClick={goToPrevious}
-        className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-4 rounded-full focus:outline-none transition-colors"
+        className={`absolute ${isMobile ? "left-4" : "left-8"} top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white ${
+          isMobile ? "p-2" : isTablet ? "p-3" : "p-4"
+        } rounded-full focus:outline-none transition-colors`}
         aria-label="Previous banner"
       >
-        <ChevronLeft size={32} />
+        <ChevronLeft size={isMobile ? 24 : 32} />
       </button>
       <button
         onClick={goToNext}
-        className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-4 rounded-full focus:outline-none transition-colors"
+        className={`absolute ${isMobile ? "right-4" : "right-8"} top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white ${
+          isMobile ? "p-2" : isTablet ? "p-3" : "p-4"
+        } rounded-full focus:outline-none transition-colors`}
         aria-label="Next banner"
       >
-        <ChevronRight size={32} />
+        <ChevronRight size={isMobile ? 24 : 32} />
       </button>
 
       {/* Indicator dots */}
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-4">
+      <div
+        className={`absolute ${isMobile ? "bottom-6" : isTablet ? "bottom-8" : "bottom-10"} left-1/2 transform -translate-x-1/2 flex ${isMobile ? "space-x-2" : "space-x-4"}`}
+      >
         {banners.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-4 h-4 rounded-full focus:outline-none transition-colors ${
+            className={`${isMobile ? "w-3 h-3" : "w-4 h-4"} rounded-full focus:outline-none transition-colors ${
               index === currentIndex ? "bg-white" : "bg-white/50 hover:bg-white/70"
             }`}
             aria-label={`Go to banner ${index + 1}`}
