@@ -215,53 +215,59 @@ export default function HomeMediaCarousel() {
 
   return (
     <div className="w-full h-full relative overflow-hidden bg-[#fff5f0]">
-      <div className="absolute inset-4 bg-[#ffd6c0] rounded-sm overflow-hidden">
-        {/* Media Items */}
-        {mediaItems.map((item, index) => (
-          <div
-            key={item.id}
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
-            }`}
-          >
-            {item.media_type === "video" ? (
-              <video
-                src={item.media_url}
-                className="w-full h-full object-contain md:object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
-            ) : (
-              <div className="relative w-full h-full">
-                <img
-                  src={item.media_url || "/placeholder.svg"}
-                  alt={item.title}
-                  className="w-full h-full object-contain md:object-cover"
-                  style={{
-                    maxHeight: "100%",
-                    maxWidth: "100%",
-                  }}
+      {/* Changed from absolute inset-4 to relative with padding to maintain aspect ratio */}
+      <div className="relative bg-[#ffd6c0] rounded-sm overflow-hidden m-4">
+        {/* Added aspect ratio container */}
+        <div className="relative w-full" style={{ paddingBottom: "56.25%" /* 16:9 aspect ratio */ }}>
+          {/* Media Items */}
+          {mediaItems.map((item, index) => (
+            <div
+              key={item.id}
+              className={`absolute inset-0 transition-opacity duration-500 ${
+                index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+              }`}
+            >
+              {item.media_type === "video" ? (
+                <video
+                  src={item.media_url}
+                  className="absolute inset-0 w-full h-full object-contain"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
                 />
-              </div>
-            )}
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <img
+                    src={item.media_url || "/placeholder.svg"}
+                    alt={item.title}
+                    className="max-w-full max-h-full object-contain"
+                    style={{
+                      width: "auto",
+                      height: "auto",
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                    }}
+                  />
+                </div>
+              )}
 
-            {/* Text Overlay with responsive adjustments */}
-            {item.text_overlay && (
-              <div
-                className={`absolute ${getTextPositionClasses(item.text_position)} p-2 sm:p-4 bg-black/30 rounded text-white max-w-full sm:max-w-md`}
-              >
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{item.text_overlay}</h2>
-                {item.description && (
-                  <p className="text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-none">{item.description}</p>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-
-        {/* Navigation Arrows and Dots have been removed */}
+              {/* Text Overlay with responsive adjustments */}
+              {item.text_overlay && (
+                <div
+                  className={`absolute ${getTextPositionClasses(item.text_position)} p-2 sm:p-4 bg-black/30 rounded text-white max-w-full sm:max-w-md`}
+                >
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{item.text_overlay}</h2>
+                  {item.description && (
+                    <p className="text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-none">
+                      {item.description}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

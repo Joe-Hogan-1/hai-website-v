@@ -1,13 +1,15 @@
 import Header from "@/components/header"
 import ProductGrid from "@/components/products/product-grid"
+import AlignmentDebug from "@/components/alignment-debug"
 
 export default function ProductsPage() {
   return (
     <>
       <Header />
+      <AlignmentDebug />
       <div className="page-container">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-6 text-left">our products</h1>
+        <div className="container mx-auto px-4 relative">
+          <h1 className="text-4xl font-bold mb-6 text-left exact-align pl-[24px]">our products</h1>
           <div className="product-content">
             <ProductGrid />
           </div>

@@ -7,6 +7,22 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "New Order";
+  src: url("/fonts/NewOrder-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "New Order";
+  src: url("/fonts/NewOrder-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -38,12 +54,13 @@ body {
   --logo-glow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
   --header-height: 70px; /* Increased from 50px to 70px */
   --breaking-news-height: 32px; /* Fixed breaking news height */
-  --page-top-padding: 2rem; /* Increased from 0rem to 2rem */
-  --title-top-margin: 2.5rem; /* Added this new variable for title spacing */
+  --page-top-padding: 0.5rem; /* Reduced from 2rem to 0.5rem to decrease space */
+  --title-top-margin: 1rem; /* Reduced from 2.5rem to 1rem to decrease space */
   --title-negative-margin: 0px; /* Changed from -20px to 0px to stop negative margins */
   --content-padding: 1rem; /* Standard padding for content */
-  --title-bottom-margin: 2rem; /* Increased from 1rem to 2rem */
+  --title-bottom-margin: 1.5rem; /* Reduced from 2rem to 1.5rem */
   --title-left-padding: 2rem; /* Added for left alignment of titles */
+  --exact-align-left: 1.5rem; /* New variable for exact text alignment */
 }
 
 body.has-breaking-news {
@@ -55,7 +72,7 @@ body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
   font-family: "New Order", system-ui, sans-serif;
-  font-weight: 500;
+  font-weight: 500; /* Using Medium as the default font weight */
 }
 
 h1,
@@ -65,7 +82,7 @@ h4,
 h5,
 h6,
 .font-semibold {
-  font-weight: 600;
+  font-weight: 600; /* Using Semi Bold for headings */
   color: black;
 }
 
@@ -77,6 +94,23 @@ h6,
 /* Add a class for explicitly setting text to New Order Semi Bold */
 .font-semibold {
   font-weight: 600 !important;
+}
+
+/* Add a class for explicitly setting text to New Order Regular */
+.font-regular {
+  font-weight: 400 !important;
+}
+
+/* Apply Semi Bold to specific elements */
+.header-link,
+.badge,
+button,
+.btn,
+a.btn,
+.nav-link,
+.product-card h2,
+.read-more-link {
+  font-weight: 600 !important; /* Semi Bold */
 }
 
 /* Ensure consistent font rendering */
@@ -220,6 +254,7 @@ header {
   margin: 0 !important;
   box-sizing: border-box !important;
   white-space: nowrap !important;
+  font-weight: 600 !important; /* Semi Bold */
 }
 
 .simple-dashboard-button svg {
@@ -262,6 +297,7 @@ body.theater-mode-active .breaking-news-bar {
   background-color: black !important;
   color: white !important;
   border-color: black !important;
+  font-weight: 600 !important; /* Semi Bold */
 }
 
 .button-hover:hover {
@@ -276,6 +312,7 @@ body.theater-mode-active .breaking-news-bar {
   text-decoration: none;
   color: black;
   font-size: 1.125rem; /* Increased from 1rem to 1.125rem */
+  font-weight: 600 !important; /* Semi Bold */
 }
 
 .header-link::after {
@@ -382,7 +419,7 @@ body.theater-mode-active .breaking-news-bar {
   text-align: left !important; /* Changed from center to left */
   text-transform: lowercase !important; /* Make all titles lowercase */
   font-size: 2.25rem !important; /* Reduced from 3rem to 2.25rem */
-  font-weight: bold !important;
+  font-weight: 600 !important; /* Semi Bold */
   line-height: 1 !important; /* Reduced from 1.1 to 1 */
   padding-left: var(--title-left-padding) !important; /* Added left padding */
   padding-right: 0 !important;
@@ -411,6 +448,7 @@ body.theater-mode-active .breaking-news-bar {
   line-height: 1 !important;
   padding-left: var(--title-left-padding) !important; /* Added left padding */
   padding-right: 0 !important;
+  font-weight: 600 !important; /* Semi Bold */
 }
 
 /* Breaking News Bar Styles */
@@ -490,7 +528,7 @@ body.has-breaking-news .breaking-news-bar::after {
   white-space: nowrap;
   animation: marquee 30s linear infinite;
   padding-left: 100%;
-  font-weight: 600;
+  font-weight: 600; /* Semi Bold */
   color: black;
 }
 
@@ -530,6 +568,7 @@ body.has-breaking-news {
   width: auto !important;
   max-width: 100% !important;
   transform: none !important;
+  font-weight: 600 !important; /* Semi Bold */
 }
 
 /* Override any center alignment for all headings */
@@ -540,6 +579,7 @@ h4,
 h5,
 h6 {
   text-align: left !important;
+  font-weight: 600 !important; /* Semi Bold */
 }
 
 /* Force left alignment for specific title classes */
@@ -567,4 +607,75 @@ h6 {
   padding-right: 0 !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
+}
+
+/* EXACT ALIGNMENT STYLES - This will ensure the "o" and "C" are aligned */
+.exact-align {
+  position: relative !important;
+  box-sizing: border-box !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-indent: 0 !important;
+  border-left: none !important;
+}
+
+/* Alignment container */
+.alignment-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+  overflow: visible;
+  z-index: 1000;
+}
+
+/* Ensure the badge container is aligned with the heading */
+.flex.flex-wrap.gap-2 {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Specific adjustment for the Categories heading */
+h2.exact-align {
+  padding-left: 24px !important; /* Adjust this value to align with the "o" */
+  margin-left: 0 !important;
+  font-weight: 600 !important; /* Semi Bold */
+}
+
+/* Ensure no other styles interfere with our alignment */
+.exact-align::before,
+.exact-align::after {
+  content: none !important;
+}
+
+/* Apply Semi Bold to badges */
+.badge {
+  font-weight: 600 !important; /* Semi Bold */
+}
+
+/* Apply Semi Bold to buttons */
+button,
+.btn,
+.button {
+  font-weight: 600 !important; /* Semi Bold */
+}
+
+/* Apply Semi Bold to navigation links */
+nav a,
+.nav-link {
+  font-weight: 600 !important; /* Semi Bold */
+}
+
+/* Apply Semi Bold to footer links */
+footer a {
+  font-weight: 600 !important; /* Semi Bold */
+}
+
+/* Apply Semi Bold to product cards */
+.product-card h2 {
+  font-weight: 600 !important; /* Semi Bold */
+}
+
+/* Apply Semi Bold to read more links */
+.read-more-link {
+  font-weight: 600 !important; /* Semi Bold */
 }

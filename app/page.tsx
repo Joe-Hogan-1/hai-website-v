@@ -44,8 +44,8 @@ export default function HomePage() {
           {/* Main content area with full-width image carousel */}
           <div className="min-h-screen pt-24 px-6 pb-6 flex flex-col">
             <div className="flex-grow flex flex-col">
-              {/* Full-width media carousel */}
-              <div className="w-full h-[calc(100vh-96px-3rem)]">
+              {/* Full-width media carousel - removed fixed height constraint */}
+              <div className="w-full mb-8">
                 <HomeMediaCarousel />
               </div>
 

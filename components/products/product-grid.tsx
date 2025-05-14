@@ -210,8 +210,7 @@ export default function ProductGrid() {
     <>
       {/* Category Filter */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-black text-left">Categories</h2>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 pl-[24px]">
           <Badge
             className={`cursor-pointer ${!activeCategory ? "bg-[#ffd6c0]" : "bg-gray-200 hover:bg-gray-300"}`}
             onClick={() => setActiveCategory(null)}
