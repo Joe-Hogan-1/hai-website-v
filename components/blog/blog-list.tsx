@@ -30,15 +30,28 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
       try {
         setLoading(true)
 
-        const { data, error } = await supabase
-          .from("blog_posts")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(limit || 10)
+        // Try to use the get_published_blog_posts function
+        const { data, error } = await supabase.rpc("get_published_blog_posts", {
+          limit_count: limit || 10,
+          offset_count: 0,
+        })
 
         if (error) {
-          setError(`Failed to load blog posts: ${error.message}`)
-          setBlogPosts([])
+          // Fall back to direct query if RPC fails
+          const { data: directData, error: directError } = await supabase
+            .from("blog_posts")
+            .select("*")
+            .eq("published", true)
+            .order("created_at", { ascending: false })
+            .limit(limit || 10)
+
+          if (directError) {
+            setError(`Failed to load blog posts: ${directError.message}`)
+            setBlogPosts([])
+          } else {
+            setBlogPosts(directData || [])
+            setError(null)
+          }
         } else {
           setBlogPosts(data || [])
           setError(null)

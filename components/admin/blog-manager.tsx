@@ -47,6 +47,7 @@ export default function BlogManager({ userId }: BlogManagerProps) {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [activeTab, setActiveTab] = useState("all")
+  const [publishLoading, setPublishLoading] = useState<string | null>(null)
 
   useEffect(() => {
     fetchBlogPosts()
@@ -55,10 +56,23 @@ export default function BlogManager({ userId }: BlogManagerProps) {
   const fetchBlogPosts = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("blog_posts").select("*").order("created_at", { ascending: false })
+      // Use the get_user_blog_posts function to get all posts for the current user
+      const { data, error } = await supabase
+        .rpc("get_user_blog_posts", { limit_count: 50, offset_count: 0 })
+        .order("created_at", { ascending: false })
 
-      if (error) throw error
-      setBlogPosts(data || [])
+      if (error) {
+        // Fall back to direct query if RPC fails
+        const { data: directData, error: directError } = await supabase
+          .from("blog_posts")
+          .select("*")
+          .order("created_at", { ascending: false })
+
+        if (directError) throw directError
+        setBlogPosts(directData || [])
+      } else {
+        setBlogPosts(data || [])
+      }
     } catch (error) {
       console.error("Error fetching blog posts:", error)
       toast.error("Failed to load blog posts")
@@ -131,15 +145,31 @@ export default function BlogManager({ userId }: BlogManagerProps) {
 
   const handleTogglePublish = async (blog: BlogPost) => {
     try {
-      const { error } = await supabase.from("blog_posts").update({ published: !blog.published }).eq("id", blog.id)
+      setPublishLoading(blog.id)
 
-      if (error) throw error
+      // Try to use the toggle_blog_post_published function
+      const { data, error } = await supabase.rpc("toggle_blog_post_published", { post_id: blog.id })
+
+      if (error) {
+        // Fall back to direct update if RPC fails
+        const { error: updateError } = await supabase
+          .from("blog_posts")
+          .update({
+            published: !blog.published,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", blog.id)
+
+        if (updateError) throw updateError
+      }
 
       toast.success(`Blog post ${!blog.published ? "published" : "unpublished"} successfully`)
       fetchBlogPosts()
     } catch (error) {
       console.error("Error toggling publish status:", error)
       toast.error("Failed to update publish status")
+    } finally {
+      setPublishLoading(null)
     }
   }
 
@@ -432,8 +462,15 @@ export default function BlogManager({ userId }: BlogManagerProps) {
                                 size="sm"
                                 onClick={() => handleTogglePublish(blog)}
                                 title={blog.published ? "Unpublish" : "Publish"}
+                                disabled={publishLoading === blog.id}
                               >
-                                {blog.published ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                                {publishLoading === blog.id ? (
+                                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                ) : blog.published ? (
+                                  <Eye className="h-4 w-4" />
+                                ) : (
+                                  <EyeOff className="h-4 w-4" />
+                                )}
                               </Button>
                               <Button
                                 variant="ghost"
