@@ -46,8 +46,8 @@ export default function AgeVerificationPage() {
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hai_logo_transparent_black-83ImGs5RWDRJ4m77zReENm6jy5pGP3.png"
             alt="hai."
-            width={148}
-            height={74}
+            width={222}
+            height={111}
             className="transition-all duration-300 hover:opacity-80"
             priority
           />

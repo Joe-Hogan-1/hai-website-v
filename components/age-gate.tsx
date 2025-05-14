@@ -43,7 +43,7 @@ export default function AgeGate({ onVerify }: AgeGateProps) {
     <div className={`fixed inset-0 z-50 flex justify-center items-center bg-white ${isDissolving ? "fade-out" : ""}`}>
       <div className="bg-[#ffd6c0] p-12 w-full max-w-4xl rounded-sm flex flex-col items-center justify-center min-h-[400px]">
         {/* Add the large logo here */}
-        <div className="mb-8 w-[200px] h-[200px]">
+        <div className="mb-8 w-[300px] h-[300px]">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -53,10 +53,10 @@ export default function AgeGate({ onVerify }: AgeGateProps) {
             <Image
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hai_logo_transparent_black-83ImGs5RWDRJ4m77zReENm6jy5pGP3.png"
               alt="hai."
-              width={200}
-              height={200}
+              width={300}
+              height={300}
               priority
-              className="w-[200px] h-[200px] object-contain"
+              className="w-[300px] h-[300px] object-contain"
             />
           </motion.div>
         </div>

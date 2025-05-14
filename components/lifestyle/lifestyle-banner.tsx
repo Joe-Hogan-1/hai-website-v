@@ -114,7 +114,7 @@ export default function LifestyleBanner() {
   // If no banners or still loading, show placeholder
   if (loading) {
     return (
-      <div className="w-full h-[375px] bg-gray-100 animate-pulse flex items-center justify-center">
+      <div className="w-full bg-gray-100 animate-pulse flex items-center justify-center aspect-[16/9]">
         <p className="text-gray-400">Loading banner...</p>
       </div>
     )
@@ -122,7 +122,7 @@ export default function LifestyleBanner() {
 
   if (banners.length === 0) {
     return (
-      <div className="w-full h-[375px] bg-gray-100 flex items-center justify-center">
+      <div className="w-full bg-gray-100 flex items-center justify-center aspect-[16/9]">
         <p className="text-gray-400">No banner available</p>
       </div>
     )
@@ -132,15 +132,14 @@ export default function LifestyleBanner() {
   if (banners.length === 1) {
     const banner = banners[0]
     return (
-      <div className="relative w-full h-[375px] overflow-hidden rounded-lg">
-        <div className="absolute inset-0">
+      <div className="relative w-full overflow-hidden rounded-lg aspect-[16/9]">
+        <div className="flex items-center justify-center h-full">
           <img
             src={banner.image_url || "/placeholder.svg"}
             alt={banner.alt_text || "Lifestyle Banner"}
-            className={`w-full h-full ${isMobile ? "object-contain" : isTablet ? "object-cover object-center" : "object-cover"}`}
+            className="w-auto h-auto max-w-full max-h-full object-contain"
           />
         </div>
-        {/* Shadow overlay removed */}
         {(banner.title || banner.description) && (
           <div className={`absolute bottom-0 left-0 right-0 ${isMobile ? "p-4" : isTablet ? "p-6" : "p-8"} text-white`}>
             {banner.title && (
@@ -166,7 +165,7 @@ export default function LifestyleBanner() {
   // Multiple banners, show carousel without indicator dots
   return (
     <div
-      className="relative w-full h-[375px] overflow-hidden rounded-lg"
+      className="relative w-full overflow-hidden rounded-lg aspect-[16/9]"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -179,12 +178,13 @@ export default function LifestyleBanner() {
               index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
           >
-            <img
-              src={banner.image_url || "/placeholder.svg"}
-              alt={banner.alt_text || "Lifestyle Banner"}
-              className={`w-full h-full ${isMobile ? "object-contain" : isTablet ? "object-cover object-center" : "object-cover"}`}
-            />
-            {/* Shadow overlay removed */}
+            <div className="flex items-center justify-center h-full">
+              <img
+                src={banner.image_url || "/placeholder.svg"}
+                alt={banner.alt_text || "Lifestyle Banner"}
+                className="w-auto h-auto max-w-full max-h-full object-contain"
+              />
+            </div>
             {(banner.title || banner.description) && (
               <div
                 className={`absolute bottom-0 left-0 right-0 ${isMobile ? "p-4" : isTablet ? "p-6" : "p-8"} text-white`}
