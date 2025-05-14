@@ -39,7 +39,7 @@ body {
   --header-height: 70px; /* Increased from 50px to 70px */
   --breaking-news-height: 32px; /* Fixed breaking news height */
   --page-top-padding: 0rem; /* Completely eliminated padding */
-  --title-negative-margin: -30px; /* Increased negative margin to pull titles up more */
+  --title-negative-margin: -20px; /* Changed from -30px to -20px to add more space */
   --content-padding: 1rem; /* Standard padding for content */
   --title-bottom-margin: 2rem; /* Increased from 1rem to 2rem */
 }
@@ -397,7 +397,7 @@ body.theater-mode-active .breaking-news-bar {
 /* Specific adjustment for products page */
 .page-container h1.text-4xl.font-bold.mb-4.text-center,
 .page-container h1.text-4xl.font-bold.mb-3.text-center,
-.page-container h1.text-4xl.font-bold.mb-2.text-center,
+.page-page-container h1.text-4xl.font-bold.mb-2.text-center,
 .page-container h1.text-5xl.font-bold.mb-2,
 .page-container h1.text-4xl.font-bold.mb-2 {
   margin-top: var(--title-negative-margin) !important;
