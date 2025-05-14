@@ -146,7 +146,7 @@ export default function VerticalBlogCarousel() {
   if (loading) {
     return (
       <div className="h-full flex flex-col justify-center items-center">
-        <div className="w-full aspect-w-16 aspect-h-9 bg-white/40 rounded mb-4 animate-pulse"></div>
+        <div className="w-full h-[160px] bg-white/40 rounded mb-4 animate-pulse"></div>
         <div className="w-3/4 h-6 bg-white/40 rounded mb-3 animate-pulse"></div>
         <div className="w-full h-4 bg-white/40 rounded mb-2 animate-pulse"></div>
       </div>
@@ -175,39 +175,46 @@ export default function VerticalBlogCarousel() {
   const visiblePosts = blogPosts.slice(0, 3)
   const remainingPosts = blogPosts.slice(3)
 
+  // Create a card component to ensure consistency
+  const BlogCard = ({ post }: { post: BlogPost }) => (
+    <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg flex flex-col h-[320px]">
+      <div className="mb-3 overflow-hidden rounded-lg w-full h-[160px] bg-gray-100 flex-shrink-0">
+        <img
+          src={post.image_url || "/placeholder.svg?height=160&width=320&query=lifestyle"}
+          alt={post.title}
+          className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement
+            target.src = "/diverse-group-relaxing.png"
+          }}
+        />
+      </div>
+      <div className="flex flex-col flex-grow">
+        <h3 className="text-lg font-semibold mb-2 text-black line-clamp-2">{post.title}</h3>
+        <p className="text-gray-700 mb-3 text-sm line-clamp-2 flex-grow">{post.summary}</p>
+        <div className="flex justify-between items-center mt-auto">
+          <span className="text-xs text-gray-500">
+            {new Date(post.created_at).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
+          <div className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm">
+            Read more <ArrowRight className="ml-1 h-3 w-3" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="h-full flex flex-col">
       {/* Container for the first 3 articles - these are always visible */}
       <div className="space-y-4 mb-2">
         {visiblePosts.map((post) => (
           <Link key={post.id} href={`/lifestyle/${post.id}`} className="block">
-            <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg h-full flex flex-col">
-              <div className="mb-3 overflow-hidden rounded-lg w-full aspect-w-16 aspect-h-9 bg-gray-100">
-                <img
-                  src={post.image_url || "/placeholder.svg?height=180&width=320&query=lifestyle"}
-                  alt={post.title}
-                  className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.src = "/diverse-group-relaxing.png"
-                  }}
-                />
-              </div>
-              <h3 className="text-lg font-semibold mb-2 text-black">{post.title}</h3>
-              <p className="text-gray-700 mb-3 text-sm line-clamp-2">{post.summary}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500">
-                  {new Date(post.created_at).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
-                <div className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm">
-                  Read more <ArrowRight className="ml-1 h-3 w-3" />
-                </div>
-              </div>
-            </div>
+            <BlogCard post={post} />
           </Link>
         ))}
       </div>
@@ -236,33 +243,7 @@ export default function VerticalBlogCarousel() {
             <div className="space-y-4">
               {remainingPosts.map((post) => (
                 <Link key={post.id} href={`/lifestyle/${post.id}`} className="block">
-                  <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg h-full flex flex-col">
-                    <div className="mb-3 overflow-hidden rounded-lg w-full aspect-w-16 aspect-h-9 bg-gray-100">
-                      <img
-                        src={post.image_url || "/placeholder.svg?height=180&width=320&query=lifestyle"}
-                        alt={post.title}
-                        className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          target.src = "/diverse-group-relaxing.png"
-                        }}
-                      />
-                    </div>
-                    <h3 className="text-lg font-semibold mb-2 text-black">{post.title}</h3>
-                    <p className="text-gray-700 mb-3 text-sm line-clamp-2">{post.summary}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">
-                        {new Date(post.created_at).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </span>
-                      <div className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm">
-                        Read more <ArrowRight className="ml-1 h-3 w-3" />
-                      </div>
-                    </div>
-                  </div>
+                  <BlogCard post={post} />
                 </Link>
               ))}
             </div>
@@ -281,21 +262,6 @@ export default function VerticalBlogCarousel() {
         .hide-scrollbar::-webkit-scrollbar-thumb {
           background-color: rgba(0, 0, 0, 0.2);
           border-radius: 20px;
-        }
-
-        /* Add aspect ratio support */
-        .aspect-w-16 {
-          position: relative;
-          padding-bottom: 56.25%;
-        }
-        .aspect-h-9 {
-          position: absolute;
-          height: 100%;
-          width: 100%;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
         }
       `}</style>
     </div>
