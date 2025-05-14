@@ -1,16 +1,16 @@
 import { createClient } from "@supabase/supabase-js"
 
-// Get environment variables with fallbacks for development
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://lseluxoxdzvptfyijruj.supabase.co"
-const supabaseKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxzZWx1eG94ZHp2cHRmeWlqcnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTU0MTksImV4cCI6MjA1ODQ5MTQxOX0.kA78RUrSKHZaDi70IT3w33scJU19yEuXCjH4pHeq5gM"
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Create and export the Supabase client with storage enabled
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Missing Supabase environment variables")
+}
+
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
-    autoRefreshToken: true,
+    storageKey: "hai-website-auth",
   },
   global: {
     headers: {

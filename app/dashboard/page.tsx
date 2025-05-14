@@ -1,74 +1,46 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { supabase } from "@/utils/supabase"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, X } from "lucide-react"
-import BlogManager from "@/components/admin/blog-manager"
-import ProductManager from "@/components/admin/product-manager"
-import BreakingNewsManager from "@/components/admin/breaking-news-manager"
-import MediaManager from "@/components/admin/media-manager"
-import DispensaryManager from "@/components/admin/dispensary-manager"
-import NewsletterManager from "@/components/admin/newsletter-manager"
-import GridImageManager from "@/components/admin/grid-image-manager"
-import CategoryManager from "@/components/admin/category-manager"
+import dynamic from "next/dynamic"
+
+// Dynamically import admin components
+const BlogManager = dynamic(() => import("@/components/admin/blog-manager"), { ssr: false })
+const ProductManager = dynamic(() => import("@/components/admin/product-manager"), { ssr: false })
+const BreakingNewsManager = dynamic(() => import("@/components/admin/breaking-news-manager"), { ssr: false })
+const MediaManager = dynamic(() => import("@/components/admin/media-manager"), { ssr: false })
+const DispensaryManager = dynamic(() => import("@/components/admin/dispensary-manager"), { ssr: false })
+const NewsletterManager = dynamic(() => import("@/components/admin/newsletter-manager"), { ssr: false })
+const GridImageManager = dynamic(() => import("@/components/admin/grid-image-manager"), { ssr: false })
+const CategoryManager = dynamic(() => import("@/components/admin/category-manager"), { ssr: false })
+const LifestyleBannerManager = dynamic(() => import("@/components/admin/lifestyle-banner-manager"), { ssr: false })
+const LifestyleContentManager = dynamic(() => import("@/components/admin/lifestyle-content-manager"), { ssr: false })
+
+// Import other components
 import Header from "@/components/header"
 import WaterBackground from "@/components/water-background"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
-import LifestyleBannerManager from "@/components/admin/lifestyle-banner-manager"
 
 export default function AdminDashboard() {
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, isLoading, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState("media")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const router = useRouter()
-  const searchParams = useSearchParams()
 
+  // Handle auth state
   useEffect(() => {
-    const tabParam = searchParams.get("tab")
-    if (tabParam) {
-      setActiveTab(tabParam)
+    if (!isLoading && !user) {
+      router.push("/signin")
     }
-  }, [searchParams])
+  }, [isLoading, user, router])
 
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-
-        if (user) {
-          setUser(user)
-        } else {
-          router.push("/signin")
-        }
-      } catch (error) {
-        router.push("/signin")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    checkUser()
-  }, [router])
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/signin")
-  }
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value)
-    setIsMobileMenuOpen(false)
-    router.push(`/dashboard?tab=${value}`, { scroll: false })
-  }
-
-  if (loading) {
+  // Show loading state while checking auth
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-pulse text-3xl text-[#ffd6c0]">Loading...</div>
@@ -76,13 +48,34 @@ export default function AdminDashboard() {
     )
   }
 
+  // If not authenticated and not loading, don't render anything
+  // The useEffect will handle the redirect
   if (!user) {
-    return null // Router will redirect, this prevents flash of content
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-3xl text-[#ffd6c0]">Redirecting to login...</div>
+      </div>
+    )
+  }
+
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+      router.push("/signin")
+    } catch (error) {
+      console.error("Error signing out:", error)
+    }
+  }
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    setIsMobileMenuOpen(false)
   }
 
   const tabItems = [
     { id: "media", label: "Homepage Carousel" },
     { id: "lifestyle-banner", label: "Lifestyle Banner" },
+    { id: "lifestyle-content", label: "Lifestyle Content" },
     { id: "grid-images", label: "Photo Grid" },
     { id: "blogs", label: "Blog Management" },
     { id: "products", label: "Product Management" },
@@ -104,7 +97,7 @@ export default function AdminDashboard() {
                 <p className="text-gray-600 hidden md:block">Welcome, {user.email}</p>
                 <button
                   onClick={handleSignOut}
-                  className="bg-[#ffd6c0] text-white py-2 px-4 rounded-lg hover:bg-opacity-80 transition-all button-hover"
+                  className="bg-[#ffd6c0] text-white py-2 px-4 rounded-lg hover:bg-opacity-80 transition-all button-hover font-medium"
                 >
                   Sign Out
                 </button>
@@ -152,7 +145,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="mb-8">
-              <BreakingNewsManager />
+              <BreakingNewsManager userId={user.id} />
             </div>
 
             <div className="mb-4 p-4 bg-gray-50 rounded-lg">
@@ -194,6 +187,10 @@ export default function AdminDashboard() {
                   <LifestyleBannerManager userId={user.id} />
                 </TabsContent>
 
+                <TabsContent value="lifestyle-content">
+                  <LifestyleContentManager userId={user.id} />
+                </TabsContent>
+
                 <TabsContent value="grid-images">
                   <GridImageManager userId={user.id} />
                 </TabsContent>
@@ -207,7 +204,7 @@ export default function AdminDashboard() {
                 </TabsContent>
 
                 <TabsContent value="categories">
-                  <CategoryManager />
+                  <CategoryManager userId={user.id} />
                 </TabsContent>
 
                 <TabsContent value="dispensaries">
@@ -215,7 +212,7 @@ export default function AdminDashboard() {
                 </TabsContent>
 
                 <TabsContent value="newsletter">
-                  <NewsletterManager />
+                  <NewsletterManager userId={user.id} />
                 </TabsContent>
               </Tabs>
             </div>
@@ -224,12 +221,13 @@ export default function AdminDashboard() {
             <div className="md:hidden">
               {activeTab === "media" && <MediaManager userId={user.id} />}
               {activeTab === "lifestyle-banner" && <LifestyleBannerManager userId={user.id} />}
+              {activeTab === "lifestyle-content" && <LifestyleContentManager userId={user.id} />}
               {activeTab === "grid-images" && <GridImageManager userId={user.id} />}
               {activeTab === "blogs" && <BlogManager userId={user.id} />}
               {activeTab === "products" && <ProductManager userId={user.id} />}
-              {activeTab === "categories" && <CategoryManager />}
+              {activeTab === "categories" && <CategoryManager userId={user.id} />}
               {activeTab === "dispensaries" && <DispensaryManager userId={user.id} />}
-              {activeTab === "newsletter" && <NewsletterManager />}
+              {activeTab === "newsletter" && <NewsletterManager userId={user.id} />}
             </div>
           </div>
         </div>

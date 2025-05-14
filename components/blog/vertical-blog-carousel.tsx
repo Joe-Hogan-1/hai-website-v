@@ -180,8 +180,8 @@ export default function VerticalBlogCarousel() {
       {/* Container for the first 3 articles - these are always visible */}
       <div className="space-y-4 mb-2">
         {visiblePosts.map((post) => (
-          <div key={post.id}>
-            <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30">
+          <Link key={post.id} href={`/lifestyle/${post.id}`} className="block">
+            <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg">
               {post.image_url && (
                 <div className="mb-3 overflow-hidden rounded-lg">
                   <img
@@ -201,15 +201,12 @@ export default function VerticalBlogCarousel() {
                     day: "numeric",
                   })}
                 </span>
-                <Link
-                  href={`/lifestyle/${post.id}`}
-                  className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm"
-                >
+                <div className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm">
                   Read more <ArrowRight className="ml-1 h-3 w-3" />
-                </Link>
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -236,8 +233,8 @@ export default function VerticalBlogCarousel() {
           >
             <div className="space-y-4">
               {remainingPosts.map((post) => (
-                <div key={post.id}>
-                  <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30">
+                <Link key={post.id} href={`/lifestyle/${post.id}`} className="block">
+                  <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg">
                     {post.image_url && (
                       <div className="mb-3 overflow-hidden rounded-lg">
                         <img
@@ -257,15 +254,12 @@ export default function VerticalBlogCarousel() {
                           day: "numeric",
                         })}
                       </span>
-                      <Link
-                        href={`/lifestyle/${post.id}`}
-                        className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm"
-                      >
+                      <div className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm">
                         Read more <ArrowRight className="ml-1 h-3 w-3" />
-                      </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

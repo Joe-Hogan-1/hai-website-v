@@ -92,40 +92,36 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
   return (
     <div className={className}>
       {blogPosts.map((post) => (
-        <div
-          key={post.id}
-          className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl border border-white/30"
-        >
-          {post.image_url && (
-            <div className="mb-4 overflow-hidden rounded-lg mx-auto w-full flex items-center justify-center">
-              <img
-                src={post.image_url || "/placeholder.svg"}
-                alt={post.title}
-                className="w-full object-cover transition-transform duration-300 hover:scale-105"
-                style={{ maxHeight: "180px" }}
-              />
-            </div>
-          )}
-          <div>
-            <h2 className="text-2xl font-semibold mb-3 text-black">{post.title}</h2>
-            {showExcerpt && <p className="text-gray-700 mb-4 line-clamp-3 font-medium">{post.summary}</p>}
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-500">
-                {new Date(post.created_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-              <Link
-                href={`/lifestyle/${post.id}`}
-                className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold underline"
-              >
-                Read more <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
+        <Link key={post.id} href={`/lifestyle/${post.id}`} className="block mb-6">
+          <div className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl border border-white/30">
+            {post.image_url && (
+              <div className="mb-4 overflow-hidden rounded-lg mx-auto w-full flex items-center justify-center">
+                <img
+                  src={post.image_url || "/placeholder.svg"}
+                  alt={post.title}
+                  className="w-full object-cover transition-transform duration-300 hover:scale-105"
+                  style={{ maxHeight: "180px" }}
+                />
+              </div>
+            )}
+            <div>
+              <h2 className="text-2xl font-semibold mb-3 text-black">{post.title}</h2>
+              {showExcerpt && <p className="text-gray-700 mb-4 line-clamp-3 font-medium">{post.summary}</p>}
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">
+                  {new Date(post.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+                <div className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold underline">
+                  Read more <ArrowRight className="ml-1 h-4 w-4" />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   )

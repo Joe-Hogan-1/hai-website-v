@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { toast } from "sonner"
@@ -17,11 +17,23 @@ export default function SignIn() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const { signIn } = useAuth()
+  const [isRedirecting, setIsRedirecting] = useState(false)
+  const { signIn, user, isLoading: authLoading } = useAuth()
   const router = useRouter()
+
+  // Handle redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user && !isRedirecting) {
+      setIsRedirecting(true)
+      router.push("/dashboard")
+    }
+  }, [user, authLoading, router, isRedirecting])
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (isLoading || isRedirecting) return
+
     setIsLoading(true)
 
     try {
@@ -31,7 +43,11 @@ export default function SignIn() {
         toast.error(error.message || "Failed to sign in")
       } else {
         toast.success("Signed in successfully")
-        router.push("/dashboard")
+        setIsRedirecting(true)
+        // Add a slight delay to ensure state updates before redirect
+        setTimeout(() => {
+          router.push("/dashboard")
+        }, 100)
       }
     } catch (error) {
       toast.error("An unexpected error occurred")
@@ -39,6 +55,18 @@ export default function SignIn() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // If we're already logged in and waiting for redirect, show loading
+  if (!authLoading && user) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center p-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Already logged in</h2>
+          <p className="mb-4">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -68,7 +96,7 @@ export default function SignIn() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || isRedirecting}
                 />
               </div>
 
@@ -85,12 +113,16 @@ export default function SignIn() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || isRedirecting}
                 />
               </div>
 
-              <Button type="submit" className="w-full bg-[#ffd6c0] hover:bg-[#ffcbb0]" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign In"}
+              <Button
+                type="submit"
+                className="w-full bg-[#ffd6c0] hover:bg-[#ffcbb0]"
+                disabled={isLoading || isRedirecting || authLoading}
+              >
+                {isLoading ? "Signing in..." : isRedirecting ? "Redirecting..." : "Sign In"}
               </Button>
 
               <div className="text-center text-sm">

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { botProtectionMiddleware } from "@/middleware/bot-protection"
 
-// Update the middleware to handle the age verification cookie and bot protection
 export function middleware(request: NextRequest) {
   // First, check for bot protection
   const botProtectionResponse = botProtectionMiddleware(request)
@@ -12,18 +11,22 @@ export function middleware(request: NextRequest) {
 
   // Check if the user is visiting a page that should bypass age verification
   const url = request.nextUrl.clone()
+  const path = url.pathname
+
+  // Define paths that should bypass age verification
   const bypassPaths = [
     "/age-verification",
     "/user-agreement",
     "/privacy-policy",
     "/signin",
-    "/_next", // Allow Next.js resources
-    "/api", // Allow API routes
+    "/_next",
+    "/api",
     "/favicon.ico",
   ]
 
   // Check if the current path should bypass verification
-  if (bypassPaths.some((path) => url.pathname.startsWith(path))) {
+  // Also bypass all dashboard routes completely to avoid auth conflicts
+  if (bypassPaths.some((bypass) => path.startsWith(bypass)) || path.startsWith("/dashboard")) {
     return NextResponse.next()
   }
 
@@ -41,14 +44,5 @@ export function middleware(request: NextRequest) {
 
 // Only run middleware on specific paths
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - api routes
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 }

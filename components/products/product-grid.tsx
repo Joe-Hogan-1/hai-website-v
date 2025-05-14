@@ -1,13 +1,10 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { supabase } from "@/utils/supabase"
-import { useTilt } from "@/hooks/use-tilt"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight } from "lucide-react"
-import ProductDetailModal from "./product-detail-modal"
+import Link from "next/link"
 
 interface Product {
   id: string
@@ -30,10 +27,7 @@ export default function ProductGrid() {
   const [categories, setCategories] = useState<ProductCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { tiltRef, handleMouseMove, handleMouseEnter, handleMouseLeave } = useTilt()
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     async function fetchData() {
@@ -126,16 +120,6 @@ export default function ProductGrid() {
     }
   }
 
-  const openProductModal = (product: Product) => {
-    setSelectedProduct(product)
-    setIsModalOpen(true)
-  }
-
-  const closeProductModal = () => {
-    setIsModalOpen(false)
-    setSelectedProduct(null)
-  }
-
   if (loading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -175,45 +159,33 @@ export default function ProductGrid() {
 
   function renderProduct(product: Product) {
     return (
-      <div
+      <Link
         key={product.id}
-        ref={tiltRef as React.RefObject<HTMLDivElement>}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className="bg-white rounded-lg overflow-hidden transform-gpu transition-all duration-300 hover:shadow-xl product-card border border-gray-200"
-        style={{
-          transformStyle: "preserve-3d",
-          boxShadow: "0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1)",
-        }}
+        href={`/products/${product.id}`}
+        className="block bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl product-card border border-gray-200"
       >
         <div className="h-48 overflow-hidden relative">
           <img
             src={product.image_url || "/placeholder.svg?height=200&width=300"}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-            style={{ transform: "translateZ(20px)" }}
           />
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {product.category && (
-              <div
-                className={`${getCategoryColor(product.category)} text-xs font-bold px-2 py-1 rounded-full`}
-                style={{ transform: "translateZ(40px)" }}
-              >
+              <div className={`${getCategoryColor(product.category)} text-xs font-bold px-2 py-1 rounded-full`}>
                 {product.category}
               </div>
             )}
             {product.product_category && (
               <div
                 className={`${getProductCategoryColor(product.product_category)} text-xs font-bold px-2 py-1 rounded-full`}
-                style={{ transform: "translateZ(40px)" }}
               >
                 {product.product_category}
               </div>
             )}
           </div>
         </div>
-        <div className="p-4" style={{ transform: "translateZ(30px)" }}>
+        <div className="p-4">
           {/* First line: Product name */}
           <h2 className="text-xl font-semibold text-black line-clamp-1">{product.name}</h2>
 
@@ -223,15 +195,12 @@ export default function ProductGrid() {
           {/* Third line: Area for 3 lines of text with read more */}
           <div className="mt-2 relative">
             <p className="text-gray-700 text-sm font-medium line-clamp-3">{product.description}</p>
-            <button
-              onClick={() => openProductModal(product)}
-              className="read-more-link mt-2 text-black hover:text-gray-700 text-sm font-medium flex items-center underline"
-            >
+            <div className="read-more-link mt-2 text-black hover:text-gray-700 text-sm font-medium flex items-center underline">
               Read more <ArrowRight className="ml-1 h-3 w-3" />
-            </button>
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
     )
   }
 
@@ -266,9 +235,6 @@ export default function ProductGrid() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredProducts.map((product) => renderProduct(product))}
       </div>
-
-      {/* Product Detail Modal */}
-      <ProductDetailModal product={selectedProduct} isOpen={isModalOpen} onClose={closeProductModal} />
     </>
   )
 }

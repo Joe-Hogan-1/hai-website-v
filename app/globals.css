@@ -36,8 +36,8 @@ body {
   --primary-color: black;
   --header-color: #ffd6c0;
   --logo-glow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
-  --header-height: 50px; /* Further reduced from 56px */
-  --breaking-news-height: 32px; /* 2rem */
+  --header-height: 70px; /* Increased from 50px to 70px */
+  --breaking-news-height: 32px; /* Fixed breaking news height */
   --page-top-padding: 0rem; /* Completely eliminated padding */
   --title-negative-margin: -30px; /* Increased negative margin to pull titles up more */
   --content-padding: 1rem; /* Standard padding for content */
@@ -45,7 +45,7 @@ body {
 }
 
 body.has-breaking-news {
-  --header-height: 82px; /* Reduced from 88px */
+  --header-height: 70px; /* Keep header height consistent */
 }
 
 /* Update the font-weight settings to ensure proper usage of New Order Medium and Semi Bold */
@@ -124,6 +124,19 @@ h6,
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
 }
 
+/* Add text shadow utility classes */
+.text-shadow-sm {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.text-shadow-md {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.text-shadow-lg {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
 /* Basic animations */
 .fade-out {
   opacity: 0;
@@ -181,19 +194,37 @@ h6,
 /* Update header and footer to peach */
 /* Adjust header positioning to remove extra space */
 header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  transition: opacity 0.3s ease;
   background-color: #ffd6c0;
   color: black;
-  margin: 0;
-  padding: 0;
-  height: var(--header-height);
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
+  border: none !important;
+}
+
+/* Simple dashboard button styling */
+.simple-dashboard-button {
+  height: 24px !important;
+  line-height: 24px !important;
+  padding: 0 8px !important;
+  font-size: 0.75rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+}
+
+.simple-dashboard-button svg {
+  width: 0.75rem !important;
+  height: 0.75rem !important;
+  margin-right: 0.25rem !important;
+  flex-shrink: 0 !important;
 }
 
 /* Hide header when theater mode is active */
@@ -242,6 +273,7 @@ body.theater-mode-active .breaking-news-bar {
   position: relative;
   text-decoration: none;
   color: black;
+  font-size: 1.125rem; /* Increased from 1rem to 1.125rem */
 }
 
 .header-link::after {
@@ -321,60 +353,6 @@ body.theater-mode-active .breaking-news-bar {
 
 .hover\:filter:hover {
   animation: logoGlow 2s infinite;
-}
-
-.waterfall-container {
-  position: absolute;
-  top: -10%;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.water-drop {
-  position: absolute;
-  width: 2px;
-  height: 50px;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.5) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: fall 15s infinite;
-}
-
-@keyframes fall {
-  0% {
-    transform: translateY(-100%) translateX(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) translateX(100px);
-    opacity: 0;
-  }
-}
-
-/* Distribute water drops across the screen */
-.water-drop:nth-child(3n) {
-  left: 10%;
-  animation-delay: 0s;
-}
-.water-drop:nth-child(3n + 1) {
-  left: 50%;
-  animation-delay: 5s;
-}
-.water-drop:nth-child(3n + 2) {
-  left: 90%;
-  animation-delay: 10s;
 }
 
 /* Update the white outline frame styles to remove side borders */
@@ -556,18 +534,6 @@ body.has-breaking-news {
 /* Adjust page container to account for breaking news bar */
 .has-breaking-news .page-container {
   padding-top: calc(var(--header-height) + var(--breaking-news-height)); /* Removed additional padding */
-}
-
-/* Adjust header position when breaking news is present */
-body.has-breaking-news header {
-  top: var(--breaking-news-height);
-  margin-top: 0; /* Remove any margin */
-}
-
-/* Ensure breaking news bar doesn't add extra space when not present */
-body:not(.has-breaking-news) header {
-  top: 0;
-  margin-top: 0; /* Remove any margin */
 }
 
 /* Video Banner Section Styles */
@@ -1288,7 +1254,7 @@ header .flex.items-center {
 
 /* Fix for the breaking news bar and header alignment */
 .breaking-news-bar + header {
-  margin-top: 0;
+  margin-top: 0 !important;
 }
 
 /* Ensure consistent height for all header elements */

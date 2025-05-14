@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { supabase } from "@/utils/supabase"
 import type { Session, User } from "@supabase/supabase-js"
@@ -22,15 +22,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
+  // Use a ref to track if we've already redirected to prevent loops
+  const hasRedirected = useRef(false)
+
+  useEffect(() => {
+    // Reset the redirect flag when the pathname changes
+    hasRedirected.current = false
+  }, [pathname])
+
   useEffect(() => {
     // Check active session
     const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
-      setIsLoading(false)
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+        setSession(session)
+        setUser(session?.user ?? null)
+      } catch (error) {
+        console.error("Error checking session:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     checkSession()
@@ -49,15 +62,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Redirect if on protected route and not authenticated
+  // Handle redirects based on auth state
   useEffect(() => {
-    if (!isLoading) {
-      const isProtectedRoute = pathname === "/dashboard"
+    // Only proceed if not loading and we haven't already redirected
+    if (!isLoading && !hasRedirected.current) {
+      const isDashboardRoute = pathname === "/dashboard" || pathname.startsWith("/dashboard/")
       const isAuthRoute = pathname === "/signin"
 
-      if (isProtectedRoute && !user) {
+      if (isDashboardRoute && !user) {
+        // User is trying to access dashboard but is not logged in
+        hasRedirected.current = true
         router.push("/signin")
       } else if (isAuthRoute && user) {
+        // User is on login page but is already logged in
+        hasRedirected.current = true
         router.push("/dashboard")
       }
     }

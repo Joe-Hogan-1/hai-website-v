@@ -25,7 +25,6 @@ export default function HomeMediaCarousel() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [autoplayEnabled, setAutoplayEnabled] = useState(true)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const [debugInfo, setDebugInfo] = useState<string>("")
 
   // Add media query hooks for responsive design
   const isMobile = useMediaQuery("(max-width: 640px)")
@@ -38,13 +37,9 @@ export default function HomeMediaCarousel() {
     const channel = supabase
       .channel("banner_media_changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "banner_media" }, (payload) => {
-        console.log("Banner media change detected:", payload)
         fetchMediaItems()
       })
-      .subscribe((status) => {
-        console.log("Subscription status:", status)
-        setDebugInfo((prev) => prev + `\nSubscription status: ${JSON.stringify(status)}`)
-      })
+      .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
@@ -57,7 +52,6 @@ export default function HomeMediaCarousel() {
   const fetchMediaItems = async () => {
     try {
       setLoading(true)
-      setDebugInfo((prev) => prev + `\nFetching media items...`)
 
       // Fetch from banner_media table
       const { data, error } = await supabase
@@ -67,24 +61,16 @@ export default function HomeMediaCarousel() {
         .order("display_order", { ascending: true })
 
       if (error) {
-        console.error("Error fetching media items:", error)
-        setDebugInfo((prev) => prev + `\nError: ${error.message}`)
         setError(`Failed to load carousel items: ${error.message}`)
         return
       }
-
-      console.log("Fetched media items:", data)
-      setDebugInfo((prev) => prev + `\nFetched ${data?.length || 0} items`)
 
       if (data && data.length > 0) {
         setMediaItems(data)
       } else {
         setMediaItems([])
-        setDebugInfo((prev) => prev + `\nNo items found`)
       }
     } catch (error: any) {
-      console.error("Unexpected error fetching media items:", error)
-      setDebugInfo((prev) => prev + `\nUnexpected error: ${error.message}`)
       setError("An unexpected error occurred")
       setMediaItems([])
     } finally {
@@ -103,24 +89,6 @@ export default function HomeMediaCarousel() {
     setTimeout(() => {
       setIsTransitioning(false)
     }, 500)
-  }
-
-  // Function to go to the previous slide
-  const goToPrevSlide = () => {
-    if (isTransitioning || mediaItems.length <= 1) return
-
-    setIsTransitioning(true)
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + mediaItems.length) % mediaItems.length)
-
-    // Reset transition state after animation completes
-    setTimeout(() => {
-      setIsTransitioning(false)
-    }, 500)
-  }
-
-  // Toggle autoplay
-  const toggleAutoplay = () => {
-    setAutoplayEnabled(!autoplayEnabled)
   }
 
   // Set up automatic slide rotation
@@ -293,76 +261,8 @@ export default function HomeMediaCarousel() {
           </div>
         ))}
 
-        {/* Navigation Arrows - Responsive positioning */}
-        {mediaItems.length > 1 && (
-          <>
-            <button
-              onClick={goToPrevSlide}
-              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1 sm:p-2 z-20"
-              aria-label="Previous slide"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 sm:h-6 sm:w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={goToNextSlide}
-              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-1 sm:p-2 z-20"
-              aria-label="Next slide"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 sm:h-6 sm:w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </>
-        )}
-
-        {/* Dots Indicator - Responsive positioning */}
-        {mediaItems.length > 1 && (
-          <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex space-x-1 sm:space-x-2 z-20">
-            {mediaItems.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setIsTransitioning(true)
-                  setCurrentIndex(index)
-                  setTimeout(() => setIsTransitioning(false), 500)
-                }}
-                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${index === currentIndex ? "bg-white" : "bg-white/50"}`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Autoplay Toggle - Responsive positioning */}
-        <button
-          onClick={toggleAutoplay}
-          className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black/30 text-white p-1 sm:p-2 rounded-full hover:bg-black/50 z-20 text-xs sm:text-sm"
-          aria-label={autoplayEnabled ? "Pause autoplay" : "Start autoplay"}
-        >
-          {autoplayEnabled ? "Pause" : "Play"}
-        </button>
+        {/* Navigation Arrows and Dots have been removed */}
       </div>
-
-      {/* Debug info - only visible in development */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-2 text-xs z-50 max-h-32 overflow-auto">
-          <pre>{debugInfo}</pre>
-        </div>
-      )}
     </div>
   )
 }
