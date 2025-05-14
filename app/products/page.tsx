@@ -1,15 +1,14 @@
 import Header from "@/components/header"
 import ProductGrid from "@/components/products/product-grid"
 
-// Centered lowercase title with consistent padding
 export default function ProductsPage() {
   return (
     <>
       <Header />
       <div className="page-container">
-        <div className="container mx-auto px-4 py-0">
-          <h1 className="text-4xl font-bold mb-2 text-center">our products</h1>
-          <div className="product-content px-4 pt-2">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl font-bold mb-6 text-left">our products</h1>
+          <div className="product-content">
             <ProductGrid />
           </div>
         </div>

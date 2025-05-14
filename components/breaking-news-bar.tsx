@@ -48,7 +48,10 @@ export default function BreakingNewsBar() {
   }
 
   return (
-    <div className="bg-white h-[32px] w-full overflow-hidden fixed top-0 left-0 right-0 z-[60] shadow-md breaking-news-bar animate-fadeIn flex items-center">
+    <div
+      className="bg-white h-[32px] w-full overflow-hidden fixed top-0 left-0 right-0 z-[60] shadow-md breaking-news-bar animate-fadeIn flex items-center"
+      style={{ margin: 0, padding: 0, borderBottom: "1px solid rgba(0,0,0,0.1)" }}
+    >
       <div className="marquee-container">
         <div className="marquee text-black">
           <span>{newsText}</span>

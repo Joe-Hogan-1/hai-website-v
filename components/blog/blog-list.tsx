@@ -117,8 +117,8 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
               </div>
             )}
             <div className="flex-grow">
-              <h2 className="text-2xl font-semibold mb-3 text-black">{post.title}</h2>
-              {showExcerpt && <p className="text-gray-700 mb-4 line-clamp-3 font-medium">{post.summary}</p>}
+              <h2 className="text-2xl font-semibold mb-3 text-black text-left">{post.title}</h2>
+              {showExcerpt && <p className="text-gray-700 mb-4 line-clamp-3 font-medium text-left">{post.summary}</p>}
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">
                   {new Date(post.created_at).toLocaleDateString("en-US", {

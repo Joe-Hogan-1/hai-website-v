@@ -60,8 +60,8 @@ export default function LifestyleContentBlock() {
 
   return (
     <div className="w-full py-6">
-      {content.title && <h2 className="text-2xl font-semibold mb-4">{content.title}</h2>}
-      <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content.content }} />
+      {content.title && <h2 className="text-2xl font-semibold mb-4 text-left">{content.title}</h2>}
+      <div className="prose max-w-none text-left" dangerouslySetInnerHTML={{ __html: content.content }} />
     </div>
   )
 }

@@ -27,9 +27,24 @@ export default function Header() {
   return (
     <div
       className={`fixed left-0 right-0 z-50 ${hasBreakingNews ? "top-[32px]" : "top-0"}`}
-      style={{ height: "70px", margin: 0, padding: 0 }}
+      style={{
+        height: "70px",
+        margin: 0,
+        padding: 0,
+        borderTop: "none",
+        boxShadow: hasBreakingNews ? "none" : "0 1px 3px rgba(0,0,0,0.1)",
+      }}
     >
-      <header className="bg-[#ffd6c0] shadow-sm w-full h-full" style={{ margin: 0, padding: 0, border: "none" }}>
+      <header
+        className="bg-[#ffd6c0] w-full h-full"
+        style={{
+          margin: 0,
+          padding: 0,
+          border: "none",
+          borderTop: "none",
+          boxShadow: "none",
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center w-full h-full">
           <div className="flex items-center justify-center h-full">
             <Logo />

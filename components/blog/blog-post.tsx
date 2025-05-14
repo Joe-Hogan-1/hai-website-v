@@ -21,7 +21,7 @@ export default function BlogPost({ post }: BlogPostProps) {
   // Function to format the content with proper paragraphs
   const formatContent = (content: string) => {
     return content.split("\n").map((paragraph, index) => (
-      <p key={index} className="mb-4">
+      <p key={index} className="mb-4 text-left">
         {paragraph}
       </p>
     ))
@@ -33,9 +33,9 @@ export default function BlogPost({ post }: BlogPostProps) {
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to all posts
       </Link>
 
-      <h1 className="text-3xl md:text-4xl font-bold mb-4 text-black">{post.title}</h1>
+      <h1 className="text-3xl md:text-4xl font-bold mb-4 text-black text-left">{post.title}</h1>
 
-      <div className="text-gray-500 mb-8">
+      <div className="text-gray-500 mb-8 text-left">
         {new Date(post.created_at).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
@@ -44,7 +44,7 @@ export default function BlogPost({ post }: BlogPostProps) {
       </div>
 
       {post.image_url && (
-        <div className="mb-8 relative w-1/2 mx-auto">
+        <div className="mb-8 relative w-full">
           <img
             src={post.image_url || "/placeholder.svg"}
             alt={post.title}
@@ -66,7 +66,7 @@ export default function BlogPost({ post }: BlogPostProps) {
         </div>
       )}
 
-      <div className="prose max-w-none text-gray-800">{formatContent(post.content)}</div>
+      <div className="prose max-w-none text-gray-800 text-left">{formatContent(post.content)}</div>
     </article>
   )
 }

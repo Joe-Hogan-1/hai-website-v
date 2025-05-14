@@ -91,9 +91,9 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
 
                 {/* Product Details */}
                 <div>
-                  <h1 className="text-3xl font-bold text-black mb-4">{product.name}</h1>
+                  <h1 className="text-3xl font-bold text-black mb-4 text-left">{product.name}</h1>
 
-                  <div className="prose prose-sm max-w-none text-gray-700">
+                  <div className="prose prose-sm max-w-none text-gray-700 text-left">
                     <p className="whitespace-pre-line">{product.description}</p>
                   </div>
                 </div>

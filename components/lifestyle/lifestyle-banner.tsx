@@ -145,14 +145,14 @@ export default function LifestyleBanner() {
           <div className={`absolute bottom-0 left-0 right-0 ${isMobile ? "p-4" : isTablet ? "p-6" : "p-8"} text-white`}>
             {banner.title && (
               <h2
-                className={`${isMobile ? "text-xl" : isTablet ? "text-2xl" : "text-3xl"} font-bold mb-${isMobile ? "1" : "2"} text-shadow-sm`}
+                className={`${isMobile ? "text-xl" : isTablet ? "text-2xl" : "text-3xl"} font-bold mb-${isMobile ? "1" : "2"} text-shadow-sm text-left`}
               >
                 {banner.title}
               </h2>
             )}
             {banner.description && (
               <p
-                className={`${isMobile ? "text-sm line-clamp-2" : isTablet ? "text-base line-clamp-3" : "text-lg"} max-w-3xl text-shadow-sm`}
+                className={`${isMobile ? "text-sm line-clamp-2" : isTablet ? "text-base line-clamp-3" : "text-lg"} max-w-3xl text-shadow-sm text-left`}
               >
                 {banner.description}
               </p>
@@ -191,14 +191,14 @@ export default function LifestyleBanner() {
               >
                 {banner.title && (
                   <h2
-                    className={`${isMobile ? "text-xl" : isTablet ? "text-2xl" : "text-3xl"} font-bold mb-${isMobile ? "1" : "2"} text-shadow-sm`}
+                    className={`${isMobile ? "text-xl" : isTablet ? "text-2xl" : "text-3xl"} font-bold mb-${isMobile ? "1" : "2"} text-shadow-sm text-left`}
                   >
                     {banner.title}
                   </h2>
                 )}
                 {banner.description && (
                   <p
-                    className={`${isMobile ? "text-sm line-clamp-2" : isTablet ? "text-base line-clamp-3" : "text-lg"} max-w-3xl text-shadow-sm`}
+                    className={`${isMobile ? "text-sm line-clamp-2" : isTablet ? "text-base line-clamp-3" : "text-lg"} max-w-3xl text-shadow-sm text-left`}
                   >
                     {banner.description}
                   </p>

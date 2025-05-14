@@ -55,7 +55,7 @@ export default function HomePage() {
                   <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                     {/* Tagline */}
                     <div className="text-center md:text-left md:w-1/2">
-                      <h2 className="text-3xl font-bold mb-4 text-black">embrace the glow</h2>
+                      <h2 className="text-3xl font-bold mb-4 text-black text-left">embrace the glow</h2>
                       <p className="text-xl text-black mb-6">
                         discover the balance of health, wellness, and recreation
                       </p>

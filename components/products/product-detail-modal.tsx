@@ -71,7 +71,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
       >
         <DialogHeader className="p-6 pb-0 bg-white">
           <div className="flex justify-between items-start">
-            <DialogTitle className="text-2xl font-bold">{product.name}</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-left">{product.name}</DialogTitle>
           </div>
           <DialogDescription className="sr-only">Product details for {product.name}</DialogDescription>
         </DialogHeader>
@@ -96,8 +96,8 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
 
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Description</h3>
-              <p className="text-gray-700 whitespace-pre-line">{product.description}</p>
+              <h3 className="text-lg font-semibold mb-2 text-left">Description</h3>
+              <p className="text-gray-700 whitespace-pre-line text-left">{product.description}</p>
             </div>
 
             <div className="pt-4 pb-2 border-t border-gray-200">

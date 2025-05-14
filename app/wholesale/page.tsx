@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import Header from "@/components/header"
+import LeftAlignedTitle from "@/components/left-aligned-title"
 import { validateForm, required, email, phone, minLength } from "@/components/contact/form-validator"
 import { submitWholesaleForm } from "@/app/actions/wholesale-form-actions"
 
@@ -182,9 +183,9 @@ export default function WholesalePage() {
     <>
       <Header />
       <div className="page-container">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center">Wholesale Inquiries</h1>
-          <div className="bg-[#ffd6c0] p-6 w-full max-w-4xl mx-auto rounded-sm min-h-[400px] mt-4">
+        <div className="container mx-auto">
+          <LeftAlignedTitle>Wholesale Inquiries</LeftAlignedTitle>
+          <div className="bg-[#ffd6c0] p-6 w-full max-w-4xl mx-auto rounded-sm min-h-[400px]">
             {submitted ? (
               <div className="text-center py-8">
                 <h2 className="text-2xl font-semibold mb-4">Thank You!</h2>

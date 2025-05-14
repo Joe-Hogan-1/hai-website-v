@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { trackAgeVerification } from "@/utils/user-data"
 import Link from "next/link"
+import Image from "next/image"
+import { motion } from "framer-motion"
 
 interface AgeGateProps {
   onVerify: () => void
@@ -40,6 +42,25 @@ export default function AgeGate({ onVerify }: AgeGateProps) {
   return (
     <div className={`fixed inset-0 z-50 flex justify-center items-center bg-white ${isDissolving ? "fade-out" : ""}`}>
       <div className="bg-[#ffd6c0] p-12 w-full max-w-4xl rounded-sm flex flex-col items-center justify-center min-h-[400px]">
+        {/* Add the large logo here */}
+        <div className="mb-8 w-[200px] h-[200px]">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center justify-center"
+          >
+            <Image
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hai_logo_transparent_black-83ImGs5RWDRJ4m77zReENm6jy5pGP3.png"
+              alt="hai."
+              width={200}
+              height={200}
+              priority
+              className="w-[200px] h-[200px] object-contain"
+            />
+          </motion.div>
+        </div>
+
         <h2 className="text-xl mb-8 font-semibold">Are you 21 or older?</h2>
         <div className="flex gap-8">
           <button

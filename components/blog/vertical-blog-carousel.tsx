@@ -190,8 +190,8 @@ export default function VerticalBlogCarousel() {
         />
       </div>
       <div className="flex flex-col flex-grow">
-        <h3 className="text-lg font-semibold mb-2 text-black line-clamp-2">{post.title}</h3>
-        <p className="text-gray-700 mb-3 text-sm line-clamp-2 flex-grow">{post.summary}</p>
+        <h3 className="text-lg font-semibold mb-2 text-black line-clamp-2 text-left">{post.title}</h3>
+        <p className="text-gray-700 mb-3 text-sm line-clamp-2 flex-grow text-left">{post.summary}</p>
         <div className="flex justify-between items-center mt-auto">
           <span className="text-xs text-gray-500">
             {new Date(post.created_at).toLocaleDateString("en-US", {

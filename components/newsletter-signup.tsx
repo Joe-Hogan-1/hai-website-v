@@ -56,8 +56,8 @@ export default function NewsletterSignup() {
 
   return (
     <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-      <h3 className="text-center text-lg font-semibold mb-3 text-black">Stay in the glow</h3>
-      <p className="text-center text-sm mb-4 text-black font-medium">
+      <h3 className="text-left text-lg font-semibold mb-3 text-black">Stay in the glow</h3>
+      <p className="text-left text-sm mb-4 text-black font-medium">
         Subscribe to our newsletter for updates and exclusive offers
       </p>
 

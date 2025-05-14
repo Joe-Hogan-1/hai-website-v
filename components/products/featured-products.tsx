@@ -79,16 +79,16 @@ export default function FeaturedProducts() {
             </div>
             <div className="p-4">
               {/* First line: Product name */}
-              <h2 className="text-xl font-semibold text-black line-clamp-1">{product.name}</h2>
+              <h2 className="text-xl font-semibold text-black line-clamp-1 text-left">{product.name}</h2>
 
               {/* Second line: Short description (first sentence) */}
-              <p className="text-gray-700 text-sm mt-1 font-medium line-clamp-1">
+              <p className="text-gray-700 text-sm mt-1 font-medium line-clamp-1 text-left">
                 {product.description.split(".")[0]}.
               </p>
 
               {/* Third line: Area for 3 lines of text with read more */}
               <div className="mt-2 relative">
-                <p className="text-gray-700 text-sm font-medium line-clamp-3">{product.description}</p>
+                <p className="text-gray-700 text-sm font-medium line-clamp-3 text-left">{product.description}</p>
                 <div className="mt-2 text-white bg-black hover:bg-gray-700 text-sm font-medium flex items-center px-3 py-1 rounded w-fit">
                   Read more <ChevronRight className="h-3 w-3 ml-1" />
                 </div>

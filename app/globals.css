@@ -38,10 +38,12 @@ body {
   --logo-glow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
   --header-height: 70px; /* Increased from 50px to 70px */
   --breaking-news-height: 32px; /* Fixed breaking news height */
-  --page-top-padding: 0rem; /* Completely eliminated padding */
-  --title-negative-margin: -20px; /* Changed from -30px to -20px to add more space */
+  --page-top-padding: 2rem; /* Increased from 0rem to 2rem */
+  --title-top-margin: 2.5rem; /* Added this new variable for title spacing */
+  --title-negative-margin: 0px; /* Changed from -20px to 0px to stop negative margins */
   --content-padding: 1rem; /* Standard padding for content */
   --title-bottom-margin: 2rem; /* Increased from 1rem to 2rem */
+  --title-left-padding: 2rem; /* Added for left alignment of titles */
 }
 
 body.has-breaking-news {
@@ -358,7 +360,7 @@ body.theater-mode-active .breaking-news-bar {
 /* Update the white outline frame styles to remove side borders */
 /* Adjust page container to account for header height */
 .page-container {
-  padding-top: var(--header-height); /* Removed additional padding */
+  padding-top: calc(var(--header-height) + var(--page-top-padding)); /* Added page-top-padding */
   min-height: 100vh;
   background: transparent;
   margin: 0;
@@ -369,107 +371,46 @@ body.theater-mode-active .breaking-news-bar {
 /* Add this new style for extra top padding on mobile */
 @media (max-width: 768px) {
   .page-container {
-    padding-top: var(--header-height); /* Removed additional padding */
+    padding-top: calc(var(--header-height) + var(--page-top-padding)); /* Added page-top-padding */
   }
 }
 
 /* Reduce spacing for page headers */
 .page-container h1 {
-  margin-top: var(--title-negative-margin) !important; /* Negative margin to pull titles up */
+  margin-top: var(--title-top-margin) !important; /* Changed to title-top-margin */
   margin-bottom: var(--title-bottom-margin) !important; /* Increased bottom margin */
-  text-align: center !important; /* Center all page titles */
+  text-align: left !important; /* Changed from center to left */
   text-transform: lowercase !important; /* Make all titles lowercase */
   font-size: 2.25rem !important; /* Reduced from 3rem to 2.25rem */
   font-weight: bold !important;
   line-height: 1 !important; /* Reduced from 1.1 to 1 */
-  padding-left: 0 !important;
+  padding-left: var(--title-left-padding) !important; /* Added left padding */
   padding-right: 0 !important;
-  width: 100% !important; /* Ensure full width for proper centering */
+  width: auto !important; /* Changed from 100% to auto */
+  max-width: 100% !important;
 }
 
 /* Reduce spacing for page content containers */
 .page-container .container {
   padding-top: 0 !important; /* Eliminated top padding */
-  padding-left: var(--content-padding) !important; /* Consistent padding */
-  padding-right: var(--content-padding) !important; /* Consistent padding */
+  padding-left: 0 !important; /* Changed from var(--content-padding) to 0 */
+  padding-right: 0 !important; /* Changed from var(--content-padding) to 0 */
 }
 
 /* Specific adjustment for products page */
 .page-container h1.text-4xl.font-bold.mb-4.text-center,
 .page-container h1.text-4xl.font-bold.mb-3.text-center,
-.page-page-container h1.text-4xl.font-bold.mb-2.text-center,
+.page-container h1.text-4xl.font-bold.mb-2.text-center,
 .page-container h1.text-5xl.font-bold.mb-2,
 .page-container h1.text-4xl.font-bold.mb-2 {
-  margin-top: var(--title-negative-margin) !important;
+  margin-top: var(--title-top-margin) !important;
   margin-bottom: var(--title-bottom-margin) !important;
-  text-align: center !important;
+  text-align: left !important; /* Changed from center to left */
   text-transform: lowercase !important;
   font-size: 2.25rem !important;
   line-height: 1 !important;
-  padding-left: 0 !important;
+  padding-left: var(--title-left-padding) !important; /* Added left padding */
   padding-right: 0 !important;
-}
-
-.water-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, white, white);
-  overflow: hidden;
-  z-index: -2;
-  border-radius: 0;
-}
-
-.water-overlay {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: rgba(255, 214, 192, 0.05); /* Changed to peach */
-  animation: waterFlow 20s linear infinite;
-  opacity: 0.1;
-  z-index: -1;
-}
-
-@keyframes float {
-  0% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(10px, -15px);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-
-@keyframes sway {
-  0% {
-    transform: rotate(-2deg);
-  }
-  50% {
-    transform: rotate(2deg);
-  }
-  100% {
-    transform: rotate(-2deg);
-  }
-}
-
-/* Update the fade-in-element class to remove the float animation */
-.fade-in-element {
-  opacity: 0;
-  animation: fadeIn 1s ease-out forwards;
-  animation-delay: var(--delay, 0s);
-}
-
-/* Add a new class for section titles that doesn't float */
-.section-title {
-  opacity: 0;
-  animation: fadeIn 1s ease-out forwards;
-  animation-delay: var(--delay, 0s);
 }
 
 /* Breaking News Bar Styles */
@@ -481,17 +422,60 @@ body.theater-mode-active .breaking-news-bar {
   height: var(--breaking-news-height);
   display: flex;
   align-items: center;
-  z-index: 100;
+  z-index: 101; /* Higher than header z-index */
   background-color: white;
   color: black;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: none; /* Remove border to avoid potential gap */
   overflow: hidden;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important; /* Remove shadow to avoid visual gap */
+  border-radius: 0 !important;
+}
+
+/* Ensure NO gap between breaking news and header */
+.has-breaking-news .page-container {
+  padding-top: calc(var(--header-height) + var(--breaking-news-height) + var(--page-top-padding)) !important;
+  margin-top: 0 !important; /* Ensure no margin creates a gap */
+}
+
+body.has-breaking-news header {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  border-top: none !important;
+  top: var(--breaking-news-height) !important;
+}
+
+/* Create a single visual element by using a continuous shadow */
+body.has-breaking-news header {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.breaking-news-bar + div {
+  margin-top: 0 !important;
+  border-top: none !important;
+}
+
+/* Force immediate adjacency between elements */
+header,
+.breaking-news-bar {
+  transform: translateZ(0); /* Force hardware acceleration for seamless rendering */
+}
+
+/* Add special case for handling the joint between the two elements */
+body.has-breaking-news .breaking-news-bar::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: 102;
 }
 
 .marquee-container {
@@ -533,808 +517,54 @@ body.has-breaking-news {
 
 /* Adjust page container to account for breaking news bar */
 .has-breaking-news .page-container {
-  padding-top: calc(var(--header-height) + var(--breaking-news-height)); /* Removed additional padding */
+  padding-top: calc(var(--header-height) + var(--breaking-news-height) + var(--page-top-padding)); /* Added page-top-padding */
 }
 
-/* Video Banner Section Styles */
-.video-banner-section {
-  position: relative;
-  height: 60vh; /* Taller to accommodate multiple videos */
-  min-height: 300px;
-  background: transparent;
-  margin: 0; /* Remove margin */
-  padding: 0; /* Remove padding */
-  overflow: visible; /* Allow videos to overflow */
-  z-index: 1;
-  width: 100%;
-}
-
-/* Video error message */
-.video-error-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 214, 192, 0.7); /* Changed to peach */
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
-
-.video-error-message.theater {
-  min-height: 300px;
-}
-
-/* Theater mode styles */
-.theater-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 214, 192, 0.9);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.theater-container {
-  position: relative;
-  width: 90%;
-  max-width: 1000px;
-  background: rgba(255, 214, 192, 0.5);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(255, 255, 255, 0.3);
-}
-
-/* Remove these animations that cause jittering */
-@keyframes scaleIn {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.theater-close-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(255, 214, 192, 0.5);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  transition: all 0.2s ease;
-}
-
-.theater-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2); /* Changed to white */
-  transform: scale(1.1);
-}
-
-.theater-video-wrapper {
-  width: 100%;
-  overflow: hidden;
-}
-
-.theater-video {
-  width: 100%;
-  display: block;
-}
-
-.theater-content {
-  padding: 24px;
-  color: white;
-  background: linear-gradient(to top, rgba(255, 214, 192, 0.8), rgba(255, 214, 192, 0.4));
-}
-
-/* Theater active state for the original container */
-.theater-active {
-  z-index: 101;
-}
-
-/* Fix for map tile rendering issues */
-.map-tiles {
-  filter: brightness(0.95) contrast(1.1);
-}
-
-.leaflet-container {
-  background-color: #ffd6c0 !important;
-}
-
-.leaflet-tile-pane {
-  opacity: 1 !important;
-}
-
-.leaflet-tile-loaded {
-  visibility: visible !important;
-}
-
-/* Add these styles at the end of the file */
-
-/* Enhanced map styles to ensure proper loading */
-.map-container {
-  width: 100% !important;
-  height: 100% !important;
-  position: absolute !important;
-  top: 0 !important;
+/* Add this at the end of the file to override all other styles */
+.page-container h1 {
+  text-align: left !important;
+  position: relative !important;
   left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  z-index: 1;
-}
-
-.map-tiles {
-  filter: brightness(0.95) contrast(1.1);
-}
-
-.leaflet-container {
-  background-color: #ffd6c0 !important;
-}
-
-.leaflet-tile-pane {
-  opacity: 1 !important;
-  z-index: 200 !important;
-}
-
-.leaflet-tile {
-  visibility: visible !important;
-}
-
-.leaflet-tile-loaded {
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Fix for Safari and mobile browsers */
-@supports (-webkit-overflow-scrolling: touch) {
-  .leaflet-container {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-/* Add these styles to make the map look cleaner */
-
-/* Enhanced map styles for a cleaner look */
-.map-container {
-  width: 100% !important;
-  height: 100% !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  z-index: 1;
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-/* Style the popups to match the hai brand */
-.leaflet-popup-content-wrapper {
-  border-radius: 8px !important;
-  box-shadow: 0 3px 14px rgba(255, 255, 255, 0.2) !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-}
-
-.leaflet-popup-content {
-  margin: 0 !important;
-  width: 250px !important;
-}
-
-.dispensary-popup h3 {
-  font-size: 1rem !important;
-  margin-bottom: 0.25rem !important;
-  color: white !important; /* Ensure text is white */
-}
-
-.dispensary-popup {
-  overflow: hidden !important;
-}
-
-.dispensary-popup img {
-  margin-top: 0.5rem !important;
-  border-radius: 4px !important;
-}
-
-/* Style the map controls */
-.leaflet-control-zoom {
-  border: none !important;
-  border-radius: 8px !important;
-  overflow: hidden !important;
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.15) !important;
-}
-
-.leaflet-control-zoom a {
-  background-color: #ffd6c0 !important;
-  color: white !important;
-  border: none !important;
-  width: 30px !important;
-  height: 30px !important;
-  line-height: 30px !important;
-  font-size: 16px !important;
-  font-weight: bold !important;
-}
-
-.leaflet-control-zoom a:hover {
-  background-color: #ffcbb0 !important;
-  color: white !important;
-}
-
-/* Style the attribution */
-.leaflet-control-attribution {
-  background-color: rgba(255, 214, 192, 0.8) !important;
-  padding: 2px 5px !important;
-  border-radius: 3px !important;
-  font-size: 10px !important;
-  color: white !important;
-}
-
-.section-with-video {
-  padding-bottom: 15vh; /* Add space at the bottom for videos */
-  position: relative;
-  overflow: visible;
-}
-
-/* Add these styles at the end of your globals.css file */
-
-/* Enhanced product card hover effects */
-.product-card {
-  perspective: 1000px;
-  transform-style: preserve-3d;
-  will-change: transform;
-  background-color: white !important;
-  color: black !important;
-}
-
-.product-card:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-  transform: scale(1.05);
-  z-index: 10;
-}
-
-.product-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: 0;
-  border-radius: 8px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
-  transition: opacity 0.3s ease-in-out;
-}
-
-.product-card:hover::after {
-  opacity: 1;
-}
-
-.product-card > * {
-  transform: translateZ(0);
-  transition: transform 0.3s ease-in-out;
-}
-
-.product-card:hover > * {
-  transform: translateZ(30px);
-}
-
-/* Enhanced product card styles with better contrast */
-.product-card {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-
-.product-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.product-card:hover::before {
-  opacity: 1;
-}
-
-.product-card:hover {
-  transform: scale(1.03);
-  z-index: 10;
-}
-
-/* Add a subtle glow effect on hover */
-.product-card:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.05), 0 0 10px rgba(0, 0, 0, 0.05) !important;
-}
-
-/* Improve text contrast */
-.product-card h2 {
-  color: black !important;
-  font-weight: 600;
-}
-
-.product-card p {
-  color: black !important;
-  font-weight: 400;
-}
-
-/* Add these scroll animation styles to the end of the file */
-
-@keyframes fadeUpIn {
-  0% {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.scroll-animation {
-  opacity: 0;
-  transform: translateY(30px) scale(0.95);
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.scroll-animation.animate {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.scroll-animation-title {
-  perspective: 1000px;
-  transform-style: preserve-3d;
-}
-
-.scroll-animation-title .letter {
-  display: inline-block;
-  transform-origin: 0 100%;
-  opacity: 0;
-  transform: rotateX(-90deg);
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: calc(var(--index) * 0.05s);
-}
-
-.scroll-animation-title.animate .letter {
-  opacity: 1;
-  transform: rotateX(0deg);
-}
-
-/* Adjust the section and video banner positioning */
-.section-with-padding {
-  padding-top: 15vh;
-  padding-bottom: 15vh;
-}
-
-.video-banner-section {
-  height: 60vh;
-  min-height: 300px;
-}
-
-/* Improve section spacing */
-.welcome-section {
-  margin-bottom: 15vh;
-}
-
-.products-section {
-  padding-top: 20vh;
-  padding-bottom: 10vh;
-}
-
-/* Enhanced header animation and effects */
-.scroll-animation-title.animate .letter {
-  opacity: 1;
-  transform: rotateX(0deg);
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
-}
-
-/* Special effect for the main welcome header */
-h1.scroll-animation-title.animate .letter {
-  animation: glowPulse 3s infinite alternate;
-  animation-delay: calc(var(--index) * 0.05s + 1s);
-}
-
-/* Add these styles to your globals.css file */
-
-/* Image Banner Section Styles */
-.image-banner-section {
-  position: relative;
-  height: 60vh;
-  min-height: 300px;
-  background: transparent;
-  margin: 0;
-  padding: 0;
-  overflow: visible;
-  z-index: 1;
-  width: 100%;
-}
-
-.image-error-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 214, 192, 0.7); /* Changed to peach */
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
-
-/* Increase the height of the image banner section for larger banners */
-.image-banner-section {
-  height: 70vh; /* Increased from 60vh */
-}
-
-/* Optimize scrollbar appearance */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(255, 214, 192, 0.1);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  border: 2px solid rgba(255, 214, 192, 0.1);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-/* For Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(255, 214, 192, 0.1);
-}
-
-/* Custom scrollbar styles */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 214, 192, 0.1);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-/* For Firefox */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(255, 214, 192, 0.1);
-}
-
-/* Add these button styles to override all buttons to black */
-button:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link),
-.button:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link),
-.btn:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link),
-[type="button"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link),
-[type="submit"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link),
-[type="reset"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) {
-  background-color: black !important;
-  color: white !important;
-  border-color: black !important;
-}
-
-button:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link):hover,
-.button:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link):hover,
-.btn:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link):hover,
-[type="button"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link):hover,
-[type="submit"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link):hover,
-[type="reset"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link):hover {
-  background-color: #333333 !important;
-  color: white !important;
-}
-
-/* Make sure text is visible on black buttons */
-button:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) span,
-.button:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) span,
-.btn:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) span,
-[type="button"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) span,
-[type="submit"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) span,
-[type="reset"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) span {
-  color: white !important;
-}
-
-/* Ensure icons in buttons are visible */
-button:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) svg,
-.button:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) svg,
-.btn:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) svg,
-[type="button"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) svg,
-[type="submit"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) svg,
-[type="reset"]:not(.read-more-link):not(.newsletter-close-btn):not(.footer-link) svg {
-  color: white !important;
-}
-
-/* Override shadcn button styles */
-.bg-\\[#ffd6c0\\],
-.bg-\\[#a8d1e7\\],
-.bg-\\[#ffcbb0\\],
-.bg-\\[#97c0d6\\] {
-  background-color: black !important;
-  color: white !important;
-}
-
-.hover\\:bg-\\[#ffcbb0\\]:hover,
-.hover\\:bg-\\[#97c0d6\\]:hover {
-  background-color: #333333 !important;
-  color: white !important;
-}
-
-/* Override button styles for navigation links */
-header a,
-header a:hover,
-.header-link,
-.header-link:hover {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: black !important;
-  transform: none;
-}
-
-/* Restore the hover effect for header links */
-.header-link:hover {
-  transform: translateY(-2px);
-}
-
-/* Make sure mobile navigation links are not affected by button styles */
-.mobile-nav-link,
-.mobile-nav-link:hover {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: black !important;
-}
-
-/* Override button styles for footer links */
-.footer-link,
-.footer-link:hover {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: black !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  font-size: inherit !important;
-  font-weight: inherit !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-}
-
-/* Ensure footer links maintain proper styling */
-footer a,
-footer button {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: black !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-/* Add these styles to override the cookie preferences and newsletter buttons */
-.cookie-switch {
-  background-color: transparent !important;
-}
-
-.cookie-button,
-.cookie-button-outline {
-  background-color: transparent !important;
-  color: black !important;
-  border: 1px solid black !important;
-}
-
-.cookie-button:hover,
-.cookie-button-outline:hover {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  color: black !important;
-}
-
-/* Newsletter close button styling */
-.newsletter-close-btn {
-  background-color: transparent !important;
-  color: black !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 4px !important;
-  border-radius: 50% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: background-color 0.2s ease !important;
-}
-
-.newsletter-close-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  color: #333 !important;
-}
-
-.newsletter-close-btn svg {
-  color: black !important;
-  stroke: black !important;
-  fill: none !important;
-}
-
-.newsletter-submit-btn {
-  background-color: black !important;
-  color: white !important;
-}
-
-.newsletter-submit-btn:hover {
-  background-color: #333 !important;
-}
-
-/* NEW STYLES FOR FOOTER SPACING AND NEWSLETTER X BUTTON */
-/* Increase spacing between footer navigation links */
-footer .hidden.md\\:flex.items-center.space-x-8 {
-  column-gap: 3rem !important; /* Equivalent to space-x-12 */
-}
-
-footer .flex.space-x-6 {
-  column-gap: 2.5rem !important; /* Equivalent to space-x-10 */
-}
-
-/* Read more link styling for all links */
-a[href*="/lifestyle/"],
-button.text-black,
-button.text-[#e76f51],
-.read-more-link {
-  display: inline-flex;
-  align-items: center;
-  background-color: transparent !important;
-  padding: 4px 0;
-  transition: all 0.3s ease;
-  text-decoration: underline;
-  font-weight: 500;
-  color: black !important;
-}
-
-a[href*="/lifestyle/"]:hover,
-button.text-black:hover,
-button.text-[#e76f51]:hover,
-.read-more-link:hover {
-  transform: translateX(3px);
-  opacity: 0.9;
-  background-color: transparent !important;
-  color: #333 !important;
-}
-
-/* Ensure Read More link icons are black */
-.read-more-link svg {
-  color: black !important;
-}
-
-.read-more-link:hover svg {
-  color: #333 !important;
-}
-
-/* Fix for the dashboard button spacing */
-header .hidden.md\\:flex,
-header .hidden.md\\:block {
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-/* Ensure the dashboard button doesn't add extra height */
-header .flex.items-center {
-  height: 100%;
-}
-
-/* Fix for the breaking news bar and header alignment */
-.breaking-news-bar + header {
-  margin-top: 0 !important;
-}
-
-/* Ensure consistent height for all header elements */
-header nav,
-header ul,
-header li,
-header a {
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-/* Specific adjustments for page headers */
-.container h1.text-4xl {
-  margin-top: var(--title-negative-margin) !important;
-  padding-top: 0 !important;
-}
-
-/* Extreme reduction - completely eliminate vertical padding in containers */
-.container.mx-auto.px-4.py-6.pt-8,
-.container.mx-auto.px-4.py-2,
-.container.mx-auto.px-4.pt-12.pb-16,
-.container.mx-auto.px-4.pt-2.pb-8,
-.container.mx-auto.px-4.py-2,
-.container.mx-auto.px-4.py-0,
-.container.mx-auto.px-4.pt-0.pb-4 {
-  padding-top: 0 !important;
-  padding-bottom: 0.5rem !important;
-  padding-left: var(--content-padding) !important; /* Consistent padding */
-  padding-right: var(--content-padding) !important; /* Consistent padding */
-}
-
-/* Adjust spacing for all pages */
-.page-container > div > .container {
-  padding-top: 0 !important;
-  margin-top: var(--title-negative-margin) !important;
-}
-
-/* Specific adjustment for page titles to overlap with header */
-.page-container h1.text-4xl {
-  position: relative;
-  z-index: 10;
-}
-
-/* Reduce font size of page titles to fit better */
-.page-container h1.text-4xl {
-  font-size: 2.25rem !important; /* Reduced from 3rem */
-  line-height: 1 !important;
-}
-
-/* Add specific styling for the map page title */
-.page-container h1.text-5xl.font-bold.mb-6.text-black {
-  text-transform: lowercase !important;
-  font-size: 2.25rem !important;
-  line-height: 1 !important;
-  margin-top: var(--title-negative-margin) !important;
-  text-align: center !important;
+  margin-left: 0 !important;
+  padding-left: var(--title-left-padding) !important;
+  width: auto !important;
+  max-width: 100% !important;
+  transform: none !important;
+}
+
+/* Override any center alignment for all headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-align: left !important;
+}
+
+/* Force left alignment for specific title classes */
+.text-center,
+.text-4xl,
+.font-bold,
+.mb-2,
+.mb-4,
+.text-5xl {
+  text-align: left !important;
+}
+
+/* Content container adjustments for left-aligned titles */
+.container > div,
+.container > section {
+  padding-left: var(--content-padding) !important;
+  padding-right: var(--content-padding) !important;
+}
+
+/* Ensure content is properly aligned with left-aligned titles */
+.product-content,
+.lifestyle-content,
+.story-content {
   padding-left: 0 !important;
   padding-right: 0 !important;
-}
-
-/* Make sure all page titles are the same size */
-.page-container h1.text-5xl {
-  font-size: 2.25rem !important;
-  line-height: 1 !important;
-  text-align: center !important;
-}
-
-/* Ensure content is aligned with titles */
-.page-container .container > div,
-.page-container .container > section,
-.page-container .container > article {
-  padding-left: var(--content-padding) !important; /* Match content padding */
-  padding-right: var(--content-padding) !important; /* Match content padding */
-}
-
-/* Ensure grid and product content is aligned */
-.grid,
-.product-grid,
-.blog-list {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
