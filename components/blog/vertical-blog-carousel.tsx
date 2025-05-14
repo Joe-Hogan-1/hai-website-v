@@ -181,13 +181,13 @@ export default function VerticalBlogCarousel() {
       <div className="space-y-4 mb-2">
         {visiblePosts.map((post) => (
           <Link key={post.id} href={`/lifestyle/${post.id}`} className="block">
-            <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg">
+            <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg h-full flex flex-col">
               {post.image_url && (
-                <div className="mb-3 overflow-hidden rounded-lg">
+                <div className="mb-3 overflow-hidden rounded-lg h-[180px] w-full">
                   <img
                     src={post.image_url || "/placeholder.svg"}
                     alt={post.title}
-                    className="w-full h-32 object-cover transition-transform duration-300 hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
               )}
@@ -234,13 +234,13 @@ export default function VerticalBlogCarousel() {
             <div className="space-y-4">
               {remainingPosts.map((post) => (
                 <Link key={post.id} href={`/lifestyle/${post.id}`} className="block">
-                  <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg">
+                  <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg h-full flex flex-col">
                     {post.image_url && (
-                      <div className="mb-3 overflow-hidden rounded-lg">
+                      <div className="mb-3 overflow-hidden rounded-lg h-[180px] w-full">
                         <img
                           src={post.image_url || "/placeholder.svg"}
                           alt={post.title}
-                          className="w-full h-32 object-cover transition-transform duration-300 hover:scale-105"
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                         />
                       </div>
                     )}
