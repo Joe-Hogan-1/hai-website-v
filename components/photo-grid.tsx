@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/utils/supabase"
 import Image from "next/image"
+import Link from "next/link"
 
 interface GridImage {
   id: string
@@ -115,7 +116,11 @@ export default function PhotoGrid() {
   return (
     <div className="grid grid-cols-2 gap-3 w-full h-full">
       {images.map((image, index) => (
-        <div key={image.id} className="relative aspect-square overflow-hidden rounded-md shadow-sm group">
+        <Link
+          href="/products"
+          key={image.id}
+          className="block relative aspect-square overflow-hidden rounded-md shadow-sm group"
+        >
           <Image
             src={image.image_url || "/placeholder.svg"}
             alt={image.title || `Grid image ${index + 1}`}
@@ -131,7 +136,7 @@ export default function PhotoGrid() {
               </div>
             </div>
           )}
-        </div>
+        </Link>
       ))}
     </div>
   )

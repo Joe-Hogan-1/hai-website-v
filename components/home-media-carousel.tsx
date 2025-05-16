@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { supabase } from "@/utils/supabase"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import Link from "next/link"
 
 interface MediaItem {
   id: number
@@ -227,44 +228,49 @@ export default function HomeMediaCarousel() {
                 index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
               }`}
             >
-              {item.media_type === "video" ? (
-                <video
-                  src={item.media_url}
-                  className="absolute inset-0 w-full h-full object-contain"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <img
-                    src={item.media_url || "/placeholder.svg"}
-                    alt={item.title}
-                    className="max-w-full max-h-full object-contain"
-                    style={{
-                      width: "auto",
-                      height: "auto",
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                    }}
+              {/* Wrap in Link component to make clickable */}
+              <Link href="/products" className="block w-full h-full">
+                {item.media_type === "video" ? (
+                  <video
+                    src={item.media_url}
+                    className="absolute inset-0 w-full h-full object-contain"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
                   />
-                </div>
-              )}
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <img
+                      src={item.media_url || "/placeholder.svg"}
+                      alt={item.title}
+                      className="max-w-full max-h-full object-contain"
+                      style={{
+                        width: "auto",
+                        height: "auto",
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                      }}
+                    />
+                  </div>
+                )}
 
-              {/* Text Overlay with responsive adjustments */}
-              {item.text_overlay && (
-                <div
-                  className={`absolute ${getTextPositionClasses(item.text_position)} p-2 sm:p-4 bg-black/30 rounded text-white max-w-full sm:max-w-md`}
-                >
-                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{item.text_overlay}</h2>
-                  {item.description && (
-                    <p className="text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-none">
-                      {item.description}
-                    </p>
-                  )}
-                </div>
-              )}
+                {/* Text Overlay with responsive adjustments */}
+                {item.text_overlay && (
+                  <div
+                    className={`absolute ${getTextPositionClasses(
+                      item.text_position,
+                    )} p-2 sm:p-4 bg-black/30 rounded text-white max-w-full sm:max-w-md`}
+                  >
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{item.text_overlay}</h2>
+                    {item.description && (
+                      <p className="text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-none">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </Link>
             </div>
           ))}
         </div>

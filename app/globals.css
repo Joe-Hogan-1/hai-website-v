@@ -73,6 +73,7 @@ body {
   background: rgb(var(--background-rgb));
   font-family: "New Order", system-ui, sans-serif;
   font-weight: 500; /* Using Medium as the default font weight */
+  text-transform: lowercase; /* Make all text lowercase by default */
 }
 
 h1,
@@ -84,6 +85,7 @@ h6,
 .font-semibold {
   font-weight: 600; /* Using Semi Bold for headings */
   color: black;
+  text-transform: lowercase !important; /* Force lowercase for headings */
 }
 
 /* Add a class for explicitly setting text to New Order Medium */
@@ -678,4 +680,36 @@ footer a {
 /* Apply Semi Bold to read more links */
 .read-more-link {
   font-weight: 600 !important; /* Semi Bold */
+}
+
+/* Force lowercase for all text */
+* {
+  text-transform: lowercase !important;
+}
+
+/* Exceptions for specific elements that should not be lowercase */
+code,
+pre,
+.code,
+.pre,
+input[type="password"],
+input[type="email"] {
+  text-transform: none !important;
+}
+
+/* Journal subheading style */
+.journal-subheading {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+  padding-left: var(--title-left-padding);
+}
+
+@media (max-width: 768px) {
+  .journal-subheading {
+    font-size: 0.875rem;
+    margin-top: -0.75rem;
+  }
 }

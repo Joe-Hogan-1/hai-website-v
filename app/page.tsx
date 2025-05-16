@@ -53,17 +53,18 @@ export default function HomePage() {
               <div className="w-full py-12">
                 <div className="container mx-auto">
                   <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                    {/* Tagline */}
+                    {/* Tagline - Updated text */}
                     <div className="text-center md:text-left md:w-1/2">
                       <h2 className="text-3xl font-bold mb-4 text-black text-left">embrace the glow</h2>
                       <p className="text-xl text-black mb-6">
-                        discover the balance of health, wellness, and recreation
+                        discover the intersection of wellness and a life well lived
                       </p>
+                      {/* Updated button text */}
                       <Link
                         href="/products"
                         className="inline-flex px-6 py-3 bg-black text-white rounded-md border border-white/20 hover:bg-gray-800 transition-colors font-medium"
                       >
-                        explore products
+                        shop essentials
                       </Link>
                     </div>
 

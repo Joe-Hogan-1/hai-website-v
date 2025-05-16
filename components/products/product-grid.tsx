@@ -162,13 +162,13 @@ export default function ProductGrid() {
       <Link
         key={product.id}
         href={`/products/${product.id}`}
-        className="block bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl product-card border border-gray-200"
+        className="block bg-white rounded-lg overflow-hidden product-card border border-gray-200"
       >
         <div className="h-48 overflow-hidden relative">
           <img
             src={product.image_url || "/placeholder.svg?height=200&width=300"}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            className="w-full h-full object-cover"
           />
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {product.category && (
@@ -185,19 +185,14 @@ export default function ProductGrid() {
             )}
           </div>
         </div>
-        <div className="p-4">
-          {/* First line: Product name */}
-          <h2 className="text-xl font-semibold text-black line-clamp-1 text-left">{product.name}</h2>
+        <div className="p-5">
+          {/* Product name */}
+          <h2 className="text-2xl font-semibold text-black line-clamp-2 text-left mb-2">{product.name}</h2>
 
-          {/* Second line: Short description (first sentence) */}
-          <p className="text-gray-700 text-sm mt-1 font-medium line-clamp-1 text-left">
-            {product.description.split(".")[0]}.
-          </p>
-
-          {/* Third line: Area for 3 lines of text with read more */}
-          <div className="mt-2 relative">
+          {/* Description with read more */}
+          <div className="relative">
             <p className="text-gray-700 text-sm font-medium line-clamp-3 text-left">{product.description}</p>
-            <div className="read-more-link mt-2 text-black hover:text-gray-700 text-sm font-medium flex items-center underline">
+            <div className="read-more-link mt-2 text-black text-sm font-medium flex items-center underline">
               Read more <ArrowRight className="ml-1 h-3 w-3" />
             </div>
           </div>
