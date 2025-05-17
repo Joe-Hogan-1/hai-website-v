@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { updateSiteSettings, getComingSoonStatus } from "@/utils/site-settings"
+import { supabase } from "@/utils/supabase"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
@@ -21,9 +21,22 @@ export default function ComingSoonManager({ userId }: ComingSoonManagerProps) {
   useEffect(() => {
     async function loadSettings() {
       try {
-        const settings = await getComingSoonStatus()
-        setIsActive(settings.active)
-        setMessage(settings.message)
+        // Get coming soon status directly from the database
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("value")
+          .eq("key", "coming_soon_mode")
+          .single()
+
+        if (error) {
+          console.error("Error loading coming soon settings:", error)
+          return
+        }
+
+        if (data && data.value) {
+          setIsActive(data.value.active || false)
+          setMessage(data.value.message || "")
+        }
       } catch (error) {
         console.error("Error loading coming soon settings:", error)
       } finally {
@@ -39,16 +52,36 @@ export default function ComingSoonManager({ userId }: ComingSoonManagerProps) {
     setSaveStatus("idle")
 
     try {
-      const success = await updateSiteSettings({
-        isComingSoon: isActive,
-        comingSoonMessage: message,
-      })
+      // Get current settings
+      const { data: currentSettings, error: fetchError } = await supabase
+        .from("site_settings")
+        .select("id")
+        .eq("key", "coming_soon_mode")
+        .single()
 
-      if (success) {
-        setSaveStatus("success")
-      } else {
-        setSaveStatus("error")
+      const comingSoonValue = {
+        active: isActive,
+        message: message,
       }
+
+      if (fetchError || !currentSettings) {
+        // If no settings exist, create a new record
+        const { error: insertError } = await supabase
+          .from("site_settings")
+          .insert([{ key: "coming_soon_mode", value: comingSoonValue }])
+
+        if (insertError) throw insertError
+      } else {
+        // Update existing settings
+        const { error: updateError } = await supabase
+          .from("site_settings")
+          .update({ value: comingSoonValue })
+          .eq("id", currentSettings.id)
+
+        if (updateError) throw updateError
+      }
+
+      setSaveStatus("success")
     } catch (error) {
       console.error("Error saving coming soon settings:", error)
       setSaveStatus("error")

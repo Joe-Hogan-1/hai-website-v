@@ -11,18 +11,34 @@ function isAllowedPath(path: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Add the pathname to headers so it can be accessed in the layout
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set("x-pathname", pathname)
+
   // Allow access to dashboard for authenticated users
   if (pathname.startsWith("/dashboard")) {
     // Let auth middleware handle this
-    return NextResponse.next()
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
 
   // Skip middleware on allowed paths
   if (isAllowedPath(pathname)) {
-    return NextResponse.next()
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
 
-  return NextResponse.next()
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
 }
 
 export const config = {

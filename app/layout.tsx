@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { headers } from "next/headers"
 import "./globals.css"
 import Footer from "@/components/footer"
 import ScrollToTop from "@/components/scroll-to-top"
@@ -12,7 +13,6 @@ import PageTransition from "@/components/page-transition"
 import { cookies } from "next/headers"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import ComingSoonGate from "@/components/coming-soon-gate"
-import { getComingSoonStatus } from "@/utils/site-settings"
 
 // Import client components normally - they'll be rendered on the client
 import ClientComponents from "@/components/client-components"
@@ -29,7 +29,18 @@ const fontNewOrder = {
   display: "swap",
 }
 
-async function checkComingSoonStatus() {
+async function getComingSoonStatus(pathname: string) {
+  // Don't show coming soon on these paths
+  if (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/signin") ||
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/_next/") ||
+    pathname.startsWith("/fonts/")
+  ) {
+    return { active: false, message: "" }
+  }
+
   try {
     const cookieStore = cookies()
     const supabase = createServerComponentClient({ cookies: () => cookieStore })
@@ -43,11 +54,17 @@ async function checkComingSoonStatus() {
       return { active: false, message: "" }
     }
 
-    // Get coming soon status from our utility function
-    const comingSoonStatus = await getComingSoonStatus()
-    return comingSoonStatus
+    // Get coming soon status directly from the database
+    const { data, error } = await supabase.from("site_settings").select("value").eq("key", "coming_soon_mode").single()
+
+    if (error || !data) {
+      console.error("Error getting coming soon status:", error)
+      return { active: false, message: "" }
+    }
+
+    return data.value
   } catch (err) {
-    console.error("Unexpected error checking coming soon status:", err)
+    console.error("Unexpected error getting coming soon status:", err)
     return { active: false, message: "" }
   }
 }
@@ -57,8 +74,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Get the current path from the request
+  const pathname = headers().get("x-pathname") || ""
+
   // Get coming soon status
-  const comingSoonStatus = await checkComingSoonStatus()
+  const comingSoonStatus = await getComingSoonStatus(pathname)
 
   return (
     <html lang="en">
@@ -76,7 +96,7 @@ export default async function RootLayout({
             <Footer />
             <Toaster position="top-right" />
 
-            {/* Coming Soon Gate - path checking is done inside the component */}
+            {/* Coming Soon Gate */}
             {comingSoonStatus.active && <ComingSoonGate message={comingSoonStatus.message} />}
           </BreakingNewsProvider>
         </AuthProvider>

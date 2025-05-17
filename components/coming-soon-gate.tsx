@@ -6,7 +6,6 @@ import { useState } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { subscribeToNewsletter } from "@/app/actions/newsletter-actions"
-import { usePathname } from "next/navigation"
 
 interface ComingSoonGateProps {
   message?: string
@@ -19,20 +18,6 @@ export default function ComingSoonGate({ message }: ComingSoonGateProps) {
   const [submitted, setSubmitted] = useState(false)
   const [responseMessage, setResponseMessage] = useState("")
   const [error, setError] = useState("")
-  const pathname = usePathname()
-
-  // Check if the current path should be excluded from coming soon mode
-  const isExcludedPath =
-    pathname?.startsWith("/dashboard") ||
-    pathname?.startsWith("/signin") ||
-    pathname?.startsWith("/api/") ||
-    pathname?.startsWith("/_next/") ||
-    pathname?.startsWith("/fonts/")
-
-  // If this is an excluded path, don't render the coming soon gate
-  if (isExcludedPath) {
-    return null
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
