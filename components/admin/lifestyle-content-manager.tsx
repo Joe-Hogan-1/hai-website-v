@@ -75,9 +75,10 @@ export default function LifestyleContentManager({ userId }: { userId: string }) 
         return
       }
 
+      // Preserve the content exactly as entered, including whitespace and formatting
       const contentData = {
         title: title.trim() || null,
-        content: editorContent.trim(),
+        content: editorContent, // Don't trim to preserve whitespace
         is_active: true,
         user_id: userId,
         updated_at: new Date().toISOString(),
@@ -148,17 +149,28 @@ export default function LifestyleContentManager({ userId }: { userId: string }) 
     }
   }
 
-  // Helper function to convert plain text to HTML with basic formatting
+  // Enhanced function to convert text to HTML while preserving whitespace and formatting
   function formatTextAsHtml(text: string) {
-    // Replace line breaks with <br> tags
-    return text
+    // First, preserve line breaks and indentation
+    const html = text
+      // Replace double line breaks with paragraph tags
       .replace(/\n\n/g, "</p><p>")
+      // Replace single line breaks with <br> tags
       .replace(/\n/g, "<br>")
+      // Preserve indentation by replacing spaces with non-breaking spaces
+      .replace(/( {2,})/g, (match) => {
+        return "&nbsp;".repeat(match.length)
+      })
+      // Replace tabs with non-breaking spaces
+      .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
+      // Handle basic formatting
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.*?)\*/g, "<em>$1</em>")
       .replace(/^### (.*?)$/gm, "<h3>$1</h3>")
       .replace(/^## (.*?)$/gm, "<h2>$1</h2>")
       .replace(/^# (.*?)$/gm, "<h1>$1</h1>")
+
+    return html
   }
 
   // Helper function to add basic formatting instructions
@@ -168,7 +180,7 @@ export default function LifestyleContentManager({ userId }: { userId: string }) 
         <p>
           Formatting: <strong>**bold**</strong>, <em>*italic*</em>, # Heading 1, ## Heading 2, ### Heading 3
         </p>
-        <p>Use line breaks for new paragraphs.</p>
+        <p>Whitespace, indentation, and line breaks will be preserved in the published content.</p>
       </div>
     )
   }
@@ -209,14 +221,15 @@ export default function LifestyleContentManager({ userId }: { userId: string }) 
                   id="content"
                   value={editorContent}
                   onChange={(e) => setEditorContent(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black min-h-[300px]"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black min-h-[300px] font-mono"
                   placeholder="Enter content here. Use markdown-style formatting for basic styling."
+                  style={{ whiteSpace: "pre-wrap" }}
                 />
                 {editorContent && (
                   <div className="mt-4 border rounded-md p-4">
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Preview:</h3>
                     <div
-                      className="prose max-w-none text-sm"
+                      className="prose max-w-none text-sm whitespace-pre-wrap"
                       dangerouslySetInnerHTML={{ __html: `<p>${formatTextAsHtml(editorContent)}</p>` }}
                     />
                   </div>
@@ -260,8 +273,8 @@ export default function LifestyleContentManager({ userId }: { userId: string }) 
                     </div>
                   </div>
 
-                  <div className="prose max-w-none border-t pt-4">
-                    <div dangerouslySetInnerHTML={{ __html: `<p>${content.content}</p>` }} />
+                  <div className="prose max-w-none border-t pt-4 whitespace-pre-wrap">
+                    <div dangerouslySetInnerHTML={{ __html: `<p>${formatTextAsHtml(content.content)}</p>` }} />
                   </div>
                 </div>
               ) : (

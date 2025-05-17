@@ -3,15 +3,23 @@
 import { useState, useEffect } from "react"
 import { useBreakingNews } from "@/contexts/breaking-news-context"
 import { usePathname } from "next/navigation"
+import { useSiteSettings } from "@/utils/site-settings"
 
 export default function BreakingNewsBar() {
   const { newsText, isLoading } = useBreakingNews()
   const [shouldShow, setShouldShow] = useState(false)
   const pathname = usePathname()
+  const { isComingSoon } = useSiteSettings()
 
   useEffect(() => {
     // Check if we should show the breaking news bar
     const checkIfShouldShow = () => {
+      // Don't show if coming soon mode is active
+      if (isComingSoon) {
+        setShouldShow(false)
+        return
+      }
+
       // Don't show on these specific pages
       if (pathname === "/user-agreement" || pathname === "/privacy-policy" || pathname === "/age-verification") {
         setShouldShow(false)
@@ -40,7 +48,7 @@ export default function BreakingNewsBar() {
     return () => {
       window.removeEventListener("storage", handleStorageChange)
     }
-  }, [pathname])
+  }, [pathname, isComingSoon])
 
   // Don't render anything if loading, no news text, or shouldn't show
   if (isLoading || !newsText || !shouldShow) {

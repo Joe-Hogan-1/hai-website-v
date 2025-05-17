@@ -19,6 +19,7 @@ const GridImageManager = dynamic(() => import("@/components/admin/grid-image-man
 const CategoryManager = dynamic(() => import("@/components/admin/category-manager"), { ssr: false })
 const LifestyleBannerManager = dynamic(() => import("@/components/admin/lifestyle-banner-manager"), { ssr: false })
 const LifestyleContentManager = dynamic(() => import("@/components/admin/lifestyle-content-manager"), { ssr: false })
+const ComingSoonManager = dynamic(() => import("@/components/admin/coming-soon-manager"), { ssr: false })
 
 // Import other components
 import Header from "@/components/header"
@@ -73,6 +74,7 @@ export default function AdminDashboard() {
   }
 
   const tabItems = [
+    { id: "coming-soon", label: "Coming Soon Page" },
     { id: "media", label: "Homepage Carousel" },
     { id: "lifestyle-banner", label: "Lifestyle Banner" },
     { id: "lifestyle-content", label: "Lifestyle Content" },
@@ -110,11 +112,11 @@ export default function AdminDashboard() {
                         <Menu size={24} />
                       </button>
                     </SheetTrigger>
-                    <SheetContent side="right" className="w-[80vw] sm:w-[385px] p-0">
+                    <SheetContent side="right" className="bg-white border-none p-0 w-[80vw] sm:w-[385px]">
                       <div className="flex flex-col h-full">
                         <div className="p-4 border-b flex justify-between items-center">
-                          <h2 className="text-xl font-semibold">Dashboard Menu</h2>
-                          <button onClick={() => setIsMobileMenuOpen(false)}>
+                          <h2 className="text-xl font-semibold text-gray-800">Dashboard Menu</h2>
+                          <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-600">
                             <X size={24} />
                           </button>
                         </div>
@@ -124,7 +126,7 @@ export default function AdminDashboard() {
                               <button
                                 key={tab.id}
                                 className={`w-full text-left px-4 py-3 rounded-md transition-colors ${
-                                  activeTab === tab.id ? "bg-[#ffd6c0] text-white" : "hover:bg-gray-100"
+                                  activeTab === tab.id ? "bg-[#ffd6c0] text-white" : "text-gray-700 hover:bg-gray-100"
                                 }`}
                                 onClick={() => handleTabChange(tab.id)}
                               >
@@ -133,9 +135,9 @@ export default function AdminDashboard() {
                             ))}
                           </div>
                         </div>
-                        <div className="p-4 border-t">
+                        <div className="p-4 border-t border-gray-200">
                           <p className="text-sm text-gray-500 mb-2">Logged in as:</p>
-                          <p className="font-medium truncate">{user.email}</p>
+                          <p className="font-medium truncate text-gray-700">{user.email}</p>
                         </div>
                       </div>
                     </SheetContent>
@@ -179,6 +181,10 @@ export default function AdminDashboard() {
               </div>
 
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+                <TabsContent value="coming-soon">
+                  <ComingSoonManager userId={user.id} />
+                </TabsContent>
+
                 <TabsContent value="media">
                   <MediaManager userId={user.id} />
                 </TabsContent>
@@ -219,6 +225,7 @@ export default function AdminDashboard() {
 
             {/* Mobile tab content - shown based on active tab */}
             <div className="md:hidden">
+              {activeTab === "coming-soon" && <ComingSoonManager userId={user.id} />}
               {activeTab === "media" && <MediaManager userId={user.id} />}
               {activeTab === "lifestyle-banner" && <LifestyleBannerManager userId={user.id} />}
               {activeTab === "lifestyle-content" && <LifestyleContentManager userId={user.id} />}

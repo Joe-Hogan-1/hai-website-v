@@ -216,8 +216,8 @@ export default function HomeMediaCarousel() {
 
   return (
     <div className="w-full h-full relative overflow-hidden bg-[#fff5f0]">
-      {/* Changed from absolute inset-4 to relative with padding to maintain aspect ratio */}
-      <div className="relative bg-[#ffd6c0] rounded-sm overflow-hidden m-4">
+      {/* Changed from bg-[#ffd6c0] to bg-white for white borders */}
+      <div className="relative bg-white rounded-sm overflow-hidden m-4">
         {/* Added aspect ratio container */}
         <div className="relative w-full" style={{ paddingBottom: "56.25%" /* 16:9 aspect ratio */ }}>
           {/* Media Items */}

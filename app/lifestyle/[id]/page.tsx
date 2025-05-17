@@ -17,7 +17,7 @@ export default function LifestylePostPage({ params }: BlogPostPageProps) {
       <WaterBackground />
       <Header />
       <div className="page-container">
-        <div className="container mx-auto px-4 py-6 pt-8">
+        <div className="container mx-auto px-0 py-6 pt-8">
           <Suspense fallback={<BlogPostSkeleton />}>
             <BlogPostContent id={params.id} />
           </Suspense>
@@ -60,7 +60,7 @@ async function BlogPostContent({ id }: { id: string }) {
 
 function BlogPostSkeleton() {
   return (
-    <div className="max-w-3xl mx-auto bg-white/30 backdrop-blur-sm p-8 rounded-lg shadow-md animate-pulse">
+    <div className="max-w-5xl mx-auto bg-white/30 backdrop-blur-sm p-8 rounded-lg shadow-md animate-pulse">
       <div className="h-8 bg-white/40 rounded w-3/4 mb-6"></div>
       <div className="h-4 bg-white/40 rounded w-1/4 mb-8"></div>
       <div className="h-64 bg-white/40 rounded mb-8"></div>

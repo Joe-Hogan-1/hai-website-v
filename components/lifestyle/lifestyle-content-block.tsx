@@ -43,6 +43,30 @@ export default function LifestyleContentBlock() {
     fetchContent()
   }, [])
 
+  // Enhanced function to convert text to HTML while preserving whitespace and formatting
+  function formatTextAsHtml(text: string) {
+    // First, preserve line breaks and indentation
+    const html = text
+      // Replace double line breaks with paragraph tags
+      .replace(/\n\n/g, "</p><p>")
+      // Replace single line breaks with <br> tags
+      .replace(/\n/g, "<br>")
+      // Preserve indentation by replacing spaces with non-breaking spaces
+      .replace(/( {2,})/g, (match) => {
+        return "&nbsp;".repeat(match.length)
+      })
+      // Replace tabs with non-breaking spaces
+      .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
+      // Handle basic formatting
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>")
+      .replace(/^### (.*?)$/gm, "<h3>$1</h3>")
+      .replace(/^## (.*?)$/gm, "<h2>$1</h2>")
+      .replace(/^# (.*?)$/gm, "<h1>$1</h1>")
+
+    return html
+  }
+
   if (loading) {
     return (
       <div className="w-full py-8 animate-pulse">
@@ -61,7 +85,10 @@ export default function LifestyleContentBlock() {
   return (
     <div className="w-full py-6">
       {content.title && <h2 className="text-2xl font-semibold mb-4 text-left">{content.title}</h2>}
-      <div className="prose max-w-none text-left" dangerouslySetInnerHTML={{ __html: content.content }} />
+      <div
+        className="prose max-w-none text-left whitespace-pre-wrap"
+        dangerouslySetInnerHTML={{ __html: `<p>${formatTextAsHtml(content.content)}</p>` }}
+      />
     </div>
   )
 }

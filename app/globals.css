@@ -713,3 +713,32 @@ input[type="email"] {
     margin-top: -0.75rem;
   }
 }
+
+/* Blog post specific styles - override any padding on blog post titles */
+.blog-post-title {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  text-align: left !important;
+}
+
+/* Override any padding in the blog post container */
+article.blog-post-container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Ensure blog post content is properly aligned */
+article.blog-post-container > * {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Photo grid text color override */
+.photo-grid-text {
+  color: white !important;
+}
+
+.photo-grid-text h3,
+.photo-grid-text p {
+  color: white !important;
+}

@@ -119,20 +119,37 @@ export default function PhotoGrid() {
         <Link
           href="/products"
           key={image.id}
-          className="block relative aspect-square overflow-hidden rounded-md shadow-sm group"
+          className="group block relative aspect-square overflow-hidden rounded-md shadow-sm"
         >
           <Image
             src={image.image_url || "/placeholder.svg"}
             alt={image.title || `Grid image ${index + 1}`}
             fill
-            className="object-cover transition-transform duration-300 hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 40vw, 20vw"
           />
+
+          {/* Dark overlay that appears on hover */}
+          <div
+            className="absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity duration-300"
+            aria-hidden="true"
+          />
+
+          {/* Text container that reveals on hover */}
           {image.title && (
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-end">
-              <div className="p-3 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                <h3 className="text-lg font-semibold">{image.title}</h3>
-                {image.description && <p className="text-sm mt-1">{image.description}</p>}
+            <div className="absolute inset-0 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="p-4">
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: "#ffffff", textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
+                >
+                  {image.title}
+                </h3>
+                {image.description && (
+                  <p className="text-sm mt-1" style={{ color: "#ffffff", textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>
+                    {image.description}
+                  </p>
+                )}
               </div>
             </div>
           )}

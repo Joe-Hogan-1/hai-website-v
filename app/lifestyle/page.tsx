@@ -34,9 +34,13 @@ export default function LifestylePage() {
               </div>
 
               <div className="bg-[#ffd6c0]/50 rounded-lg p-4 flex flex-col h-full min-h-[600px]">
-                <h2 className="text-2xl font-semibold mb-4 text-left">Latest Articles</h2>
-                <div className="flex-grow overflow-y-auto pr-2 custom-scrollbar">
-                  <BlogListWrapper limit={20} showExcerpt={true} className="space-y-4" />
+                <h2 className="text-2xl font-semibold mb-1 text-left">the journal</h2>
+                <p className="text-sm mb-4 text-left text-gray-600">rituals, routines, and how we really live</p>
+                <div
+                  className="flex-grow overflow-y-auto pr-2 custom-scrollbar"
+                  style={{ height: "500px", minHeight: "500px" }}
+                >
+                  <BlogListWrapper limit={20} showExcerpt={true} className="space-y-3" />
                 </div>
               </div>
             </div>
