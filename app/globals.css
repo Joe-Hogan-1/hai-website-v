@@ -27,7 +27,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+html::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
 html {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
   scroll-behavior: smooth;
   /* Add momentum-based scrolling for iOS */
   -webkit-overflow-scrolling: touch;
@@ -741,4 +749,24 @@ article.blog-post-container > * {
 .photo-grid-text h3,
 .photo-grid-text p {
   color: white !important;
+}
+
+/* Hide scrollbar for all elements that might need scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for any overflow containers */
+div[style*="overflow"] {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+div[style*="overflow"]::-webkit-scrollbar {
+  display: none;
 }

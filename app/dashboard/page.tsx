@@ -20,6 +20,10 @@ const CategoryManager = dynamic(() => import("@/components/admin/category-manage
 const LifestyleBannerManager = dynamic(() => import("@/components/admin/lifestyle-banner-manager"), { ssr: false })
 const LifestyleContentManager = dynamic(() => import("@/components/admin/lifestyle-content-manager"), { ssr: false })
 const ComingSoonManager = dynamic(() => import("@/components/admin/coming-soon-manager"), { ssr: false })
+const HomepageTextManager = dynamic(() => import("@/components/admin/homepage-text-manager"), { ssr: false })
+const VerticalCarouselManager = dynamic(() => import("@/components/admin/vertical-carousel-manager"), { ssr: false })
+const SecondaryTextManager = dynamic(() => import("@/components/admin/secondary-text-manager"), { ssr: false })
+const SecondaryGridManager = dynamic(() => import("@/components/admin/secondary-grid-manager"), { ssr: false })
 
 // Import other components
 import Header from "@/components/header"
@@ -75,10 +79,14 @@ export default function AdminDashboard() {
 
   const tabItems = [
     { id: "coming-soon", label: "Coming Soon Page" },
+    { id: "homepage-text", label: "Homepage Text (Top)" },
+    { id: "grid-images", label: "Photo Grid (Top)" },
+    { id: "secondary-text", label: "Homepage Text (Bottom)" },
+    { id: "secondary-grid", label: "Photo Grid (Bottom)" },
     { id: "media", label: "Homepage Carousel" },
+    { id: "vertical-carousel", label: "Vertical Image Carousel" },
     { id: "lifestyle-banner", label: "Lifestyle Banner" },
     { id: "lifestyle-content", label: "Lifestyle Content" },
-    { id: "grid-images", label: "Photo Grid" },
     { id: "blogs", label: "Blog Management" },
     { id: "products", label: "Product Management" },
     { id: "categories", label: "Categories" },
@@ -185,6 +193,14 @@ export default function AdminDashboard() {
                   <ComingSoonManager userId={user.id} />
                 </TabsContent>
 
+                <TabsContent value="homepage-text">
+                  <HomepageTextManager userId={user.id} />
+                </TabsContent>
+
+                <TabsContent value="secondary-text">
+                  <SecondaryTextManager userId={user.id} />
+                </TabsContent>
+
                 <TabsContent value="media">
                   <MediaManager userId={user.id} />
                 </TabsContent>
@@ -199,6 +215,14 @@ export default function AdminDashboard() {
 
                 <TabsContent value="grid-images">
                   <GridImageManager userId={user.id} />
+                </TabsContent>
+
+                <TabsContent value="secondary-grid">
+                  <SecondaryGridManager userId={user.id} />
+                </TabsContent>
+
+                <TabsContent value="vertical-carousel">
+                  <VerticalCarouselManager userId={user.id} />
                 </TabsContent>
 
                 <TabsContent value="blogs">
@@ -226,10 +250,14 @@ export default function AdminDashboard() {
             {/* Mobile tab content - shown based on active tab */}
             <div className="md:hidden">
               {activeTab === "coming-soon" && <ComingSoonManager userId={user.id} />}
+              {activeTab === "homepage-text" && <HomepageTextManager userId={user.id} />}
+              {activeTab === "secondary-text" && <SecondaryTextManager userId={user.id} />}
               {activeTab === "media" && <MediaManager userId={user.id} />}
               {activeTab === "lifestyle-banner" && <LifestyleBannerManager userId={user.id} />}
               {activeTab === "lifestyle-content" && <LifestyleContentManager userId={user.id} />}
               {activeTab === "grid-images" && <GridImageManager userId={user.id} />}
+              {activeTab === "secondary-grid" && <SecondaryGridManager userId={user.id} />}
+              {activeTab === "vertical-carousel" && <VerticalCarouselManager userId={user.id} />}
               {activeTab === "blogs" && <BlogManager userId={user.id} />}
               {activeTab === "products" && <ProductManager userId={user.id} />}
               {activeTab === "categories" && <CategoryManager userId={user.id} />}

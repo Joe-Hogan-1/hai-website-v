@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { supabase } from "@/utils/supabase"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import Link from "next/link"
 
@@ -26,24 +25,26 @@ export default function HomeMediaCarousel() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [autoplayEnabled, setAutoplayEnabled] = useState(true)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Add media query hooks for responsive design
   const isMobile = useMediaQuery("(max-width: 640px)")
   const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)")
 
   useEffect(() => {
+    // Initial fetch
     fetchMediaItems()
 
-    // Subscribe to changes in the banner_media table
-    const channel = supabase
-      .channel("banner_media_changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "banner_media" }, (payload) => {
-        fetchMediaItems()
-      })
-      .subscribe()
+    // Set up polling for updates every 2 minutes
+    pollIntervalRef.current = setInterval(() => {
+      fetchMediaItems()
+    }, 120000) // 2 minutes
 
     return () => {
-      supabase.removeChannel(channel)
+      // Clean up intervals on unmount
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+      }
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
@@ -54,17 +55,14 @@ export default function HomeMediaCarousel() {
     try {
       setLoading(true)
 
-      // Fetch from banner_media table
-      const { data, error } = await supabase
-        .from("banner_media")
-        .select("*")
-        .eq("is_active", true)
-        .order("display_order", { ascending: true })
+      // Use fetch API instead of direct Supabase client
+      const response = await fetch("/api/banner-media")
 
-      if (error) {
-        setError(`Failed to load carousel items: ${error.message}`)
-        return
+      if (!response.ok) {
+        throw new Error(`Failed to fetch banner media: ${response.status}`)
       }
+
+      const data = await response.json()
 
       if (data && data.length > 0) {
         setMediaItems(data)
@@ -72,8 +70,9 @@ export default function HomeMediaCarousel() {
         setMediaItems([])
       }
     } catch (error: any) {
-      setError("An unexpected error occurred")
-      setMediaItems([])
+      console.error("Error fetching media items:", error)
+      setError(error.message || "An unexpected error occurred")
+      // Don't clear existing items on error to prevent flickering
     } finally {
       setLoading(false)
     }
@@ -114,7 +113,7 @@ export default function HomeMediaCarousel() {
     }
   }, [currentIndex, isTransitioning, mediaItems.length, autoplayEnabled])
 
-  if (loading) {
+  if (loading && mediaItems.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-[#fff5f0]">
         <div className="text-[#ffd6c0] text-xl animate-pulse">Loading carousel...</div>
@@ -122,7 +121,7 @@ export default function HomeMediaCarousel() {
     )
   }
 
-  if (error) {
+  if (error && mediaItems.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-[#fff5f0]">
         <div className="text-red-500">{error}</div>
@@ -137,8 +136,6 @@ export default function HomeMediaCarousel() {
       </div>
     )
   }
-
-  const currentItem = mediaItems[currentIndex]
 
   // Function to get text position classes
   const getTextPositionClasses = (position: string) => {
@@ -260,19 +257,31 @@ export default function HomeMediaCarousel() {
                   <div
                     className={`absolute ${getTextPositionClasses(
                       item.text_position,
-                    )} p-2 sm:p-4 bg-black/30 rounded text-white max-w-full sm:max-w-md`}
+                    )} p-2 sm:p-4 text-white max-w-full sm:max-w-md`}
                   >
                     <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{item.text_overlay}</h2>
                     {item.description && (
-                      <p className="text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-none">
-                        {item.description}
-                      </p>
+                      <p className="text-sm md:text-base line-clamp-2 sm:line-clamp-none">{item.description}</p>
                     )}
                   </div>
                 )}
               </Link>
             </div>
           ))}
+
+          {/* Fixed text and button in lower left corner - appears on all slides */}
+          <div className="absolute bottom-6 left-6 z-20 max-w-xs sm:max-w-sm md:max-w-md text-black">
+            <div className="p-3 sm:p-4">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1">embrace the glow.</h2>
+              <p className="text-sm md:text-base mb-3">discover the intersection of wellness and a life well lived.</p>
+              <Link
+                href="/products"
+                className="inline-block bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded transition-colors"
+              >
+                shop essentials.
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>

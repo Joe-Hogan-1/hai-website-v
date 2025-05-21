@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import Header from "@/components/header"
 import HomeMediaCarousel from "@/components/home-media-carousel"
 import NewsletterPopup from "@/components/newsletter-popup"
 import PhotoGrid from "@/components/photo-grid"
+import HomepageTextBlock from "@/components/homepage-text-block"
+import VerticalImageCarousel from "@/components/vertical-image-carousel"
+import SecondaryTextBlock from "@/components/secondary-text-block"
+import SecondaryPhotoGrid from "@/components/secondary-photo-grid"
+import ChatPopup from "@/components/chat-popup"
 
 export default function HomePage() {
   const router = useRouter()
@@ -39,6 +43,7 @@ export default function HomePage() {
     <>
       <Header />
       <NewsletterPopup />
+      <ChatPopup />
       <div className="relative overflow-hidden">
         <div className="relative z-10">
           {/* Main content area with full-width image carousel */}
@@ -49,28 +54,42 @@ export default function HomePage() {
                 <HomeMediaCarousel />
               </div>
 
-              {/* Tagline and photo grid section */}
+              {/* First section: Text and photo grid */}
               <div className="w-full py-12">
                 <div className="container mx-auto">
                   <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                    {/* Tagline - Updated text */}
-                    <div className="text-center md:text-left md:w-1/2">
-                      <h2 className="text-3xl font-bold mb-4 text-black text-left">embrace the glow</h2>
-                      <p className="text-xl text-black mb-6">
-                        discover the intersection of wellness and a life well lived
-                      </p>
-                      {/* Updated button text */}
-                      <Link
-                        href="/products"
-                        className="inline-flex px-6 py-3 bg-black text-white rounded-md border border-white/20 hover:bg-gray-800 transition-colors font-medium"
-                      >
-                        shop essentials
-                      </Link>
+                    {/* Homepage Text Block */}
+                    <div className="w-full md:w-1/2">
+                      <HomepageTextBlock />
                     </div>
 
                     {/* Photo Grid */}
                     <div className="w-full md:w-1/2 max-w-md mx-auto md:mx-0">
                       <PhotoGrid />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vertical Image Carousel Section */}
+              <div className="w-full py-12">
+                <div className="container mx-auto">
+                  <VerticalImageCarousel />
+                </div>
+              </div>
+
+              {/* Second section: Text and photo grid */}
+              <div className="w-full py-12">
+                <div className="container mx-auto">
+                  <div className="flex flex-col md:flex-row-reverse items-center justify-between gap-8">
+                    {/* Secondary Text Block (flipped position) */}
+                    <div className="w-full md:w-1/2">
+                      <SecondaryTextBlock />
+                    </div>
+
+                    {/* Secondary Photo Grid (flipped position) */}
+                    <div className="w-full md:w-1/2 max-w-md mx-auto md:mx-0">
+                      <SecondaryPhotoGrid />
                     </div>
                   </div>
                 </div>

@@ -109,3 +109,65 @@ export async function deleteFromDispensaryImages(filePath: string) {
     throw error
   }
 }
+
+// Function to upload to grid-images bucket
+export async function uploadToGridImages(file: File, fileName?: string) {
+  try {
+    // Generate a unique filename if not provided
+    const actualFileName =
+      fileName || `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${file.name.split(".").pop()}`
+
+    // Upload the file directly to the existing bucket
+    const { data, error } = await supabase.storage.from("grid-images").upload(actualFileName, file, {
+      cacheControl: "3600",
+      upsert: true,
+    })
+
+    if (error) {
+      console.error("Upload error:", error)
+      throw error
+    }
+
+    // Get the public URL
+    const { data: urlData } = supabase.storage.from("grid-images").getPublicUrl(actualFileName)
+
+    return {
+      path: data.path,
+      url: urlData.publicUrl,
+    }
+  } catch (error) {
+    console.error("Error uploading file:", error)
+    throw error
+  }
+}
+
+// Function to upload to secondary-grid-images bucket
+export async function uploadToSecondaryGridImages(file: File, fileName?: string) {
+  try {
+    // Generate a unique filename if not provided
+    const actualFileName =
+      fileName || `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${file.name.split(".").pop()}`
+
+    // Upload the file directly to the existing bucket
+    const { data, error } = await supabase.storage.from("secondary-grid-images").upload(actualFileName, file, {
+      cacheControl: "3600",
+      upsert: true,
+    })
+
+    if (error) {
+      console.error("Upload error:", error)
+      throw error
+    }
+
+    // Get the public URL
+    const { data: urlData } = supabase.storage.from("secondary-grid-images").getPublicUrl(actualFileName)
+
+    return {
+      path: data.path,
+      url: urlData.publicUrl,
+    }
+  } catch (error) {
+    console.error("Error uploading file:", error)
+    throw error
+  }
+}

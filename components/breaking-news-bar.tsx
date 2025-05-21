@@ -1,69 +1,62 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useBreakingNews } from "@/contexts/breaking-news-context"
 import { usePathname } from "next/navigation"
-import { useSiteSettings } from "@/utils/site-settings"
+import { useBreakingNews } from "@/contexts/breaking-news-context"
 
 export default function BreakingNewsBar() {
   const { newsText, isLoading } = useBreakingNews()
-  const [shouldShow, setShouldShow] = useState(false)
+  const [show, setShow] = useState(false)
   const pathname = usePathname()
-  const { isComingSoon } = useSiteSettings()
 
   useEffect(() => {
     // Check if we should show the breaking news bar
     const checkIfShouldShow = () => {
-      // Don't show if coming soon mode is active
-      if (isComingSoon) {
-        setShouldShow(false)
+      // Don't show on these paths
+      if (
+        pathname.startsWith("/signin") ||
+        pathname.startsWith("/dashboard") ||
+        pathname === "/user-agreement" ||
+        pathname === "/privacy-policy" ||
+        pathname === "/age-verification" ||
+        pathname === "/coming-soon"
+      ) {
+        setShow(false)
         return
       }
 
-      // Don't show on these specific pages
-      if (pathname === "/user-agreement" || pathname === "/privacy-policy" || pathname === "/age-verification") {
-        setShouldShow(false)
-        return
-      }
-
-      // On homepage, only show if age verified
-      if (pathname === "/") {
-        const isAgeVerified = sessionStorage.getItem("ageVerified") === "true"
-        setShouldShow(isAgeVerified)
-        return
-      }
-
-      // Show on all other pages
-      setShouldShow(true)
+      // Show if we have news text
+      setShow(!!newsText && newsText.length > 0)
     }
 
     checkIfShouldShow()
+  }, [newsText, pathname])
 
-    // Listen for storage events (in case age verification happens in another tab)
-    const handleStorageChange = () => {
-      checkIfShouldShow()
+  useEffect(() => {
+    // Add class to body when breaking news is shown
+    if (show) {
+      document.body.classList.add("has-breaking-news")
+    } else {
+      document.body.classList.remove("has-breaking-news")
     }
 
-    window.addEventListener("storage", handleStorageChange)
     return () => {
-      window.removeEventListener("storage", handleStorageChange)
+      document.body.classList.remove("has-breaking-news")
     }
-  }, [pathname, isComingSoon])
+  }, [show])
 
-  // Don't render anything if loading, no news text, or shouldn't show
-  if (isLoading || !newsText || !shouldShow) {
+  if (isLoading || !show) {
     return null
   }
 
   return (
     <div
-      className="bg-white h-[32px] w-full overflow-hidden fixed top-0 left-0 right-0 z-[60] shadow-md breaking-news-bar animate-fadeIn flex items-center"
-      style={{ margin: 0, padding: 0, borderBottom: "1px solid rgba(0,0,0,0.1)" }}
+      className="breaking-news-bar bg-white text-black py-2 px-4 text-center font-medium sticky top-0 z-50"
+      role="alert"
+      aria-live="polite"
     >
       <div className="marquee-container">
-        <div className="marquee text-black">
-          <span>{newsText}</span>
-        </div>
+        <div className="marquee">{newsText}</div>
       </div>
     </div>
   )

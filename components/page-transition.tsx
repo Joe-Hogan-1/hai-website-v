@@ -18,9 +18,9 @@ export default function PageTransition({ children }: PageTransitionProps) {
   }, [])
 
   const variants = {
-    hidden: { opacity: 0, y: 20 },
-    enter: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 },
+    hidden: { opacity: 0 },
+    enter: { opacity: 1 },
+    exit: { opacity: 0 },
   }
 
   return (
@@ -30,7 +30,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
       animate="enter"
       exit="exit"
       variants={variants}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
+      transition={{ duration: 0.15, ease: "easeInOut" }}
     >
       {children}
     </motion.div>

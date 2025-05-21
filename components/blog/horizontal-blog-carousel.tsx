@@ -14,7 +14,7 @@ interface BlogPost {
   created_at: string
 }
 
-export default function VerticalBlogCarousel() {
+export default function HorizontalBlogCarousel() {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
   const [displayedPosts, setDisplayedPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -97,11 +97,11 @@ export default function VerticalBlogCarousel() {
     }, 500)
   }, [blogPosts, hasMore, loadingMore, page, postsPerPage])
 
-  // Intersection Observer for infinite scroll
+  // Intersection Observer for infinite scroll - now for horizontal scrolling
   useEffect(() => {
     const options = {
       root: containerRef.current,
-      rootMargin: "0px 0px 200px 0px",
+      rootMargin: "0px 200px 0px 0px", // Changed to detect right edge
       threshold: 0.1,
     }
 
@@ -112,7 +112,7 @@ export default function VerticalBlogCarousel() {
       }
     }, options)
 
-    // Create a sentinel element at the bottom of the container
+    // Create a sentinel element at the right of the container
     const sentinel = document.getElementById("scroll-sentinel")
     if (sentinel) {
       observer.observe(sentinel)
@@ -133,7 +133,7 @@ export default function VerticalBlogCarousel() {
         title: "The Benefits of CBD for Relaxation",
         summary: "Discover how CBD can help you unwind and relax after a long day.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/diverse-group-relaxing.png",
         created_at: new Date().toISOString(),
       },
       {
@@ -141,7 +141,7 @@ export default function VerticalBlogCarousel() {
         title: "Exploring Cannabis Terpenes",
         summary: "Learn about the aromatic compounds that give cannabis its unique flavors and effects.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/cannabis-terpenes.png",
         created_at: new Date().toISOString(),
       },
       {
@@ -149,7 +149,7 @@ export default function VerticalBlogCarousel() {
         title: "Cannabis and Creativity",
         summary: "How cannabis has influenced art, music, and creative thinking throughout history.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/cannabis-creativity.png",
         created_at: new Date().toISOString(),
       },
       {
@@ -157,7 +157,7 @@ export default function VerticalBlogCarousel() {
         title: "Understanding Different Cannabis Strains",
         summary: "A guide to indica, sativa, and hybrid strains and their effects.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/placeholder.svg?height=160&width=320&query=cannabis strains",
         created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
@@ -165,7 +165,7 @@ export default function VerticalBlogCarousel() {
         title: "The History of Cannabis Cultivation",
         summary: "Tracing the origins and spread of cannabis cultivation throughout human history.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/placeholder.svg?height=160&width=320&query=cannabis history",
         created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
@@ -173,7 +173,7 @@ export default function VerticalBlogCarousel() {
         title: "Medical Applications of Cannabis",
         summary: "Exploring the growing body of research on cannabis for medical treatments.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/placeholder.svg?height=160&width=320&query=medical cannabis",
         created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
@@ -181,7 +181,7 @@ export default function VerticalBlogCarousel() {
         title: "The Endocannabinoid System Explained",
         summary: "Understanding how cannabis interacts with the body's natural systems.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/placeholder.svg?height=160&width=320&query=endocannabinoid system",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
@@ -189,7 +189,7 @@ export default function VerticalBlogCarousel() {
         title: "Cannabis Cooking: Beyond Brownies",
         summary: "Creative recipes and techniques for cooking with cannabis.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/placeholder.svg?height=160&width=320&query=cannabis cooking",
         created_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
@@ -197,7 +197,7 @@ export default function VerticalBlogCarousel() {
         title: "Sustainable Cannabis Cultivation",
         summary: "Eco-friendly approaches to growing cannabis with minimal environmental impact.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/placeholder.svg?height=160&width=320&query=sustainable cannabis",
         created_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
@@ -205,7 +205,7 @@ export default function VerticalBlogCarousel() {
         title: "Cannabis and Sleep: Finding Balance",
         summary: "How different cannabis compounds can affect sleep patterns and quality.",
         content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg",
+        image_url: "/placeholder.svg?height=160&width=320&query=cannabis sleep",
         created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
       },
     ]
@@ -213,7 +213,7 @@ export default function VerticalBlogCarousel() {
 
   // Create a card component to ensure consistency
   const BlogCard = ({ post }: { post: BlogPost }) => (
-    <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg flex flex-col h-[280px]">
+    <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg flex flex-col w-[280px] h-[280px] flex-shrink-0">
       <div className="mb-3 overflow-hidden rounded-lg w-full h-[140px] bg-gray-100 flex-shrink-0">
         <img
           src={post.image_url || "/placeholder.svg?height=160&width=320&query=lifestyle"}
@@ -246,17 +246,23 @@ export default function VerticalBlogCarousel() {
 
   if (loading) {
     return (
-      <div className="h-full flex flex-col justify-center items-center">
-        <div className="w-full h-[160px] bg-white/40 rounded mb-4 animate-pulse"></div>
-        <div className="w-3/4 h-6 bg-white/40 rounded mb-3 animate-pulse"></div>
-        <div className="w-full h-4 bg-white/40 rounded mb-2 animate-pulse"></div>
+      <div className="h-full flex items-center">
+        <div className="flex space-x-4 overflow-x-auto pb-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="w-[280px] h-[280px] flex-shrink-0">
+              <div className="h-[140px] bg-white/40 rounded mb-4 animate-pulse"></div>
+              <div className="w-3/4 h-6 bg-white/40 rounded mb-3 animate-pulse"></div>
+              <div className="w-full h-4 bg-white/40 rounded mb-2 animate-pulse"></div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="h-full flex flex-col justify-center items-center">
+      <div className="h-full flex items-center justify-center">
         <p className="text-red-500 mb-4">{error}</p>
         <p className="text-black">Unable to load lifestyle articles</p>
       </div>
@@ -265,7 +271,7 @@ export default function VerticalBlogCarousel() {
 
   if (blogPosts.length === 0) {
     return (
-      <div className="h-full flex flex-col justify-center items-center">
+      <div className="h-full flex items-center justify-center">
         <p className="text-xl text-black">No lifestyle articles available yet.</p>
         <p className="text-black mt-2">Check back soon for updates!</p>
       </div>
@@ -273,27 +279,28 @@ export default function VerticalBlogCarousel() {
   }
 
   return (
-    <div className="absolute inset-0">
-      {/* Single scrollable container for all articles */}
+    <div className="h-full relative">
+      {/* Horizontal scrollable container for all articles */}
       <div
         ref={containerRef}
-        className="overflow-y-auto pr-1 h-full hide-scrollbar"
+        className="overflow-x-auto h-full hide-scrollbar pb-4 scroll-smooth"
         style={{
           scrollbarWidth: "thin",
           scrollbarColor: "rgba(0, 0, 0, 0.2) transparent",
+          WebkitOverflowScrolling: "touch",
         }}
       >
-        <div className="space-y-4">
+        <div className="flex space-x-4 pr-4">
           {displayedPosts.map((post) => (
             <Link key={post.id} href={`/lifestyle/${post.id}`} className="block">
               <BlogCard post={post} />
             </Link>
           ))}
 
-          {/* Sentinel element for infinite scroll */}
-          <div id="scroll-sentinel" className="h-4">
+          {/* Sentinel element for infinite scroll - now at the right edge */}
+          <div id="scroll-sentinel" className="w-4 flex-shrink-0">
             {loadingMore && (
-              <div className="flex justify-center py-4">
+              <div className="flex justify-center items-center h-full">
                 <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
               </div>
             )}
@@ -304,7 +311,7 @@ export default function VerticalBlogCarousel() {
       {/* Add some custom styles for the scrollbar */}
       <style jsx global>{`
         .hide-scrollbar::-webkit-scrollbar {
-          width: 4px;
+          height: 4px;
         }
         .hide-scrollbar::-webkit-scrollbar-track {
           background: transparent;

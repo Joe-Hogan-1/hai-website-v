@@ -9,7 +9,7 @@ export default function ProductsPage() {
       <AlignmentDebug />
       <div className="page-container">
         <div className="container mx-auto px-4 relative">
-          <h1 className="text-4xl font-bold mb-6 text-left exact-align pl-[24px]">our products</h1>
+          <h1 className="text-4xl font-bold mb-6 text-left exact-align pl-[24px]">explore the essentials.</h1>
           <div className="product-content">
             <ProductGrid />
           </div>

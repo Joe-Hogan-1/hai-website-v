@@ -11,8 +11,14 @@ const LifestyleContentBlock = dynamic(() => import("@/components/lifestyle/lifes
   ssr: true,
 })
 
-// Use a client wrapper for BlogList if it contains client-only features
-import { BlogListWrapper } from "@/components/blog/blog-list-wrapper"
+// Rename to HorizontalBlogCarousel for clarity
+const HorizontalBlogCarousel = dynamic(() => import("@/components/blog/horizontal-blog-carousel"), {
+  ssr: false,
+})
+
+const ConnectWithUsSection = dynamic(() => import("@/components/lifestyle/connect-with-us-section"), {
+  ssr: true,
+})
 
 export const metadata = {
   title: "Lifestyle | hai",
@@ -25,25 +31,30 @@ export default function LifestylePage() {
       <Header />
       <div className="page-container">
         <div className="container mx-auto">
-          <LeftAlignedTitle>lifestyle</LeftAlignedTitle>
-          <div className="lifestyle-content px-4 pb-16">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <LifestyleBanner />
-                <LifestyleContentBlock />
-              </div>
+          <LeftAlignedTitle>essentials and rituals.</LeftAlignedTitle>
+          <p className="text-lg md:text-xl mt-[-0.5rem] mb-6 text-left text-gray-600 max-w-2xl font-medium pl-8">
+            born in the glow of the city lights.
+          </p>
 
-              <div className="bg-[#ffd6c0]/50 rounded-lg p-4 flex flex-col h-full min-h-[600px]">
-                <h2 className="text-2xl font-semibold mb-1 text-left">the journal</h2>
-                <p className="text-sm mb-4 text-left text-gray-600">rituals, routines, and how we really live</p>
-                <div
-                  className="flex-grow overflow-y-auto pr-2 custom-scrollbar"
-                  style={{ height: "500px", minHeight: "500px" }}
-                >
-                  <BlogListWrapper limit={20} showExcerpt={true} className="space-y-3" />
-                </div>
+          <div className="lifestyle-content px-4 pb-8">
+            {/* Full-width lifestyle content */}
+            <div className="w-full">
+              <LifestyleBanner />
+              <LifestyleContentBlock />
+            </div>
+
+            {/* Blog carousel section with peach background */}
+            <div className="mt-12 mb-16 bg-[#FFDECB] p-6 rounded-lg">
+              <h2 className="text-2xl font-semibold mb-4 text-left">the journal.</h2>
+              <p className="text-sm mb-6 text-left text-gray-600">rituals, routines, and how we really live.</p>
+
+              <div className="w-full h-[320px]">
+                <HorizontalBlogCarousel />
               </div>
             </div>
+
+            {/* Connect with us section */}
+            <ConnectWithUsSection />
           </div>
         </div>
       </div>

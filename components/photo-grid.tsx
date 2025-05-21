@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/utils/supabase"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -21,16 +20,13 @@ export default function PhotoGrid() {
   useEffect(() => {
     fetchGridImages()
 
-    // Subscribe to changes in the photo_grid table
-    const channel = supabase
-      .channel("photo_grid_changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "photo_grid" }, () => {
-        fetchGridImages()
-      })
-      .subscribe()
+    // Set up polling instead of realtime subscription
+    const intervalId = setInterval(() => {
+      fetchGridImages()
+    }, 300000) // Poll every 5 minutes
 
     return () => {
-      supabase.removeChannel(channel)
+      clearInterval(intervalId)
     }
   }, [])
 
@@ -38,50 +34,27 @@ export default function PhotoGrid() {
     try {
       setLoading(true)
 
-      // First try to fetch from photo_grid table
-      const { data, error } = await supabase
-        .from("photo_grid")
-        .select("*")
-        .order("position", { ascending: true })
-        .limit(4)
+      // Use fetch API instead of Supabase client
+      const response = await fetch("/api/photo-grid")
 
-      if (error) {
-        console.error("Error fetching from photo_grid:", error)
-
-        // Fall back to grid_images table if photo_grid fails
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from("grid_images")
-          .select("*")
-          .order("position", { ascending: true })
-          .limit(4)
-
-        if (fallbackError) {
-          console.error("Error fetching from grid_images:", fallbackError)
-          setImages(getDefaultImages())
-        } else {
-          // Map grid_images data to match photo_grid structure
-          const mappedData = (fallbackData || []).map((img) => ({
-            ...img,
-            title: null,
-            description: null,
-          }))
-
-          // Fill with placeholders if needed
-          const imagesWithFallback = [...mappedData]
-          while (imagesWithFallback.length < 4) {
-            imagesWithFallback.push(createPlaceholderImage(imagesWithFallback.length))
-          }
-          setImages(imagesWithFallback.slice(0, 4))
-        }
-      } else {
-        // If we have less than 4 images, fill with placeholders
-        const imagesWithFallback = [...(data || [])]
-        while (imagesWithFallback.length < 4) {
-          imagesWithFallback.push(createPlaceholderImage(imagesWithFallback.length))
-        }
-        // Only take the first 4 images
-        setImages(imagesWithFallback.slice(0, 4))
+      if (!response.ok) {
+        throw new Error(`Error fetching grid images: ${response.statusText}`)
       }
+
+      const data = await response.json()
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      // If we have less than 4 images, fill with placeholders
+      const imagesWithFallback = [...(data || [])]
+      while (imagesWithFallback.length < 4) {
+        imagesWithFallback.push(createPlaceholderImage(imagesWithFallback.length))
+      }
+
+      // Only take the first 4 images
+      setImages(imagesWithFallback.slice(0, 4))
     } catch (error) {
       console.error("Unexpected error fetching grid images:", error)
       setImages(getDefaultImages())
@@ -92,10 +65,10 @@ export default function PhotoGrid() {
 
   const createPlaceholderImage = (index: number): GridImage => ({
     id: `placeholder-${index}`,
-    image_url: `/placeholder.svg?height=300&width=300`,
+    image_url: `/placeholder.svg?height=300&width=300&query=product+image+${index + 1}`,
     position: index,
-    title: "Placeholder Image",
-    description: "This is a placeholder image",
+    title: "Product Category",
+    description: "Explore our products",
     created_at: new Date().toISOString(),
   })
 
@@ -122,8 +95,8 @@ export default function PhotoGrid() {
           className="group block relative aspect-square overflow-hidden rounded-md shadow-sm"
         >
           <Image
-            src={image.image_url || "/placeholder.svg"}
-            alt={image.title || `Grid image ${index + 1}`}
+            src={image.image_url || "/placeholder.svg?height=300&width=300&query=product+image"}
+            alt={image.title || `Product category ${index + 1}`}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 40vw, 20vw"

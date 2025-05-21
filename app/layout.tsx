@@ -13,6 +13,7 @@ import PageTransition from "@/components/page-transition"
 import { cookies } from "next/headers"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import ComingSoonGate from "@/components/coming-soon-gate"
+import ScrollRestoration from "@/components/scroll-restoration"
 
 // Import client components normally - they'll be rendered on the client
 import ClientComponents from "@/components/client-components"
@@ -82,9 +83,27 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <style>{`
+          .no-tap-highlight {
+            -webkit-tap-highlight-color: transparent;
+          }
+          a {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            outline: none;
+          }
+          button {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            outline: none;
+          }
+        `}</style>
+      </head>
       <body className="min-h-screen flex flex-col" style={{ margin: 0, padding: 0, boxSizing: "border-box" }}>
         <FontLoader />
         <WhiteBackground />
+        <ScrollRestoration />
         <AuthProvider>
           <BreakingNewsProvider>
             <ScrollToTop />

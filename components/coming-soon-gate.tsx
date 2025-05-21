@@ -125,7 +125,7 @@ export default function ComingSoonGate({ message }: ComingSoonGateProps) {
         )}
 
         <div className="mt-2 text-center text-sm">
-          <p className="text-gray-700">© {new Date().getFullYear()} hai. all rights reserved.</p>
+          <p className="text-gray-700">© {new Date().getFullYear()} hai. All rights reserved.</p>
         </div>
       </div>
     </div>
