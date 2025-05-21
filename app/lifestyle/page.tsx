@@ -1,24 +1,9 @@
 import Header from "@/components/header"
-import dynamic from "next/dynamic"
 import LeftAlignedTitle from "@/components/left-aligned-title"
-
-// Import the client components properly
-const LifestyleBanner = dynamic(() => import("@/components/lifestyle/lifestyle-banner"), {
-  ssr: true,
-})
-
-const LifestyleContentBlock = dynamic(() => import("@/components/lifestyle/lifestyle-content-block"), {
-  ssr: true,
-})
-
-// Rename to HorizontalBlogCarousel for clarity
-const HorizontalBlogCarousel = dynamic(() => import("@/components/blog/horizontal-blog-carousel"), {
-  ssr: false,
-})
-
-const ConnectWithUsSection = dynamic(() => import("@/components/lifestyle/connect-with-us-section"), {
-  ssr: true,
-})
+import LifestyleBanner from "@/components/lifestyle/lifestyle-banner"
+import LifestyleContentBlock from "@/components/lifestyle/lifestyle-content-block"
+import BlogCarouselWrapper from "@/components/blog/blog-carousel-wrapper"
+import ConnectWithUsClientWrapper from "@/components/lifestyle/client-wrapper"
 
 export const metadata = {
   title: "Lifestyle | hai",
@@ -49,12 +34,12 @@ export default function LifestylePage() {
               <p className="text-sm mb-6 text-left text-gray-600">rituals, routines, and how we really live.</p>
 
               <div className="w-full h-[320px]">
-                <HorizontalBlogCarousel />
+                <BlogCarouselWrapper />
               </div>
             </div>
 
             {/* Connect with us section */}
-            <ConnectWithUsSection />
+            <ConnectWithUsClientWrapper />
           </div>
         </div>
       </div>
