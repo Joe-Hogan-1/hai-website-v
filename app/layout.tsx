@@ -10,7 +10,8 @@ import { BreakingNewsProvider } from "@/contexts/breaking-news-context"
 import WhiteBackground from "@/components/white-background"
 import { FontLoader } from "@/components/font-loader"
 import PageTransition from "@/components/page-transition"
-import { getServerClient } from "@/lib/supabase-client"
+import { cookies } from "next/headers"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import ComingSoonGate from "@/components/coming-soon-gate"
 import ScrollRestoration from "@/components/scroll-restoration"
 
@@ -42,7 +43,8 @@ async function getComingSoonStatus(pathname: string) {
   }
 
   try {
-    const supabase = getServerClient()
+    const cookieStore = cookies()
+    const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
     // Check if user is authenticated
     const {
