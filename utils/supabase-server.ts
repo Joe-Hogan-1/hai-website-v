@@ -1,6 +1,9 @@
+// This file is deprecated - use lib/supabase-client.ts instead
+// Keeping this file for backward compatibility
+
 import { createClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { getServerClient, getDirectServerClient } from "@/lib/supabase-client"
 
 // Original function name for backward compatibility
 export function createServerClient() {
@@ -22,24 +25,7 @@ export function createServerClient() {
 }
 
 // Server-side Supabase client with full functionality
-export const createServerSupabase = () => {
-  const cookieStore = cookies()
-  return createServerComponentClient({ cookies: () => cookieStore })
-}
+export const createServerSupabase = getServerClient
 
 // Direct server-side client for API routes
-export const createDirectServerClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-  return createClient(supabaseUrl, supabaseKey, {
-    auth: {
-      persistSession: false,
-    },
-    global: {
-      headers: {
-        "X-Client-Info": "hai-website-server",
-      },
-    },
-  })
-}
+export const createDirectServerClient = getDirectServerClient

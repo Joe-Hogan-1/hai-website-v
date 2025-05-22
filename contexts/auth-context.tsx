@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { supabase } from "@/utils/supabase"
+import { getBrowserClient } from "@/lib/supabase-client"
 import type { Session, User } from "@supabase/supabase-js"
 
 type AuthContextType = {
@@ -21,6 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
+  const supabase = getBrowserClient()
 
   // Use a ref to track if we've already redirected to prevent loops
   const hasRedirected = useRef(false)
@@ -60,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [supabase.auth])
 
   // Handle redirects based on auth state
   useEffect(() => {
