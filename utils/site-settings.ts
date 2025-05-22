@@ -25,7 +25,7 @@ const defaultSettings: SiteSettings = {
 // Cache the settings to avoid unnecessary fetches
 let cachedSettings: SiteSettings | null = null
 let lastFetchTime = 0
-const CACHE_DURATION = 60000 // 1 minute cache
+const CACHE_DURATION = 10000 // 10 seconds cache
 
 export async function fetchSiteSettings(): Promise<SiteSettings> {
   const now = Date.now()
@@ -36,6 +36,7 @@ export async function fetchSiteSettings(): Promise<SiteSettings> {
   }
 
   try {
+    // Try to get settings from the database
     const { data, error } = await supabase
       .from("site_settings")
       .select("*")
@@ -48,12 +49,27 @@ export async function fetchSiteSettings(): Promise<SiteSettings> {
       return { ...defaultSettings, isLoading: false }
     }
 
+    // Check if we have a specific coming_soon_mode setting
+    const { data: comingSoonData, error: comingSoonError } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "coming_soon_mode")
+      .single()
+
+    let isComingSoon = false
+    let comingSoonMessage = defaultSettings.comingSoonMessage
+
+    if (!comingSoonError && comingSoonData && comingSoonData.value) {
+      isComingSoon = Boolean(comingSoonData.value.active)
+      comingSoonMessage = comingSoonData.value.message || defaultSettings.comingSoonMessage
+    }
+
     const settings: SiteSettings = {
-      isComingSoon: data.is_coming_soon || false,
-      comingSoonMessage: data.coming_soon_message || defaultSettings.comingSoonMessage,
-      isAgeGateEnabled: data.is_age_gate_enabled !== false, // Default to true if not specified
-      isMaintenanceMode: data.is_maintenance_mode || false,
-      maintenanceMessage: data.maintenance_message || defaultSettings.maintenanceMessage,
+      isComingSoon,
+      comingSoonMessage,
+      isAgeGateEnabled: data?.is_age_gate_enabled !== false, // Default to true if not specified
+      isMaintenanceMode: data?.is_maintenance_mode || false,
+      maintenanceMessage: data?.maintenance_message || defaultSettings.maintenanceMessage,
       isLoading: false,
     }
 
@@ -78,16 +94,23 @@ export function useSiteSettings(): SiteSettings {
     let isMounted = true
 
     const loadSettings = async () => {
-      const fetchedSettings = await fetchSiteSettings()
-      if (isMounted) {
-        setSettings(fetchedSettings)
+      try {
+        const fetchedSettings = await fetchSiteSettings()
+        if (isMounted) {
+          setSettings(fetchedSettings)
+        }
+      } catch (error) {
+        console.error("Error loading site settings:", error)
+        if (isMounted) {
+          setSettings({ ...defaultSettings, isLoading: false })
+        }
       }
     }
 
     loadSettings()
 
     // Set up polling to check for settings changes
-    const intervalId = setInterval(loadSettings, 30000) // Check every 30 seconds
+    const intervalId = setInterval(loadSettings, 10000) // Check every 10 seconds
 
     return () => {
       isMounted = false
@@ -102,33 +125,51 @@ export async function updateSiteSettings(
   updates: Partial<SiteSettings>,
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Handle coming soon mode separately
+    if (updates.isComingSoon !== undefined || updates.comingSoonMessage !== undefined) {
+      const value = {
+        active: updates.isComingSoon,
+        message: updates.comingSoonMessage || defaultSettings.comingSoonMessage,
+      }
+
+      const { error } = await supabase
+        .from("site_settings")
+        .upsert({ key: "coming_soon_mode", value }, { onConflict: "key" })
+
+      if (error) throw error
+    }
+
     // Convert from camelCase to snake_case for database
     const dbUpdates: Record<string, any> = {}
 
-    if (updates.isComingSoon !== undefined) dbUpdates.is_coming_soon = updates.isComingSoon
-    if (updates.comingSoonMessage !== undefined) dbUpdates.coming_soon_message = updates.comingSoonMessage
     if (updates.isAgeGateEnabled !== undefined) dbUpdates.is_age_gate_enabled = updates.isAgeGateEnabled
     if (updates.isMaintenanceMode !== undefined) dbUpdates.is_maintenance_mode = updates.isMaintenanceMode
     if (updates.maintenanceMessage !== undefined) dbUpdates.maintenance_message = updates.maintenanceMessage
 
-    // Get the current settings to update
-    const { data: currentSettings, error: fetchError } = await supabase
-      .from("site_settings")
-      .select("id")
-      .order("id", { ascending: false })
-      .limit(1)
-      .single()
+    // Only update the main settings if we have updates for them
+    if (Object.keys(dbUpdates).length > 0) {
+      // Get the current settings to update
+      const { data: currentSettings, error: fetchError } = await supabase
+        .from("site_settings")
+        .select("id")
+        .order("id", { ascending: false })
+        .limit(1)
+        .single()
 
-    if (fetchError) {
-      // If no settings exist, create a new record
-      const { error: insertError } = await supabase.from("site_settings").insert([dbUpdates])
+      if (fetchError) {
+        // If no settings exist, create a new record
+        const { error: insertError } = await supabase.from("site_settings").insert([dbUpdates])
 
-      if (insertError) throw insertError
-    } else {
-      // Update existing settings
-      const { error: updateError } = await supabase.from("site_settings").update(dbUpdates).eq("id", currentSettings.id)
+        if (insertError) throw insertError
+      } else {
+        // Update existing settings
+        const { error: updateError } = await supabase
+          .from("site_settings")
+          .update(dbUpdates)
+          .eq("id", currentSettings.id)
 
-      if (updateError) throw updateError
+        if (updateError) throw updateError
+      }
     }
 
     // Clear the cache to force a refresh
@@ -147,10 +188,25 @@ export async function updateSiteSettings(
 // Add this function to get coming soon status specifically
 export async function getComingSoonStatus(): Promise<{ active: boolean; message: string }> {
   try {
-    const settings = await fetchSiteSettings()
+    // Try to get from cache first
+    if (cachedSettings) {
+      return {
+        active: cachedSettings.isComingSoon,
+        message: cachedSettings.comingSoonMessage,
+      }
+    }
+
+    // Bypass cache and fetch directly from database
+    const { data, error } = await supabase.from("site_settings").select("value").eq("key", "coming_soon_mode").single()
+
+    if (error) {
+      console.error("Error getting coming soon status:", error)
+      return { active: false, message: "" }
+    }
+
     return {
-      active: settings.isComingSoon,
-      message: settings.comingSoonMessage,
+      active: data?.value?.active || false,
+      message: data?.value?.message || "",
     }
   } catch (error) {
     console.error("Error getting coming soon status:", error)

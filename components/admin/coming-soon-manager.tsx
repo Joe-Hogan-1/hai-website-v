@@ -7,69 +7,45 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
+import { useSiteSettings, updateSiteSettings } from "@/utils/site-settings"
 
 export default function ComingSoonManager() {
+  const siteSettings = useSiteSettings()
   const [isComingSoon, setIsComingSoon] = useState(false)
   const [message, setMessage] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
+  // Use the site settings hook instead of direct API calls
   useEffect(() => {
-    fetchComingSoonStatus()
-  }, [])
-
-  const fetchComingSoonStatus = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch("/api/site-settings?key=coming_soon_mode")
-
-      if (!response.ok) {
-        throw new Error(`Error fetching coming soon status: ${response.statusText}`)
-      }
-
-      const data = await response.json()
-
-      if (data.value) {
-        setIsComingSoon(data.value.active || false)
-        setMessage(data.value.message || "")
-      } else {
-        setIsComingSoon(false)
-        setMessage("")
-      }
-    } catch (error) {
-      console.error("Error fetching coming soon status:", error)
-      toast.error("Failed to load coming soon settings")
-    } finally {
+    if (!siteSettings.isLoading) {
+      setIsComingSoon(siteSettings.isComingSoon)
+      setMessage(siteSettings.comingSoonMessage)
       setIsLoading(false)
     }
-  }
+  }, [siteSettings])
 
   const saveComingSoonStatus = async () => {
     try {
       setIsSaving(true)
+      setError(null)
 
-      const response = await fetch("/api/site-settings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          key: "coming_soon_mode",
-          value: {
-            active: isComingSoon,
-            message: message.trim(),
-          },
-        }),
+      // Use the utility function instead of direct API call
+      const result = await updateSiteSettings({
+        isComingSoon,
+        comingSoonMessage: message.trim(),
       })
 
-      if (!response.ok) {
-        throw new Error(`Error saving coming soon status: ${response.statusText}`)
+      if (!result.success) {
+        throw new Error(result.error || "Failed to save settings")
       }
 
-      toast.success("Coming soon settings saved successfully")
-    } catch (error) {
-      console.error("Error saving coming soon status:", error)
-      toast.error("Failed to save coming soon settings")
+      toast.success(`Coming soon mode ${isComingSoon ? "enabled" : "disabled"} successfully`)
+    } catch (err: any) {
+      console.error("Error saving coming soon status:", err)
+      setError(err.message || "Failed to save coming soon settings")
+      toast.error(err.message || "Failed to save coming soon settings")
     } finally {
       setIsSaving(false)
     }
@@ -100,6 +76,13 @@ export default function ComingSoonManager() {
         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
           <p className="font-bold">Coming Soon Mode is Active</p>
           <p>Your site is currently in coming soon mode. Only authenticated users can access it.</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
         </div>
       )}
 

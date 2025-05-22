@@ -48,6 +48,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Key is required" }, { status: 400 })
     }
 
+    console.log("Received site setting update:", { key, value })
+
     // Check if setting exists
     const { data: existingData, error: checkError } = await supabase
       .from("site_settings")
@@ -64,6 +66,7 @@ export async function POST(request: Request) {
 
     if (existingData) {
       // Update existing setting
+      console.log(`Updating existing setting for '${key}'`, value)
       const { data, error } = await supabase.from("site_settings").update({ value }).eq("key", key).select()
 
       if (error) {
@@ -72,8 +75,10 @@ export async function POST(request: Request) {
       }
 
       result = data?.[0]
+      console.log(`Successfully updated setting for '${key}'`, result)
     } else {
       // Create new setting
+      console.log(`Creating new setting for '${key}'`, value)
       const { data, error } = await supabase.from("site_settings").insert({ key, value }).select()
 
       if (error) {
@@ -82,6 +87,7 @@ export async function POST(request: Request) {
       }
 
       result = data?.[0]
+      console.log(`Successfully created setting for '${key}'`, result)
     }
 
     return NextResponse.json(result || {})

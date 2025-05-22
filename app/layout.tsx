@@ -56,14 +56,30 @@ async function getComingSoonStatus(pathname: string) {
     }
 
     // Get coming soon status directly from the database
-    const { data, error } = await supabase.from("site_settings").select("value").eq("key", "coming_soon_mode").single()
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("*")
+      .eq("key", "coming_soon_mode")
+      .order("id", { ascending: false })
+      .limit(1)
+      .single()
 
     if (error || !data) {
       console.error("Error getting coming soon status:", error)
       return { active: false, message: "" }
     }
 
-    return data.value
+    console.log("Coming soon data from database:", data)
+
+    // Ensure we're checking the active property correctly
+    if (!data.value || data.value.active === undefined) {
+      return { active: false, message: "" }
+    }
+
+    return {
+      active: Boolean(data.value.active),
+      message: data.value.message || "",
+    }
   } catch (err) {
     console.error("Unexpected error getting coming soon status:", err)
     return { active: false, message: "" }
@@ -80,6 +96,9 @@ export default async function RootLayout({
 
   // Get coming soon status
   const comingSoonStatus = await getComingSoonStatus(pathname)
+
+  // Log the status for debugging
+  console.log("Coming soon status:", comingSoonStatus)
 
   return (
     <html lang="en">
