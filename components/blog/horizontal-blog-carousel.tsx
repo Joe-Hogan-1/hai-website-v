@@ -213,8 +213,8 @@ export default function HorizontalBlogCarousel() {
 
   // Create a card component to ensure consistency
   const BlogCard = ({ post }: { post: BlogPost }) => (
-    <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg flex flex-col w-[280px] h-[280px] flex-shrink-0">
-      <div className="mb-3 overflow-hidden rounded-lg w-full h-[140px] bg-gray-100 flex-shrink-0">
+    <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg flex flex-col w-[350px] h-[480px] flex-shrink-0">
+      <div className="mb-3 overflow-hidden rounded-lg w-full h-[320px] bg-gray-100 flex-shrink-0">
         <img
           src={post.image_url || "/placeholder.svg?height=160&width=320&query=lifestyle"}
           alt={post.title}

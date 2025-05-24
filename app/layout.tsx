@@ -2,7 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import { headers } from "next/headers"
 import "./globals.css"
-import Footer from "@/components/footer"
 import ScrollToTop from "@/components/scroll-to-top"
 import { AuthProvider } from "@/contexts/auth-context"
 import { Toaster } from "sonner"
@@ -14,6 +13,7 @@ import { cookies } from "next/headers"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import ComingSoonGate from "@/components/coming-soon-gate"
 import ScrollRestoration from "@/components/scroll-restoration"
+import ConditionalFooter from "@/components/conditional-footer"
 
 // Import client components normally - they'll be rendered on the client
 import ClientComponents from "@/components/client-components"
@@ -21,7 +21,7 @@ import ClientComponents from "@/components/client-components"
 export const metadata: Metadata = {
   title: "hai. | embrace the glow",
   description: "discover the balance of health, wellness, and recreation",
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 // Font configuration
@@ -104,20 +104,20 @@ export default async function RootLayout({
     <html lang="en">
       <head>
         <style>{`
-          .no-tap-highlight {
-            -webkit-tap-highlight-color: transparent;
-          }
-          a {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            outline: none;
-          }
-          button {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            outline: none;
-          }
-        `}</style>
+         .no-tap-highlight {
+           -webkit-tap-highlight-color: transparent;
+         }
+         a {
+           -webkit-tap-highlight-color: transparent;
+           -webkit-touch-callout: none;
+           outline: none;
+         }
+         button {
+           -webkit-tap-highlight-color: transparent;
+           -webkit-touch-callout: none;
+           outline: none;
+         }
+       `}</style>
       </head>
       <body className="min-h-screen flex flex-col" style={{ margin: 0, padding: 0, boxSizing: "border-box" }}>
         <FontLoader />
@@ -126,12 +126,11 @@ export default async function RootLayout({
         <AuthProvider>
           <BreakingNewsProvider>
             <ScrollToTop />
-            {/* ScrollOptimizer removed to fix initialization error */}
             <ClientComponents />
             <main className="flex-grow" style={{ marginTop: 0, paddingTop: 0 }}>
               <PageTransition>{children}</PageTransition>
             </main>
-            <Footer />
+            <ConditionalFooter />
             <Toaster position="top-right" />
 
             {/* Coming Soon Gate */}

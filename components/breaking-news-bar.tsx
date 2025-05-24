@@ -10,8 +10,9 @@ export default function BreakingNewsBar() {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Check if we should show the breaking news bar
     const checkIfShouldShow = () => {
+      console.log("Breaking news check:", { pathname, newsText, newsTextLength: newsText?.length })
+
       // Don't show on these paths
       if (
         pathname.startsWith("/signin") ||
@@ -21,12 +22,15 @@ export default function BreakingNewsBar() {
         pathname === "/age-verification" ||
         pathname === "/coming-soon"
       ) {
+        console.log("Breaking news hidden due to pathname:", pathname)
         setShow(false)
         return
       }
 
       // Show if we have news text
-      setShow(!!newsText && newsText.length > 0)
+      const shouldShow = !!newsText && newsText.length > 0
+      console.log("Breaking news should show:", shouldShow)
+      setShow(shouldShow)
     }
 
     checkIfShouldShow()
@@ -45,9 +49,17 @@ export default function BreakingNewsBar() {
     }
   }, [show])
 
-  if (isLoading || !show) {
+  if (isLoading) {
+    console.log("Breaking news is loading...")
     return null
   }
+
+  if (!show) {
+    console.log("Breaking news not showing:", { show, newsText })
+    return null
+  }
+
+  console.log("Breaking news rendering:", newsText)
 
   return (
     <div

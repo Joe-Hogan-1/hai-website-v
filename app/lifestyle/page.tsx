@@ -33,7 +33,7 @@ export default function LifestylePage() {
               <h2 className="text-2xl font-semibold mb-4 text-left">the journal.</h2>
               <p className="text-sm mb-6 text-left text-gray-600">rituals, routines, and how we really live.</p>
 
-              <div className="w-full h-[320px]">
+              <div className="w-full h-[520px]">
                 <BlogCarouselWrapper />
               </div>
             </div>

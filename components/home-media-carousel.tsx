@@ -214,9 +214,10 @@ export default function HomeMediaCarousel() {
   return (
     <div className="w-full h-full relative overflow-hidden bg-[#fff5f0]">
       {/* Changed from bg-[#ffd6c0] to bg-white for white borders */}
-      <div className="relative bg-white rounded-sm overflow-hidden m-4">
+      <div className="relative bg-white rounded-sm overflow-hidden mx-2 sm:mx-4 my-2 sm:my-4">
         {/* Added aspect ratio container */}
-        <div className="relative w-full" style={{ paddingBottom: "56.25%" /* 16:9 aspect ratio */ }}>
+        {/* Mobile: 4:3 aspect ratio, Tablet+: 16:9 aspect ratio */}
+        <div className="relative w-full" style={{ paddingBottom: isMobile ? "75%" : "56.25%" }}>
           {/* Media Items */}
           {mediaItems.map((item, index) => (
             <div
@@ -270,13 +271,15 @@ export default function HomeMediaCarousel() {
           ))}
 
           {/* Fixed text and button in lower left corner - appears on all slides */}
-          <div className="absolute bottom-6 left-6 z-20 max-w-xs sm:max-w-sm md:max-w-md text-black">
-            <div className="p-3 sm:p-4">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1">embrace the glow.</h2>
-              <p className="text-sm md:text-base mb-3">discover the intersection of wellness and a life well lived.</p>
+          <div className="absolute bottom-3 sm:bottom-6 left-3 sm:left-6 z-20 max-w-xs sm:max-w-sm md:max-w-md text-black">
+            <div className="p-2 sm:p-3 md:p-4 bg-white/90 sm:bg-transparent rounded-lg sm:rounded-none backdrop-blur-sm sm:backdrop-blur-none">
+              <h2 className="text-xl sm:text-xl md:text-2xl font-bold mb-2">embrace the glow.</h2>
+              <p className="text-sm md:text-base mb-3 sm:mb-3">
+                discover the intersection of wellness and a life well lived.
+              </p>
               <Link
                 href="/products"
-                className="inline-block bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded transition-colors"
+                className="inline-block bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 sm:py-2 sm:px-4 rounded transition-colors text-sm sm:text-base"
               >
                 shop essentials.
               </Link>

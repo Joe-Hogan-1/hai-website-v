@@ -13,8 +13,8 @@ function BlogCarouselSkeleton() {
   return (
     <div className="w-full h-full flex overflow-x-auto pb-4">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="min-w-[300px] h-[400px] bg-gray-200 rounded-lg mr-4 animate-pulse flex-shrink-0">
-          <div className="h-[200px] bg-gray-300 rounded-t-lg"></div>
+        <div key={i} className="min-w-[350px] h-[380px] bg-gray-200 rounded-lg mr-4 animate-pulse flex-shrink-0">
+          <div className="h-[180px] bg-gray-300 rounded-t-lg"></div>
           <div className="p-4">
             <div className="h-6 bg-gray-300 rounded w-3/4 mb-3"></div>
             <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>

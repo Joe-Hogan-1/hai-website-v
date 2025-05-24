@@ -181,7 +181,7 @@ export default function ContactPage() {
     <>
       <Header />
       <div className="page-container">
-        <div className="container mx-auto">
+        <div className="container mx-auto mb-4">
           <LeftAlignedTitle>Contact Us</LeftAlignedTitle>
           <div className="bg-[#ffd6c0] p-6 w-full max-w-4xl mx-auto rounded-sm min-h-[400px]">
             {submitted ? (

@@ -108,7 +108,7 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
         <Link key={post.id} href={`/lifestyle/${post.id}`} className="block mb-6">
           <div className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl border border-white/30 h-full flex flex-col">
             {post.image_url && (
-              <div className="mb-4 overflow-hidden rounded-lg mx-auto w-full h-[220px]">
+              <div className="mb-4 overflow-hidden rounded-lg mx-auto w-full h-[620px]">
                 <img
                   src={post.image_url || "/placeholder.svg"}
                   alt={post.title}
