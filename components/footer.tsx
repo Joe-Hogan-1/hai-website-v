@@ -89,7 +89,7 @@ export default function Footer() {
                 <div className="flex space-x-4">
                   <motion.div whileHover={{ scale: 1.2, rotate: 5 }} whileTap={{ scale: 0.9 }}>
                     <Link
-                      href="www.instagram.com/hai_designs_"
+                      href="http://www.instagram.com/hai_designs_"
                       aria-label="Instagram"
                       className="text-black hover:text-[#000000] transition-colors"
                     >
