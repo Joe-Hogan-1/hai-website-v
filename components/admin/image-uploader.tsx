@@ -20,6 +20,12 @@ export default function ImageUploader({ existingImageUrl, onImageSelected, uploa
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      // Check file size (25MB = 25 * 1024 * 1024 bytes)
+      if (file.size > 25 * 1024 * 1024) {
+        alert("File size must be less than 25MB")
+        return
+      }
+
       onImageSelected(file)
       const reader = new FileReader()
       reader.onloadend = () => {
@@ -44,6 +50,13 @@ export default function ImageUploader({ existingImageUrl, onImageSelected, uploa
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0]
+
+      // Check file size (25MB = 25 * 1024 * 1024 bytes)
+      if (file.size > 25 * 1024 * 1024) {
+        alert("File size must be less than 25MB")
+        return
+      }
+
       onImageSelected(file)
 
       const reader = new FileReader()
@@ -86,7 +99,7 @@ export default function ImageUploader({ existingImageUrl, onImageSelected, uploa
           <div className="flex flex-col items-center">
             <Upload className="h-10 w-10 text-gray-400 mb-2" />
             <p className="text-sm text-gray-600 mb-1">Drag and drop an image here, or click to select</p>
-            <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+            <p className="text-xs text-gray-500">PNG, JPG, GIF up to 25MB</p>
           </div>
         </div>
       ) : (

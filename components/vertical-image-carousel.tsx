@@ -9,8 +9,8 @@ type VerticalCarouselItem = {
   image_url: string
   title?: string
   description?: string
-  link_url?: string
-  link_text?: string
+  link_url?: string // This will now be ignored for the main link
+  link_text?: string // This will now be ignored for the main link
   position: number
 }
 
@@ -30,7 +30,8 @@ export default function VerticalImageCarousel() {
           throw new Error("Failed to fetch vertical carousel items")
         }
         const data = await response.json()
-        setItems(data)
+        // Sort items by position to ensure correct order
+        setItems(data.sort((a: VerticalCarouselItem, b: VerticalCarouselItem) => a.position - b.position))
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred")
         console.error("Error fetching vertical carousel items:", err)
@@ -105,7 +106,8 @@ export default function VerticalImageCarousel() {
         >
           {items.map((item) => (
             <div key={item.id} className="w-1/3 flex-shrink-0 px-2">
-              <div className="h-[600px] relative group overflow-hidden rounded-lg">
+              {/* Link wrapper for the entire card */}
+              <Link href="/lifestyle" className="block h-[600px] relative group overflow-hidden rounded-lg">
                 {/* Image */}
                 <div className="absolute inset-0">
                   <img
@@ -116,23 +118,15 @@ export default function VerticalImageCarousel() {
                 </div>
 
                 {/* Content overlay - only show if there's content */}
-                {(item.title || item.description || item.link_url) && (
+                {(item.title || item.description) && ( // Removed item.link_url from condition as it's now always /lifestyle
                   <div className="absolute bottom-0 left-0 right-0 p-6">
                     {item.title && <h3 className="text-xl font-bold text-white mb-2 drop-shadow-md">{item.title}</h3>}
                     {item.description && (
                       <p className="text-white mb-4 line-clamp-3 drop-shadow-md">{item.description}</p>
                     )}
-                    {item.link_url && (
-                      <Link
-                        href={item.link_url}
-                        className="inline-flex px-4 py-2 bg-white text-black rounded-md hover:bg-gray-100 transition-colors text-sm font-medium"
-                      >
-                        {item.link_text || "Learn More"}
-                      </Link>
-                    )}
                   </div>
                 )}
-              </div>
+              </Link>
             </div>
           ))}
         </div>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { trackAgeVerification } from "@/utils/user-data"
 import Image from "next/image"
+import { setAgeVerified } from "@/utils/age-verification"
 
 export default function AgeVerificationPage() {
   const [isDissolving, setIsDissolving] = useState(false)
@@ -13,8 +14,9 @@ export default function AgeVerificationPage() {
   const handleVerify = async () => {
     setIsDissolving(true)
 
-    // Store verification in sessionStorage
-    sessionStorage.setItem("ageVerified", "true")
+    // Use the utility function to set verification status
+    // This sets both sessionStorage and the cookie for the middleware
+    setAgeVerified()
 
     // Track the age verification in Supabase if consent was given
     if (document.cookie.includes("cookie_consent=true")) {

@@ -1,7 +1,6 @@
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import Header from "@/components/header"
-import WaterBackground from "@/components/water-background"
 import BlogPost from "@/components/blog/blog-post"
 import { createServerClient } from "@/utils/supabase-server"
 
@@ -13,8 +12,7 @@ interface BlogPostPageProps {
 
 export default function LifestylePostPage({ params }: BlogPostPageProps) {
   return (
-    <>
-      <WaterBackground />
+   <>
       <Header />
       <div className="page-container">
         <div className="container mx-auto px-0 py-6 pt-8">

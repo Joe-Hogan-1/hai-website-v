@@ -1,13 +1,14 @@
 "use client"
 
 import { usePathname } from "next/navigation"
-import Footer from "@/components/footer"
+import Footer from "./footer"
 
 export default function ConditionalFooter() {
   const pathname = usePathname()
 
-  // Don't show footer on age verification page
-  if (pathname === "/age-verification") {
+  const noFooterPaths = ["/signin", "/age-verification"]
+
+  if (noFooterPaths.includes(pathname) || pathname.startsWith("/dashboard")) {
     return null
   }
 

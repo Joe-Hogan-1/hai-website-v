@@ -196,7 +196,7 @@ export default function NewsletterPopup() {
                   animate="visible"
                   custom={0}
                 >
-                  <h3 className="text-lg font-semibold text-[#0e7490]">Join the hai. community</h3>
+                  <h3 className="text-lg font-semibold">Join the hai. community</h3>
                   <button
                     onClick={handleClose}
                     className="newsletter-close-btn p-1 rounded-full hover:bg-gray-100"
@@ -259,7 +259,7 @@ export default function NewsletterPopup() {
           >
             <button
               className="bg-black hover:bg-[#333333] text-white py-2 px-3 rounded-l-lg shadow-lg transform transition-transform hover:scale-105"
-              style={{ transform: "scale(0.9)" }} // Make the tab 10% smaller
+              style={{ transform: "scale(0.9)" }}
             >
               <span className="block writing-mode-vertical">Newsletter</span>
             </button>
