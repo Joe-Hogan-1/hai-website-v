@@ -27,89 +27,48 @@ export default function HomeMediaCarousel() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Add media query hooks for responsive design
-  const isMobile = useMediaQuery("(max-width: 640px)")
-  const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)")
+  const isMobile = useMediaQuery("(max-width: 640px)") // Tailwind's 'sm' breakpoint
+  const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)") // Tailwind's 'md' to 'lg'
 
   useEffect(() => {
-    // Initial fetch
     fetchMediaItems()
-
-    // Set up polling for updates every 2 minutes
-    pollIntervalRef.current = setInterval(() => {
-      fetchMediaItems()
-    }, 120000) // 2 minutes
-
+    pollIntervalRef.current = setInterval(fetchMediaItems, 120000) // Poll every 2 minutes
     return () => {
-      // Clean up intervals on unmount
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current)
-      }
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [])
 
   const fetchMediaItems = async () => {
     try {
-      setLoading(true)
-
-      // Use fetch API instead of direct Supabase client
+      // setLoading(true); // Removed to prevent layout shift on poll
       const response = await fetch("/api/banner-media")
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch banner media: ${response.status}`)
-      }
-
+      if (!response.ok) throw new Error(`Failed to fetch banner media: ${response.status}`)
       const data = await response.json()
-
-      if (data && data.length > 0) {
-        setMediaItems(data)
-      } else {
-        setMediaItems([])
-      }
+      setMediaItems(data && data.length > 0 ? data : [])
     } catch (error: any) {
       console.error("Error fetching media items:", error)
       setError(error.message || "An unexpected error occurred")
-      // Don't clear existing items on error to prevent flickering
     } finally {
       setLoading(false)
     }
   }
 
-  // Function to go to the next slide
   const goToNextSlide = () => {
     if (isTransitioning || mediaItems.length <= 1) return
-
     setIsTransitioning(true)
     setCurrentIndex((prevIndex) => (prevIndex + 1) % mediaItems.length)
-
-    // Reset transition state after animation completes
-    setTimeout(() => {
-      setIsTransitioning(false)
-    }, 500)
+    setTimeout(() => setIsTransitioning(false), 500)
   }
 
-  // Set up automatic slide rotation
   useEffect(() => {
-    if (!autoplayEnabled || mediaItems.length <= 1) return
-
-    // Clear any existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
+    if (!autoplayEnabled || mediaItems.length <= 1 || isTransitioning) {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      return
     }
-
-    // Set up new timeout for next slide
-    timeoutRef.current = setTimeout(() => {
-      goToNextSlide()
-    }, 5000) // Change slide every 5 seconds
-
-    // Cleanup on unmount or when currentIndex changes
+    timeoutRef.current = setTimeout(goToNextSlide, 5000)
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [currentIndex, isTransitioning, mediaItems.length, autoplayEnabled])
 
@@ -137,11 +96,8 @@ export default function HomeMediaCarousel() {
     )
   }
 
-  // Function to get text position classes
   const getTextPositionClasses = (position: string) => {
-    // Adjust text positioning for mobile
     if (isMobile) {
-      // On mobile, we want to ensure text is more readable and positioned better
       switch (position) {
         case "top-left":
         case "top-center":
@@ -151,16 +107,10 @@ export default function HomeMediaCarousel() {
         case "middle-center":
         case "middle-right":
           return "top-1/2 -translate-y-1/2 left-2 right-2 text-center"
-        case "bottom-left":
-        case "bottom-center":
-        case "bottom-right":
-          return "bottom-2 left-2 right-2 text-center"
         default:
-          return "bottom-2 left-2 right-2 text-center"
+          return "bottom-2 left-2 right-2 text-center" // bottom positions
       }
     }
-
-    // Tablet adjustments
     if (isTablet) {
       switch (position) {
         case "top-left":
@@ -185,8 +135,7 @@ export default function HomeMediaCarousel() {
           return "bottom-4 left-4 text-left"
       }
     }
-
-    // Desktop positioning (original)
+    // Desktop
     switch (position) {
       case "top-left":
         return "top-6 left-6 text-left"
@@ -213,12 +162,12 @@ export default function HomeMediaCarousel() {
 
   return (
     <div className="w-full h-full relative overflow-hidden bg-[#fff5f0]">
-      {/* Changed from bg-[#ffd6c0] to bg-white for white borders */}
       <div className="relative bg-white rounded-sm overflow-hidden mx-2 sm:mx-4 my-2 sm:my-4">
-        {/* Added aspect ratio container */}
-        {/* Mobile: 4:3 aspect ratio, Tablet+: 16:9 aspect ratio */}
-        <div className="relative w-full" style={{ paddingBottom: isMobile ? "75%" : "56.25%" }}>
-          {/* Media Items */}
+        <div
+          className="relative w-full"
+          // Mobile: 1:1 aspect ratio (taller), Tablet+: 16:9 aspect ratio
+          style={{ paddingBottom: isMobile ? "100%" : "56.25%" }}
+        >
           {mediaItems.map((item, index) => (
             <div
               key={item.id}
@@ -226,12 +175,11 @@ export default function HomeMediaCarousel() {
                 index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
               }`}
             >
-              {/* Wrap in Link component to make clickable */}
               <Link href="/products" className="block w-full h-full">
                 {item.media_type === "video" ? (
                   <video
                     src={item.media_url}
-                    className="absolute inset-0 w-full h-full object-contain"
+                    className="absolute inset-0 w-full h-full object-contain" // object-contain to prevent cropping
                     autoPlay
                     muted
                     loop
@@ -242,23 +190,15 @@ export default function HomeMediaCarousel() {
                     <img
                       src={item.media_url || "/placeholder.svg"}
                       alt={item.title}
-                      className="max-w-full max-h-full object-contain"
-                      style={{
-                        width: "auto",
-                        height: "auto",
-                        maxWidth: "100%",
-                        maxHeight: "100%",
-                      }}
+                      className="max-w-full max-h-full object-contain" // object-contain
                     />
                   </div>
                 )}
-
-                {/* Text Overlay with responsive adjustments */}
                 {item.text_overlay && (
                   <div
                     className={`absolute ${getTextPositionClasses(
                       item.text_position,
-                    )} p-2 sm:p-4 text-white max-w-full sm:max-w-md`}
+                    )} p-2 sm:p-4 text-white max-w-full sm:max-w-md`} // Ensure text overlay is responsive
                   >
                     <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{item.text_overlay}</h2>
                     {item.description && (
@@ -269,10 +209,8 @@ export default function HomeMediaCarousel() {
               </Link>
             </div>
           ))}
-
-          {/* Fixed text and button in lower left corner - appears on all slides */}
           <div className="absolute bottom-3 sm:bottom-6 left-3 sm:left-6 z-20 max-w-xs sm:max-w-sm md:max-w-md text-black">
-            <div className="p-2 sm:p-3 md:p-4 bg-white/90 sm:bg-transparent rounded-lg sm:rounded-none backdrop-blur-sm sm:backdrop-blur-none">
+            <div className="p-2 sm:p-3 md:p-4 bg-white/90 sm:bg-white/70 md:bg-transparent rounded-lg sm:rounded-none backdrop-blur-sm sm:backdrop-blur-none">
               <h2 className="text-xl sm:text-xl md:text-2xl font-bold mb-2">embrace the glow.</h2>
               <p className="text-sm md:text-base mb-3 sm:mb-3">
                 discover the intersection of wellness and a life well lived.
