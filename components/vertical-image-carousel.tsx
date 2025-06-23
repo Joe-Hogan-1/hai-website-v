@@ -72,13 +72,13 @@ export default function VerticalImageCarousel() {
 
   return (
     <div className="relative w-full">
-      {/* Navigation buttons */}
+      {/* Navigation buttons - only show on desktop */}
       {showNavigation && (
         <>
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/80 shadow-md ${
+            className={`hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/80 shadow-md ${
               currentIndex === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-white"
             }`}
             aria-label="Previous slide"
@@ -88,7 +88,7 @@ export default function VerticalImageCarousel() {
           <button
             onClick={handleNext}
             disabled={currentIndex >= items.length - 3}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/80 shadow-md ${
+            className={`hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/80 shadow-md ${
               currentIndex >= items.length - 3 ? "opacity-50 cursor-not-allowed" : "hover:bg-white"
             }`}
             aria-label="Next slide"
@@ -101,13 +101,18 @@ export default function VerticalImageCarousel() {
       {/* Carousel container */}
       <div ref={carouselRef} className="w-full overflow-hidden">
         <div
-          className="flex transition-transform duration-300 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * (100 / 3)}%)` }}
+          className="flex flex-col md:flex-row md:transition-transform md:duration-300 md:ease-in-out"
+          style={{
+            transform: window.innerWidth >= 768 ? `translateX(-${currentIndex * (100 / 3)}%)` : "none",
+          }}
         >
           {items.map((item) => (
-            <div key={item.id} className="w-1/3 flex-shrink-0 px-2">
+            <div key={item.id} className="w-full md:w-1/3 md:flex-shrink-0 px-2 mb-4 md:mb-0">
               {/* Link wrapper for the entire card */}
-              <Link href="/lifestyle" className="block h-[600px] relative group overflow-hidden rounded-lg">
+              <Link
+                href="/lifestyle"
+                className="block h-[400px] md:h-[600px] relative group overflow-hidden rounded-lg"
+              >
                 {/* Image */}
                 <div className="absolute inset-0">
                   <img

@@ -29,35 +29,24 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
     async function fetchBlogPosts() {
       try {
         setLoading(true)
+        setError(null) // Reset error state
 
-        // Try to use the get_published_blog_posts function
-        const { data, error } = await supabase.rpc("get_published_blog_posts", {
-          limit_count: limit || 10,
-          offset_count: 0,
-        })
+        const { data: directData, error: directError } = await supabase
+          .from("blog_posts")
+          .select("*")
+          .eq("published", true) // Explicitly filter for published posts
+          .order("created_at", { ascending: false })
+          .limit(limit || 10)
 
-        if (error) {
-          // Fall back to direct query if RPC fails
-          const { data: directData, error: directError } = await supabase
-            .from("blog_posts")
-            .select("*")
-            .eq("published", true)
-            .order("created_at", { ascending: false })
-            .limit(limit || 10)
-
-          if (directError) {
-            setError(`Failed to load blog posts: ${directError.message}`)
-            setBlogPosts([])
-          } else {
-            setBlogPosts(directData || [])
-            setError(null)
-          }
+        if (directError) {
+          setError(`Failed to load blog posts: ${directError.message}`)
+          setBlogPosts([])
         } else {
-          setBlogPosts(data || [])
-          setError(null)
+          setBlogPosts(directData || [])
         }
       } catch (error) {
-        setError("An unexpected error occurred while loading blog posts")
+        // Catch any unexpected errors during the process
+        setError("An unexpected error occurred while loading blog posts.")
         setBlogPosts([])
       } finally {
         setLoading(false)

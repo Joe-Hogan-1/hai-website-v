@@ -82,8 +82,25 @@ export default function VerticalCarouselManager() {
 
       // Upload image if there's a new file
       if (imageFile) {
-        const uploadResult = await uploadToBannerImages(imageFile)
-        imageUrl = uploadResult.url
+        try {
+          const uploadResult = await uploadToBannerImages(imageFile)
+          if (!uploadResult || !uploadResult.url) {
+            throw new Error("Image upload failed: No URL returned from storage.")
+          }
+          imageUrl = uploadResult.url
+        } catch (uploadError) {
+          setError(uploadError instanceof Error ? `Image upload failed: ${uploadError.message}` : "Image upload failed")
+          setUploading(false) // Ensure this is set
+          return // Stop execution if upload fails
+        }
+      }
+
+      // Add this check before const itemData = { ... }
+      if (!editingId && !imageUrl && imageFile) {
+        // If it's a new item, an image was selected, but imageUrl is still not set
+        setError("Image is required for new items, and the upload may have failed to return a URL.")
+        setUploading(false)
+        return
       }
 
       const itemData = {

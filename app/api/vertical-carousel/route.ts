@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
-import { supabase } from "@/utils/supabase"
+import { createDirectServerClient } from "@/utils/supabase-server"
 
 export async function GET() {
+  const supabase = createDirectServerClient()
   try {
     const { data, error } = await supabase.from("vertical_carousel").select("*").order("position")
 
@@ -18,6 +19,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const supabase = createDirectServerClient()
   try {
     const body = await request.json()
 
@@ -36,6 +38,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const supabase = createDirectServerClient()
   try {
     const body = await request.json()
     const { id, ...updateData } = body
@@ -55,6 +58,7 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const supabase = createDirectServerClient()
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get("id")

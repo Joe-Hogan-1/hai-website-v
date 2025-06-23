@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/utils/supabase"
-import { PlusCircle, Edit, Trash2, Save, X, Eye, EyeOff, Star, StarOff, XCircle } from "lucide-react"
+import { PlusCircle, Edit, Trash2, Save, X, Eye, EyeOff, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -20,7 +20,6 @@ interface BlogPost {
   image_url: string | null
   slug: string
   published: boolean
-  featured: boolean
   view_count: number
   created_at: string
   updated_at: string
@@ -41,7 +40,6 @@ const initialBlogState: Partial<BlogPost> = {
   image_url: null,
   slug: "",
   published: false,
-  featured: false,
   embedded_image_url_1: null,
   embedded_image_url_2: null,
   embedded_image_url_3: null,
@@ -229,22 +227,6 @@ export default function BlogManager({ userId }: BlogManagerProps) {
     }
   }
 
-  const handleToggleFeatured = async (blog: BlogPost) => {
-    try {
-      const { error } = await supabase
-        .from("blog_posts")
-        .update({ featured: !blog.featured, updated_at: new Date().toISOString() })
-        .eq("id", blog.id)
-        .eq("user_id", userId) // Added user_id check for RLS
-      if (error) throw error
-      toast.success(`Blog post ${!blog.featured ? "featured" : "unfeatured"} successfully`)
-      fetchBlogPosts()
-    } catch (error) {
-      console.error("Error toggling featured status:", error)
-      toast.error("Failed to update featured status")
-    }
-  }
-
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
       const fileExt = file.name.split(".").pop()
@@ -304,7 +286,6 @@ export default function BlogManager({ userId }: BlogManagerProps) {
         content: currentBlog.content.trim(),
         slug: currentBlog.slug?.trim() || generateSlug(currentBlog.title),
         published: Boolean(currentBlog.published),
-        featured: Boolean(currentBlog.featured),
         updated_at: new Date().toISOString(),
       }
 
@@ -406,9 +387,7 @@ export default function BlogManager({ userId }: BlogManagerProps) {
         ? blogPosts.filter((post) => post.published)
         : activeTab === "draft"
           ? blogPosts.filter((post) => !post.published)
-          : activeTab === "featured"
-            ? blogPosts.filter((post) => post.featured)
-            : blogPosts
+          : blogPosts
 
   if (loading) {
     return <div className="text-center py-8">Loading blog posts...</div>
@@ -553,29 +532,17 @@ export default function BlogManager({ userId }: BlogManagerProps) {
               </div>
             ))}
 
-            {/* Published and Featured Checkboxes */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-              <div>
-                <div className="flex items-center space-x-2 mb-4">
-                  <Checkbox
-                    id="published"
-                    checked={currentBlog.published || false}
-                    onCheckedChange={(checked) => setCurrentBlog({ ...currentBlog, published: checked as boolean })}
-                  />
-                  <label htmlFor="published" className="text-sm font-medium">
-                    Published
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="featured"
-                    checked={currentBlog.featured || false}
-                    onCheckedChange={(checked) => setCurrentBlog({ ...currentBlog, featured: checked as boolean })}
-                  />
-                  <label htmlFor="featured" className="text-sm font-medium">
-                    Featured
-                  </label>
-                </div>
+            {/* Published Checkbox */}
+            <div className="pt-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="published"
+                  checked={currentBlog.published || false}
+                  onCheckedChange={(checked) => setCurrentBlog({ ...currentBlog, published: checked as boolean })}
+                />
+                <label htmlFor="published" className="text-sm font-medium">
+                  Published
+                </label>
               </div>
             </div>
 
@@ -611,7 +578,6 @@ export default function BlogManager({ userId }: BlogManagerProps) {
                   <TabsTrigger value="all">All Posts ({blogPosts.length})</TabsTrigger>
                   <TabsTrigger value="published">Published ({blogPosts.filter((p) => p.published).length})</TabsTrigger>
                   <TabsTrigger value="draft">Drafts ({blogPosts.filter((p) => !p.published).length})</TabsTrigger>
-                  <TabsTrigger value="featured">Featured ({blogPosts.filter((p) => p.featured).length})</TabsTrigger>
                 </TabsList>
               </Tabs>
 
@@ -646,18 +612,6 @@ export default function BlogManager({ userId }: BlogManagerProps) {
                                   <Eye className="h-4 w-4" />
                                 ) : (
                                   <EyeOff className="h-4 w-4" />
-                                )}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleToggleFeatured(blog)}
-                                title={blog.featured ? "Remove from featured" : "Add to featured"}
-                              >
-                                {blog.featured ? (
-                                  <Star className="h-4 w-4 text-yellow-500" />
-                                ) : (
-                                  <StarOff className="h-4 w-4" />
                                 )}
                               </Button>
                             </div>

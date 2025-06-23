@@ -25,11 +25,11 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
   const getCategoryColor = (category?: string | null) => {
     switch (category) {
       case "Indica":
-        return "bg-purple-600 text-white"
+        return "bg-[#c9a3c8] text-white"
       case "Sativa":
-        return "bg-white text-black border border-gray-300"
+        return "bg-[#c73b3a] text-white"
       case "Hybrid":
-        return "bg-yellow-400 text-black"
+        return "bg-[#9bc3d8] text-white"
       default:
         return "bg-gray-200 text-gray-700"
     }
