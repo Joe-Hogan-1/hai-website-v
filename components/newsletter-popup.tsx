@@ -22,30 +22,38 @@ export default function NewsletterPopup() {
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null)
   const pathname = usePathname()
 
+useEffect(() => {
+  const hasPopupBeenShown = localStorage.getItem("newsletter_popup_shown") === "true"
+  setHasShownPopup(hasPopupBeenShown)
+}, [])
+
+useEffect(() => {
+  if (
+    pathname === "/" &&
+    !hasSubscribed &&
+    !hasShownPopup &&
+    !hasTriggeredPopupRef.current
+  ) {
+    hasTriggeredPopupRef.current = true
+
+    const timer = setTimeout(() => {
+      setIsOpen(true)
+      localStorage.setItem("newsletter_popup_shown", "true")
+      setHasShownPopup(true)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }
+}, [pathname, hasSubscribed, hasShownPopup])
+
+
   // Check if user has previously subscribed
   useEffect(() => {
     const hasSubscribed = localStorage.getItem("newsletter_subscribed") === "true"
     setHasSubscribed(hasSubscribed)
-
-    // Check if popup has been shown in this session
-    const popupShown = sessionStorage.getItem("newsletter_popup_shown") === "true"
-    setHasShownPopup(popupShown)
   }, [])
 
-  // Auto-show popup after 5 seconds on homepage
-  useEffect(() => {
-    // Only trigger on homepage and if not already subscribed or shown
-    if (pathname === "/" && !hasSubscribed && !hasShownPopup) {
-      const timer = setTimeout(() => {
-        setIsOpen(true)
-        // Mark as shown in this session
-        sessionStorage.setItem("newsletter_popup_shown", "true")
-        setHasShownPopup(true)
-      }, 5000) // 5 seconds
-
-      return () => clearTimeout(timer)
-    }
-  }, [pathname, hasSubscribed, hasShownPopup])
+const hasTriggeredPopupRef = useRef(false)
 
   const handleMouseEnter = () => {
     // Clear any existing close timer

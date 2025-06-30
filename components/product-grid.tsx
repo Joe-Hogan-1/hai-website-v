@@ -12,7 +12,7 @@ const ProductGrid: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {products.map((product) => (
-        <div key={product.id} className="bg-white p-4 rounded-lg shadow">
+        <div key={product.id} className="bg-white p-4 shadow">
           <Image
             src={product.image || "/placeholder.svg"}
             alt={product.name}

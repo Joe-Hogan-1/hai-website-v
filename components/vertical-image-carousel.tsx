@@ -66,7 +66,7 @@ export default function VerticalImageCarousel() {
   }
 
   if (error) {
-    return <div className="w-full p-4 bg-red-50 text-red-700 rounded-md">Error loading carousel: {error}</div>
+    return <div className="w-full p-4 bg-red-50 text-red-700">Error loading carousel: {error}</div>
   }
 
   if (items.length === 0) {
@@ -81,7 +81,7 @@ export default function VerticalImageCarousel() {
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/80 shadow-md ${
+            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/80 shadow-md ${
               currentIndex === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-white"
             }`}
             aria-label="Previous slide"
@@ -91,7 +91,7 @@ export default function VerticalImageCarousel() {
           <button
             onClick={handleNext}
             disabled={currentIndex >= items.length - 3}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/80 shadow-md ${
+            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/80 shadow-md ${
               currentIndex >= items.length - 3 ? "opacity-50 cursor-not-allowed" : "hover:bg-white"
             }`}
             aria-label="Next slide"
@@ -113,7 +113,7 @@ export default function VerticalImageCarousel() {
             <div key={item.id} className="w-full md:w-1/3 md:flex-shrink-0 px-2 mb-4 md:mb-0">
               <Link
                 href="/lifestyle"
-                className="block h-[400px] md:h-[600px] relative group overflow-hidden rounded-lg"
+                className="block h-[400px] md:h-[600px] relative group overflow-hidden"
               >
                 <div className="absolute inset-0">
                   <img
@@ -147,7 +147,7 @@ export default function VerticalImageCarousel() {
         <p className="text-xl md:text-2xl font-medium mb-4 md:mb-6">from sunrise to after hours - we've got you.</p>
         <Link
           href="/products"
-          className="inline-flex px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-sm font-medium"
+          className="inline-flex px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors text-sm font-medium"
         >
           Shop Essentials
         </Link>

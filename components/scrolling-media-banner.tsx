@@ -226,7 +226,7 @@ export default function ScrollingMediaBanner() {
               boxShadow: "none", // Explicitly remove box shadow
             }}
           >
-            <div className="relative w-full h-full rounded-lg overflow-hidden shadow-none">
+            <div className="relative w-full h-full overflow-hidden shadow-none">
               {media.media_type === "video" ? (
                 <video
                   src={media.media_url}

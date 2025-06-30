@@ -21,7 +21,7 @@ import ClientComponents from "@/components/client-components"
 export const metadata: Metadata = {
   title: "hai. | embrace the glow",
   description: "discover the balance of health, wellness, and recreation",
-  generator: "v0.dev",
+    generator: 'v0.dev'
 }
 
 // Font configuration

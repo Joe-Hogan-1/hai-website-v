@@ -19,44 +19,26 @@ export default function PhotoGrid() {
 
   useEffect(() => {
     fetchGridImages()
-
-    // Set up polling instead of realtime subscription
-    const intervalId = setInterval(() => {
-      fetchGridImages()
-    }, 300000) // Poll every 5 minutes
-
-    return () => {
-      clearInterval(intervalId)
-    }
+    const intervalId = setInterval(fetchGridImages, 300000)
+    return () => clearInterval(intervalId)
   }, [])
 
   const fetchGridImages = async () => {
     try {
       setLoading(true)
-
-      // Use fetch API instead of Supabase client
       const response = await fetch("/api/photo-grid")
-
-      if (!response.ok) {
-        throw new Error(`Error fetching grid images: ${response.statusText}`)
-      }
-
+      if (!response.ok) throw new Error(`Error: ${response.statusText}`)
       const data = await response.json()
+      if (data.error) throw new Error(data.error)
 
-      if (data.error) {
-        throw new Error(data.error)
+      const filled = [...(data || [])]
+      while (filled.length < 4) {
+        filled.push(createPlaceholderImage(filled.length))
       }
 
-      // If we have less than 4 images, fill with placeholders
-      const imagesWithFallback = [...(data || [])]
-      while (imagesWithFallback.length < 4) {
-        imagesWithFallback.push(createPlaceholderImage(imagesWithFallback.length))
-      }
-
-      // Only take the first 4 images
-      setImages(imagesWithFallback.slice(0, 4))
-    } catch (error) {
-      console.error("Unexpected error fetching grid images:", error)
+      setImages(filled.slice(0, 4))
+    } catch (err) {
+      console.error("Error fetching grid images:", err)
       setImages(getDefaultImages())
     } finally {
       setLoading(false)
@@ -65,69 +47,49 @@ export default function PhotoGrid() {
 
   const createPlaceholderImage = (index: number): GridImage => ({
     id: `placeholder-${index}`,
-    image_url: `/placeholder.svg?height=300&width=300&query=product+image+${index + 1}`,
+    image_url: `/placeholder.svg?height=600&width=600&query=product+image+${index + 1}`,
     position: index,
     title: "Product Category",
     description: "Explore our products",
     created_at: new Date().toISOString(),
   })
 
-  const getDefaultImages = (): GridImage[] => {
-    return Array.from({ length: 4 }, (_, i) => createPlaceholderImage(i))
-  }
-
-  if (loading) {
-    return (
-      <div className="grid grid-cols-2 gap-3 w-full h-full">
-        {[...Array(4)].map((_, index) => (
-          <div key={index} className="aspect-square bg-gray-200 animate-pulse rounded-md"></div>
-        ))}
-      </div>
-    )
-  }
+  const getDefaultImages = (): GridImage[] =>
+    Array.from({ length: 4 }, (_, i) => createPlaceholderImage(i))
 
   return (
-    <div className="grid grid-cols-2 gap-3 w-full h-full">
-      {images.map((image, index) => (
-        <Link
-          href="/products"
-          key={image.id}
-          className="group block relative aspect-square overflow-hidden rounded-md shadow-sm"
-        >
-          <Image
-            src={image.image_url || "/placeholder.svg?height=300&width=300&query=product+image"}
-            alt={image.title || `Product category ${index + 1}`}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            sizes="(max-width: 768px) 40vw, 20vw"
-          />
-
-          {/* Dark overlay that appears on hover */}
-          <div
-            className="absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity duration-300"
-            aria-hidden="true"
-          />
-
-          {/* Text container that reveals on hover */}
-          {image.title && (
-            <div className="absolute inset-0 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="p-4">
-                <h3
-                  className="text-lg font-semibold"
-                  style={{ color: "#ffffff", textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
-                >
-                  {image.title}
-                </h3>
-                {image.description && (
-                  <p className="text-sm mt-1" style={{ color: "#ffffff", textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>
-                    {image.description}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-        </Link>
-      ))}
+    <div className="w-[800px] max-w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+        {(loading ? Array(4).fill(null) : images).map((image, index) => (
+          <div key={image?.id || index} className="relative aspect-square w-full overflow-hidden group">
+            {loading ? (
+              <div className="w-full h-full animate-pulse bg-gray-300" />
+            ) : (
+              <Link href="/products" className="block w-full h-full relative">
+                <div className="w-full h-full overflow-hidden">
+                  <Image
+                    src={image.image_url}
+                    alt={image.title || `Product ${index + 1}`}
+                    fill
+                    className="object-cover transition-transform duration-500 scale-100 group-hover:scale-110"
+                    sizes="(max-width: 1068px) 100vw, 50vw"
+                  />
+                </div>
+                <div className="absolute bottom-4 left-4 z-10">
+                  <h3 style={{ color: "#ffffff" }} className="text-lg font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]">
+                    {image.title || "Product Category"}
+                  </h3>
+                  {image.description && (
+                    <p className="text-sm mt-1 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
+                      {image.description}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

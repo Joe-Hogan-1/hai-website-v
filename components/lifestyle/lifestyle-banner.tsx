@@ -64,10 +64,10 @@ export default function LifestyleBanner() {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0 w-full">
-        <div className="bg-gray-100 animate-pulse flex items-center justify-center h-[300px] md:h-[400px] rounded-lg">
+        <div className="bg-gray-100 animate-pulse flex items-center justify-center h-[300px] md:h-[400px]">
           <p className="text-gray-400">Loading...</p>
         </div>
-        <div className="bg-gray-100 animate-pulse flex items-center justify-center h-[300px] md:h-[400px] rounded-lg">
+        <div className="bg-gray-100 animate-pulse flex items-center justify-center h-[300px] md:h-[400px]">
           <p className="text-gray-400">Loading...</p>
         </div>
       </div>
@@ -78,10 +78,10 @@ export default function LifestyleBanner() {
   if (banners.length === 0) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0 w-full">
-        <div className="bg-gray-100 flex items-center justify-center h-[300px] md:h-[400px] rounded-lg">
+        <div className="bg-gray-100 flex items-center justify-center h-[300px] md:h-[400px]">
           <p className="text-gray-400">No image available</p>
         </div>
-        <div className="bg-gray-100 flex items-center justify-center h-[300px] md:h-[400px] rounded-lg">
+        <div className="bg-gray-100 flex items-center justify-center h-[300px] md:h-[400px]">
           <p className="text-gray-400">No image available</p>
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function LifestyleBanner() {
         {finalBanners.map((banner, index) => (
           <div
             key={`${banner.id}-${index}`}
-            className="relative overflow-hidden rounded-lg flex items-center justify-center"
+            className="relative overflow-hidden flex items-center justify-center"
             style={{ minHeight: "300px" }}
           >
             <div className="w-full h-full flex items-center justify-center">
@@ -143,7 +143,7 @@ export default function LifestyleBanner() {
       <div className="absolute bottom-6 left-6 z-20">
         <Link
           href="/products"
-          className="inline-block bg-black text-white font-semibold py-3 px-8 text-lg md:text-xl md:py-4 md:px-10 rounded transition-colors outline-none focus:outline-none focus:ring-0 select-none no-tap-highlight"
+          className="inline-block bg-black text-white font-semibold py-3 px-8 text-lg md:text-xl md:py-4 md:px-10 transition-colors outline-none focus:outline-none focus:ring-0 select-none no-tap-highlight"
           style={{
             color: "white",
             WebkitTapHighlightColor: "none",
