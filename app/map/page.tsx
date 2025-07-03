@@ -15,8 +15,8 @@ export default function MapPage() {
         <div className="container mx-auto px-4 pt-24 pb-8">
           <h1 className="text-5xl font-bold mb-6 text-black">find hai.</h1>
           <p className="text-xl mb-8 text-black text-center">
-            Discover licensed dispensaries in New York State where hai. test
-            products are available.
+            Discover licensed dispensaries in New York State where hai. tested
+            test products are available.
           </p>
 
           <MapClientWrapper />
