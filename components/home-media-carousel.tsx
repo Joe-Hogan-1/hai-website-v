@@ -166,7 +166,7 @@ export default function HomeMediaCarousel() {
         <div
           className="relative w-full"
           // Mobile: 1:1 aspect ratio (taller), Tablet+: 16:9 aspect ratio
-          style={{ paddingBottom: isMobile ? "100%" : "56.25%" }}
+          style={{ paddingBottom: isMobile ? "100%" : "40.25%" }}
         >
           {mediaItems.map((item, index) => (
             <div
