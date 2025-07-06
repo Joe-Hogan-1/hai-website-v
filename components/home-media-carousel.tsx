@@ -166,7 +166,7 @@ export default function HomeMediaCarousel() {
         <div
           className="relative w-full"
           // Mobile: 1:1 aspect ratio (taller), Tablet+: 16:9 aspect ratio
-          style={{ paddingBottom: isMobile ? "100%" : "56.25%" }}
+          style={{ paddingBottom: isMobile ? "40%" : "40.25%" }}
         >
           {mediaItems.map((item, index) => (
             <div
@@ -175,18 +175,18 @@ export default function HomeMediaCarousel() {
                 index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
               }`}
             >
-              <Link href="/products" className="block w-full h-full">
+              <Link href="/products" className="block w-full">
                 {item.media_type === "video" ? (
                   <video
                     src={item.media_url}
-                    className="absolute inset-0 w-full h-full object-contain" // object-contain to prevent cropping
+                    className="relative inset-0 w-full h-full object-contain" // object-contain to prevent cropping
                     autoPlay
                     muted
                     loop
                     playsInline
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative inset-0 flex items-center justify-center">
                     <img
                       src={item.media_url || "/placeholder.svg"}
                       alt={item.title}
@@ -209,18 +209,8 @@ export default function HomeMediaCarousel() {
               </Link>
             </div>
           ))}
-          <div className="absolute bottom-3 sm:bottom-6 left-3 sm:left-6 z-20 max-w-xs sm:max-w-sm md:max-w-md text-black">
+          <div className="absolute bottom-3 sm:bottom-6 left-6 md:right-6 z-20 max-w-xs sm:max-w-sm md:max-w-md text-black">
             <div className="p-2 sm:p-3 md:p-4 bg-white/90 sm:bg-white/70 md:bg-transparent backdrop-blur-sm sm:backdrop-blur-none">
-              <h2 className="text-xl sm:text-xl md:text-2xl font-bold mb-2">embrace the glow.</h2>
-              <p className="text-sm md:text-base mb-3 sm:mb-3">
-                discover the intersection of wellness and a life well lived.
-              </p>
-              <Link
-                href="/products"
-                className="inline-block bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 sm:py-2 sm:px-4 transition-colors text-sm sm:text-base"
-              >
-                shop essentials.
-              </Link>
             </div>
           </div>
         </div>
