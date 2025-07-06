@@ -211,16 +211,6 @@ export default function HomeMediaCarousel() {
           ))}
           <div className="absolute bottom-3 sm:bottom-6 left-6 md:right-6 z-20 max-w-xs sm:max-w-sm md:max-w-md text-black">
             <div className="p-2 sm:p-3 md:p-4 bg-white/90 sm:bg-white/70 md:bg-transparent backdrop-blur-sm sm:backdrop-blur-none">
-              <h2 className="text-xl sm:text-xl md:text-2xl font-bold mb-2">embrace the glow.</h2>
-              <p className="text-sm md:text-base mb-3 sm:mb-3">
-                discover the intersection of wellness and a life well lived.
-              </p>
-              <Link
-                href="/lifestyle"
-                className="inline-block bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 sm:py-2 sm:px-4 transition-colors text-sm sm:text-base"
-              >
-                shop essentials.
-              </Link>
             </div>
           </div>
         </div>
