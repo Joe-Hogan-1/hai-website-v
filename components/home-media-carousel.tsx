@@ -175,18 +175,18 @@ export default function HomeMediaCarousel() {
                 index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
               }`}
             >
-              <Link href="/products" className="block w-full h-full">
+              <Link href="/products" className="block w-full">
                 {item.media_type === "video" ? (
                   <video
                     src={item.media_url}
-                    className="absolute inset-0 w-full h-full object-contain" // object-contain to prevent cropping
+                    className="relative inset-0 w-full h-full object-contain" // object-contain to prevent cropping
                     autoPlay
                     muted
                     loop
                     playsInline
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative inset-0 flex items-center justify-center">
                     <img
                       src={item.media_url || "/placeholder.svg"}
                       alt={item.title}
