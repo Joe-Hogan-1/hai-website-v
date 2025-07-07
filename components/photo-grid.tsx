@@ -65,7 +65,7 @@ export default function PhotoGrid() {
             {loading ? (
               <div className="w-full h-full animate-pulse bg-gray-300" />
             ) : (
-              <Link href="/products" className="block w-full h-full relative">
+              <Link href="/lifestyle" className="block w-full h-full relative">
                 <div className="w-full h-full overflow-hidden">
                   <Image
                     src={image.image_url}
