@@ -50,8 +50,8 @@ export default function SecondaryTextBlock() {
 
   if (loading) {
     return (
-      <div className="animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
+      <div className="animate-pulse px-4 md:px-0">
+        <div className="h-6 md:h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
         <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
         <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
         <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -60,11 +60,11 @@ export default function SecondaryTextBlock() {
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-3xl font-semibold">{title}</h2>
+    <div className="space-y-4 px-4 md:px-0">
+      <h2 className="text-2xl md:text-3xl font-semibold leading-tight">{title}</h2>
       <div className="prose max-w-none">
         {content.split("\n").map((paragraph, index) => (
-          <p key={index} className="mb-4 text-gray-700">
+          <p key={index} className="mb-4 text-base md:text-lg text-gray-700 leading-relaxed">
             {paragraph}
           </p>
         ))}

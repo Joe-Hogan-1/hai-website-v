@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useMediaQuery } from "@/hooks/use-media-query" // Import useMediaQuery
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 type VerticalCarouselItem = {
   id: string
@@ -21,7 +21,7 @@ export default function VerticalImageCarousel() {
   const [error, setError] = useState<string | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const carouselRef = useRef<HTMLDivElement>(null)
-  const isDesktop = useMediaQuery("(min-width: 768px)") // md breakpoint
+  const isDesktop = useMediaQuery("(min-width: 768px)")
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -45,13 +45,12 @@ export default function VerticalImageCarousel() {
   }, [])
 
   const handlePrev = () => {
-    if (!isDesktop) return // Navigation only for desktop
+    if (!isDesktop) return
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : 0))
   }
 
   const handleNext = () => {
-    if (!isDesktop) return // Navigation only for desktop
-    // On desktop, we show 3 items. So, length - 3 is the last possible starting index.
+    if (!isDesktop) return
     setCurrentIndex((prev) => (prev < items.length - 3 ? prev + 1 : prev))
   }
 
@@ -112,7 +111,7 @@ export default function VerticalImageCarousel() {
           {items.map((item) => (
             <div key={item.id} className="w-full md:w-1/3 md:flex-shrink-0 px-2 mb-4 md:mb-0">
               <Link
-                href="/lifestyle"
+                href={item.link_url || "/lifestyle"}
                 className="block h-[400px] md:h-[600px] relative group overflow-hidden"
               >
                 <div className="absolute inset-0">
@@ -143,15 +142,7 @@ export default function VerticalImageCarousel() {
       </div>
 
       {/* Text and button below carousel */}
-      <div className="mt-8 md:mt-12 text-center">
-        <p className="text-xl md:text-2xl font-medium mb-4 md:mb-6">from sunrise to after hours - we've got you.</p>
-        <Link
-          href="/products"
-          className="inline-flex px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors text-sm font-medium"
-        >
-          Shop Essentials
-        </Link>
-      </div>
+      
     </div>
   )
 }

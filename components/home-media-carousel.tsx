@@ -1,220 +1,182 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { useMediaQuery } from "@/hooks/use-media-query"
-import Link from "next/link"
+import { useState, useEffect } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface MediaItem {
-  id: number
-  title: string
-  description: string
+  id: string
   media_url: string
-  media_type: "video" | "image"
-  text_overlay: string | null
-  text_position: string
-  is_active: boolean
-  display_order: number
+  title?: string
+  description?: string
+  media_type: "image" | "video"
   created_at: string
+  text_overlay?: string
 }
 
 export default function HomeMediaCarousel() {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const [autoplayEnabled, setAutoplayEnabled] = useState(true)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
 
-  const isMobile = useMediaQuery("(max-width: 640px)") // Tailwind's 'sm' breakpoint
-  const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)") // Tailwind's 'md' to 'lg'
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
 
   useEffect(() => {
     fetchMediaItems()
-    pollIntervalRef.current = setInterval(fetchMediaItems, 120000) // Poll every 2 minutes
-    return () => {
-      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    }
+    const intervalId = setInterval(fetchMediaItems, 300000)
+    return () => clearInterval(intervalId)
   }, [])
+
+  useEffect(() => {
+    if (mediaItems.length > 1) {
+      const timer = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % mediaItems.length)
+      }, 5000)
+      return () => clearInterval(timer)
+    }
+  }, [mediaItems.length])
 
   const fetchMediaItems = async () => {
     try {
-      // setLoading(true); // Removed to prevent layout shift on poll
+      setLoading(true)
       const response = await fetch("/api/banner-media")
-      if (!response.ok) throw new Error(`Failed to fetch banner media: ${response.status}`)
+      if (!response.ok) throw new Error(`Error: ${response.statusText}`)
       const data = await response.json()
-      setMediaItems(data && data.length > 0 ? data : [])
-    } catch (error: any) {
-      console.error("Error fetching media items:", error)
-      setError(error.message || "An unexpected error occurred")
+      if (data.error) throw new Error(data.error)
+
+      const items = data || []
+      if (items.length === 0) {
+        setMediaItems(getDefaultMediaItems())
+      } else {
+        setMediaItems(items)
+      }
+    } catch (err) {
+      console.error("Error fetching media items:", err)
+      setMediaItems(getDefaultMediaItems())
     } finally {
       setLoading(false)
     }
   }
 
-  const goToNextSlide = () => {
-    if (isTransitioning || mediaItems.length <= 1) return
-    setIsTransitioning(true)
+  const getDefaultMediaItems = (): MediaItem[] => [
+    {
+      id: "default-1",
+      media_url: "/placeholder.svg?height=600&width=1200",
+      title: "Welcome to HAI",
+      description: "Premium cannabis products",
+      media_type: "image",
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: "default-2",
+      media_url: "/placeholder.svg?height=600&width=1200",
+      title: "Quality Products",
+      description: "Discover our collection",
+      media_type: "image",
+      created_at: new Date().toISOString(),
+    },
+  ]
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index)
+  }
+
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + mediaItems.length) % mediaItems.length)
+  }
+
+  const goToNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % mediaItems.length)
-    setTimeout(() => setIsTransitioning(false), 500)
   }
 
-  useEffect(() => {
-    if (!autoplayEnabled || mediaItems.length <= 1 || isTransitioning) {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-      return
-    }
-    timeoutRef.current = setTimeout(goToNextSlide, 5000)
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    }
-  }, [currentIndex, isTransitioning, mediaItems.length, autoplayEnabled])
-
-  if (loading && mediaItems.length === 0) {
+  if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-[#fff5f0]">
-        <div className="text-[#ffd6c0] text-xl animate-pulse">Loading carousel...</div>
-      </div>
-    )
-  }
-
-  if (error && mediaItems.length === 0) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-[#fff5f0]">
-        <div className="text-red-500">{error}</div>
+      <div className="relative w-full">
+        <div className="w-full h-64 md:h-96 bg-gray-300 animate-pulse" />
       </div>
     )
   }
 
   if (mediaItems.length === 0) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-[#fff5f0]">
-        <div className="text-[#ffd6c0] text-xl">No media items available</div>
-      </div>
-    )
-  }
-
-  const getTextPositionClasses = (position: string) => {
-    if (isMobile) {
-      switch (position) {
-        case "top-left":
-        case "top-center":
-        case "top-right":
-          return "top-2 left-2 right-2 text-center"
-        case "middle-left":
-        case "middle-center":
-        case "middle-right":
-          return "top-1/2 -translate-y-1/2 left-2 right-2 text-center"
-        default:
-          return "bottom-2 left-2 right-2 text-center" // bottom positions
-      }
-    }
-    if (isTablet) {
-      switch (position) {
-        case "top-left":
-          return "top-4 left-4 text-left"
-        case "top-center":
-          return "top-4 left-1/2 -translate-x-1/2 text-center"
-        case "top-right":
-          return "top-4 right-4 text-right"
-        case "middle-left":
-          return "top-1/2 -translate-y-1/2 left-4 text-left"
-        case "middle-center":
-          return "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
-        case "middle-right":
-          return "top-1/2 -translate-y-1/2 right-4 text-right"
-        case "bottom-left":
-          return "bottom-4 left-4 text-left"
-        case "bottom-center":
-          return "bottom-4 left-1/2 -translate-x-1/2 text-center"
-        case "bottom-right":
-          return "bottom-4 right-4 text-right"
-        default:
-          return "bottom-4 left-4 text-left"
-      }
-    }
-    // Desktop
-    switch (position) {
-      case "top-left":
-        return "top-6 left-6 text-left"
-      case "top-center":
-        return "top-6 left-1/2 -translate-x-1/2 text-center"
-      case "top-right":
-        return "top-6 right-6 text-right"
-      case "middle-left":
-        return "top-1/2 -translate-y-1/2 left-6 text-left"
-      case "middle-center":
-        return "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
-      case "middle-right":
-        return "top-1/2 -translate-y-1/2 right-6 text-right"
-      case "bottom-left":
-        return "bottom-6 left-6 text-left"
-      case "bottom-center":
-        return "bottom-6 left-1/2 -translate-x-1/2 text-center"
-      case "bottom-right":
-        return "bottom-6 right-6 text-right"
-      default:
-        return "bottom-6 left-6 text-left"
-    }
+    return null
   }
 
   return (
-    <div className="w-full h-full relative overflow-hidden bg-[#fff5f0]">
-      <div className="relative bg-white overflow-hidden mx-2 sm:mx-4 my-2 sm:my-4">
-        <div
-          className="relative w-full"
-          // Mobile: 1:1 aspect ratio (taller), Tablet+: 16:9 aspect ratio
-          style={{ paddingBottom: isMobile ? "40%" : "40.25%" }}
-        >
-          {mediaItems.map((item, index) => (
-            <div
-              key={item.id}
-              className={`absolute inset-0 transition-opacity duration-500 ${
-                index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
-              }`}
-            >
-              <Link href="/products" className="block w-full">
-                {item.media_type === "video" ? (
-                  <video
-                    src={item.media_url}
-                    className="relative inset-0 w-full h-full object-contain" // object-contain to prevent cropping
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  />
-                ) : (
-                  <div className="relative inset-0 flex items-center justify-center">
-                    <img
-                      src={item.media_url || "/placeholder.svg"}
-                      alt={item.title}
-                      className="max-w-full max-h-full object-contain" // object-contain
-                    />
-                  </div>
-                )}
+    <div className="relative w-full">
+      <div className="relative w-full overflow-hidden">
+        {mediaItems.map((item, index) => (
+          <div key={item.id} className={`w-full ${index === currentIndex ? "block" : "hidden"}`}>
+            {item.media_type === "video" ? (
+              <video src={item.media_url} className="w-full h-auto object-contain" autoPlay muted loop playsInline />
+            ) : (
+              <img
+                src={item.media_url || "/placeholder.svg"}
+                alt={item.title}
+                className="w-full h-auto object-contain"
+              />
+            )}
+
+            {/* Text Overlay */}
+            {(item.text_overlay || item.description) && (
+              <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-10">
                 {item.text_overlay && (
-                  <div
-                    className={`absolute ${getTextPositionClasses(
-                      item.text_position,
-                    )} p-2 sm:p-4 text-white max-w-full sm:max-w-md`} // Ensure text overlay is responsive
-                  >
-                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{item.text_overlay}</h2>
-                    {item.description && (
-                      <p className="text-sm md:text-base line-clamp-2 sm:line-clamp-none">{item.description}</p>
-                    )}
-                  </div>
+                  <h2 className="text-white text-2xl md:text-4xl font-bold mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                    {item.text_overlay}
+                  </h2>
                 )}
-              </Link>
-            </div>
-          ))}
-          <div className="absolute bottom-3 sm:bottom-6 left-6 md:right-6 z-20 max-w-xs sm:max-w-sm md:max-w-md text-black">
-            <div className="p-2 sm:p-3 md:p-4 bg-white/90 sm:bg-white/70 md:bg-transparent backdrop-blur-sm sm:backdrop-blur-none">
-            </div>
+                {item.description && (
+                  <p className="text-white text-lg md:text-xl drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
+                    {item.description}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
-        </div>
+        ))}
       </div>
+
+      {/* Navigation Arrows */}
+      {mediaItems.length > 1 && (
+        <>
+          <button
+            onClick={goToPrevious}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all z-10"
+            aria-label="Previous image"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button
+            onClick={goToNext}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all z-10"
+            aria-label="Next image"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </>
+      )}
+
+      {/* Dots Indicator */}
+      {mediaItems.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+          {mediaItems.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`w-3 h-3 rounded-full transition-all ${
+                index === currentIndex ? "bg-white" : "bg-white/50 hover:bg-white/75"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

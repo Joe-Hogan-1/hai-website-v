@@ -104,8 +104,11 @@ export default function VerticalCarouselManager() {
       }
 
       const itemData = {
-        ...newItem,
         image_url: imageUrl,
+        title: newItem.title || null,
+        description: newItem.description || null,
+        link_url: newItem.link_url || null,
+        link_text: newItem.link_text || null,
         position: editingId ? items.find((item) => item.id === editingId)?.position : items.length,
       }
 

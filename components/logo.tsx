@@ -14,12 +14,12 @@ export default function Logo() {
     >
       <Link href="/" className="transition-all duration-300 hover:filter hover:drop-shadow-glow">
         <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hai_logo_transparent_black-83ImGs5RWDRJ4m77zReENm6jy5pGP3.png"
+          src="/hailogo_vector_black.svg"
           alt="hai."
-          width={120}
-          height={120}
+          width={75}
+          height={75}
           priority
-          className="w-[120px] h-[120px] object-contain"
+          className="w-[75px] h-[75px] object-contain"
         />
       </Link>
     </motion.div>
