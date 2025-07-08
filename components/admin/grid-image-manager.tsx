@@ -14,6 +14,8 @@ interface GridImage {
   position: number
   title?: string
   description?: string
+  link_url?: string
+  link_text?: string
   created_at: string
   user_id: string
 }
@@ -31,6 +33,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
     position: 0,
     title: "",
     description: "",
+    link_url: "",
+    link_text: "",
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -87,6 +91,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
           ...img,
           title: undefined,
           description: undefined,
+          link_url: undefined,
+          link_text: undefined,
         }))
 
         setImages(mappedData)
@@ -121,6 +127,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
       position: nextPosition,
       title: "",
       description: "",
+      link_url: "",
+      link_text: "",
     })
     setImageFile(null)
     setIsEditing(true)
@@ -139,6 +147,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
       position: 0,
       title: "",
       description: "",
+      link_url: "",
+      link_text: "",
     })
     setImageFile(null)
   }
@@ -233,6 +243,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
         if (usePhotoGrid) {
           updateData.title = currentImage.title || null
           updateData.description = currentImage.description || null
+          updateData.link_url = currentImage.link_url || null
+          updateData.link_text = currentImage.link_text || null
         }
 
         const { error } = await supabase
@@ -255,6 +267,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
         if (usePhotoGrid) {
           insertData.title = currentImage.title || null
           insertData.description = currentImage.description || null
+          insertData.link_url = currentImage.link_url || null
+          insertData.link_text = currentImage.link_text || null
         }
 
         const { error } = await supabase.from(tableName).insert(insertData)
@@ -270,6 +284,8 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
         position: 0,
         title: "",
         description: "",
+        link_url: "",
+        link_text: "",
       })
       setImageFile(null)
     } catch (error) {
@@ -387,6 +403,32 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
                     placeholder="Enter image description"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Link URL (Optional)</label>
+                  <input
+                    type="url"
+                    value={currentImage.link_url || ""}
+                    onChange={(e) => setCurrentImage({ ...currentImage, link_url: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    placeholder="https://example.com or /products"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter a full URL (https://...) or a relative path (/products). Leave empty to use default /products
+                    link.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Link Text (Optional)</label>
+                  <input
+                    type="text"
+                    value={currentImage.link_text || ""}
+                    onChange={(e) => setCurrentImage({ ...currentImage, link_text: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    placeholder="Learn More, Shop Now, etc."
+                  />
+                </div>
               </>
             )}
 
@@ -455,17 +497,18 @@ export default function GridImageManager({ userId }: GridImageManagerProps) {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-red-500 hover:text-red-700"
+                            className="text-red-500 hover:text-red-700 bg-transparent"
                             onClick={() => handleDelete(image.id)}
                           >
                             <Trash2 className="h-4 w-4 mr-1" /> Delete
                           </Button>
                         </div>
                       </div>
-                      {usePhotoGrid && image.title && (
+                      {usePhotoGrid && (image.title || image.link_url) && (
                         <div className="px-4 pb-3">
-                          <h3 className="font-medium">{image.title}</h3>
+                          {image.title && <h3 className="font-medium">{image.title}</h3>}
                           {image.description && <p className="text-sm text-gray-600 mt-1">{image.description}</p>}
+                          {image.link_url && <p className="text-sm text-blue-600 mt-1">Links to: {image.link_url}</p>}
                         </div>
                       )}
                     </div>

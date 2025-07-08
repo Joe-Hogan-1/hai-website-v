@@ -10,6 +10,8 @@ interface GridImage {
   position: number
   title?: string
   description?: string
+  link_url?: string
+  link_text?: string
   created_at: string
 }
 
@@ -49,13 +51,14 @@ export default function PhotoGrid() {
     id: `placeholder-${index}`,
     image_url: `/placeholder.svg?height=600&width=600&query=product+image+${index + 1}`,
     position: index,
-    title: "Product Category",
+    title: `Product ${index + 1}`,
     description: "Explore our products",
+    link_url: "/products",
+    link_text: "Shop Now",
     created_at: new Date().toISOString(),
   })
 
-  const getDefaultImages = (): GridImage[] =>
-    Array.from({ length: 4 }, (_, i) => createPlaceholderImage(i))
+  const getDefaultImages = (): GridImage[] => Array.from({ length: 4 }, (_, i) => createPlaceholderImage(i))
 
   return (
     <div className="w-[800px] max-w-full">
@@ -65,26 +68,33 @@ export default function PhotoGrid() {
             {loading ? (
               <div className="w-full h-full animate-pulse bg-gray-300" />
             ) : (
-              <Link href="/lifestyle" className="block w-full h-full relative">
+              <Link href={image.link_url || "/products"} className="block w-full h-full relative">
                 <div className="w-full h-full overflow-hidden">
                   <Image
-                    src={image.image_url}
+                    src={image.image_url || "/placeholder.svg"}
                     alt={image.title || `Product ${index + 1}`}
                     fill
                     className="object-cover transition-transform duration-500 scale-100 group-hover:scale-110"
                     sizes="(max-width: 1068px) 100vw, 50vw"
                   />
                 </div>
-                <div className="absolute bottom-4 left-4 z-10">
-                  <h3 style={{ color: "#ffffff" }} className="text-lg font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]">
-                    {image.title || "Product Category"}
-                  </h3>
-                  {image.description && (
-                    <p className="text-sm mt-1 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
-                      {image.description}
-                    </p>
-                  )}
-                </div>
+                {(image.title || image.description) && (
+                  <div className="absolute bottom-4 left-4 z-10">
+                    {image.title && (
+                      <h3
+                        style={{ color: "#ffffff" }}
+                        className="text-lg font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]"
+                      >
+                        {image.title}
+                      </h3>
+                    )}
+                    {image.description && (
+                      <p className="text-sm mt-1 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
+                        {image.description}
+                      </p>
+                    )}
+                  </div>
+                )}
               </Link>
             )}
           </div>

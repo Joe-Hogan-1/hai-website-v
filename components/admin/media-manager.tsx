@@ -172,13 +172,6 @@ export default function MediaManager({ userId }: MediaManagerProps) {
     try {
       setIsSaving(true)
 
-      // Validate required fields
-      if (!currentMedia.title) {
-        toast.error("Title is required")
-        setIsSaving(false)
-        return
-      }
-
       // Media URL is required for new items
       if (!currentMedia.id && !mediaFile && !currentMedia.media_url) {
         toast.error("Please select a media file")
@@ -210,6 +203,7 @@ export default function MediaManager({ userId }: MediaManagerProps) {
             description: currentMedia.description,
             media_url: mediaUrl,
             media_type: currentMedia.media_type,
+            type: "carousel", // Add this line
             is_active: currentMedia.is_active,
             display_order: currentMedia.display_order,
             updated_at: new Date().toISOString(),
@@ -230,6 +224,7 @@ export default function MediaManager({ userId }: MediaManagerProps) {
           description: currentMedia.description || "",
           media_url: mediaUrl,
           media_type: currentMedia.media_type || "image",
+          type: "carousel", // Add this line to set the type field
           is_active: currentMedia.is_active !== undefined ? currentMedia.is_active : true,
           display_order: currentMedia.display_order || 0,
           user_id: userId,
@@ -397,14 +392,13 @@ export default function MediaManager({ userId }: MediaManagerProps) {
           <div className="space-y-4">
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                Title <span className="text-red-500">*</span>
+                Title
               </label>
               <Input
                 id="title"
                 value={currentMedia.title || ""}
                 onChange={(e) => setCurrentMedia({ ...currentMedia, title: e.target.value })}
                 placeholder="Enter media title"
-                required
               />
             </div>
 
@@ -589,7 +583,7 @@ export default function MediaManager({ userId }: MediaManagerProps) {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-red-500 hover:text-red-700"
+                              className="text-red-500 hover:text-red-700 bg-transparent"
                               onClick={() => handleDelete(mediaItem.id)}
                             >
                               <Trash2 className="h-4 w-4 mr-1" /> Delete

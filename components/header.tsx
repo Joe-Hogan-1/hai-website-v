@@ -46,7 +46,7 @@ export default function Header() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center w-full h-full">
-          <div className="flex items-center justify-center h-full pl-[12px]">
+          <div className="flex items-center justify-center h-full pl-[4px]">
             <Logo className="scale-90 origin-left" />
           </div>
           <div className="flex items-center h-full">
@@ -83,7 +83,7 @@ export default function Header() {
                   <div className="flex flex-col h-full">
                     <div className="p-4 border-b border-white/20">
                       <div className="flex justify-between items-center">
-                        <div className="pl-[12px]">
+                        <div className="pl-[4px]">
                           <Logo className="scale-75 origin-left" />
                         </div>
                         <button

@@ -92,10 +92,10 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
   }
 
   return (
-    <div className={className}>
+    <div className={`grid gap-8 md:grid-cols-2 lg:grid-cols-1 ${className}`}>
       {blogPosts.map((post) => (
         <Link key={post.id} href={`/lifestyle/${post.id}`} className="block mb-6">
-          <div className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl border border-white/30 h-full flex flex-col">
+          <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl border border-white/30 h-full flex flex-col mb-4">
             {post.image_url && (
               <div className="mb-4 overflow-hidden rounded-lg mx-auto w-full h-[620px]">
                 <img
@@ -105,7 +105,7 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
                 />
               </div>
             )}
-            <div className="flex-grow">
+            <div className="flex-grow mb-4">
               <h2 className="text-2xl font-semibold mb-3 text-black text-left">{post.title}</h2>
               {showExcerpt && <p className="text-gray-700 mb-4 line-clamp-3 font-medium text-left">{post.summary}</p>}
               <div className="flex justify-between items-center">

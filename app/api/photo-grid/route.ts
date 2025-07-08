@@ -22,6 +22,8 @@ export async function GET() {
         position: i,
         title: "Product Category",
         description: "Explore our products",
+        link_url: "/products",
+        link_text: "Shop Now",
         created_at: new Date().toISOString(),
       }))
 

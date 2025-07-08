@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import Header from "@/components/header"
 import HomeMediaCarousel from "@/components/home-media-carousel"
-import NewsletterPopup from "@/components/newsletter-popup"
 import PhotoGrid from "@/components/photo-grid"
 import HomepageTextBlock from "@/components/homepage-text-block"
 import VerticalImageCarousel from "@/components/vertical-image-carousel"
@@ -46,15 +46,28 @@ export default function HomePage() {
       <div className="relative overflow-hidden">
         <div className="relative z-10">
           {/* Main content area with full-width image carousel */}
-          <div className="min-h-screen pt-24 px-6 pb-6 flex flex-col">
+          <div className="min-h-screen pt-24 px-6 pb-12 flex flex-col">
             <div className="flex-grow flex flex-col">
               {/* Full-width media carousel */}
-              <div className="w-full mb-8">
+              <div className="w-full mb-16">
                 <HomeMediaCarousel />
               </div>
 
+              {/* Shop Essentials Section */}
+              <div className="w-full mb-16 text-center">
+                <p className="text-xl md:text-2xl font-medium mb-4 md:mb-6">
+                  from sunrise to after hours - we've got you.
+                </p>
+                <Link
+                  href="/products"
+                  className="inline-flex px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors text-sm font-medium"
+                >
+                  Shop Essentials
+                </Link>
+              </div>
+
               {/* First section: Text and photo grid */}
-              <div className="w-full py-12">
+              <div className="w-full py-4">
                 <div className="max-w-7xl mx-auto px-4">
                   <div className="flex flex-col md:flex-row items-start justify-between gap-8">
                     {/* Homepage Text Block */}
@@ -79,12 +92,12 @@ export default function HomePage() {
               </div>
 
               {/* Secondary Photo Grid and Text Block in a vertical layout */}
-              <div className="w-full py-12">
+              <div className="w-full py-1">
                 <div className="w-full px-1 flex flex-col">
                   <SecondaryPhotoGrid />
                 </div>
-                <div className="w-full items-center text-center py-8 px-64">
-                <SecondaryTextBlock />
+                <div className="w-full items-center text-center px-64 mt-8">
+                  <SecondaryTextBlock />
                 </div>
               </div>
             </div>

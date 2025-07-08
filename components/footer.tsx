@@ -45,7 +45,7 @@ export default function Footer() {
       >
         {/* Decorative color bar */}
         <motion.div
-          className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-white to-white top-1"
+          className="absolute left-0 right-0 h-1 bg-gradient-to-r from-white to-white top-2"
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
@@ -54,10 +54,10 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Desktop layout */}
           <div className="hidden md:block">
-            <div className="grid grid-cols-12 gap-0 items-center py-1">
+            <div className="grid grid-cols-12 gap-0 items-center py-3 pl-[-16px]">
               {/* Logo */}
-              <motion.div variants={itemVariants} className="col-span-2 pl-[12px]">
-                <Logo className="scale-90 origin-left" />
+              <motion.div variants={itemVariants} className="col-span-2">
+                <Logo className="scale-90 origin-left"/>
               </motion.div>
 
               {/* Navigation links */}

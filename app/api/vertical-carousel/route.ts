@@ -43,7 +43,17 @@ export async function PUT(request: Request) {
     const body = await request.json()
     const { id, ...updateData } = body
 
-    const { data, error } = await supabase.from("vertical_carousel").update(updateData).eq("id", id).select()
+    // Ensure all fields are properly handled
+    const cleanUpdateData = {
+      image_url: updateData.image_url,
+      title: updateData.title || null,
+      description: updateData.description || null,
+      link_url: updateData.link_url || null,
+      link_text: updateData.link_text || null,
+      position: updateData.position !== undefined ? updateData.position : 0,
+    }
+
+    const { data, error } = await supabase.from("vertical_carousel").update(cleanUpdateData).eq("id", id).select()
 
     if (error) {
       console.error("Error updating vertical carousel item:", error)
