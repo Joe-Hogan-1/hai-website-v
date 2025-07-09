@@ -82,7 +82,7 @@ export default function HomepageTextBlock() {
   }
 
   return (
-    <div class="w-full items-center text-center py-8 px-30">
+    <div className="w-full items-center text-center py-0 px-0">
       {text.title && <h2 className="text-2xl font-semibold mb-4">{text.title}</h2>}
       <div
         className="prose max-w-none whitespace-pre-wrap"
