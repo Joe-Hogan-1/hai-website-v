@@ -96,7 +96,7 @@ export default function HomePage() {
                 <div className="w-full px-1 flex flex-col">
                   <SecondaryPhotoGrid />
                 </div>
-                <div className="w-full items-center text-center px-64 mt-8">
+                <div className="w-full items-center text-center mt-8">
                   <SecondaryTextBlock />
                 </div>
               </div>
