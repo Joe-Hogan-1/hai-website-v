@@ -46,7 +46,7 @@ export default function HomePage() {
       <div className="relative overflow-hidden">
         <div className="relative z-10">
           {/* Main content area with full-width image carousel */}
-          <div className="min-h-screen pt-24 px-6 pb-12 flex flex-col">
+          <div className="min-h-screen pt-24 pb-12 flex flex-col">
             <div className="flex-grow flex flex-col">
               {/* Full-width media carousel */}
               <div className="w-full mb-16">
