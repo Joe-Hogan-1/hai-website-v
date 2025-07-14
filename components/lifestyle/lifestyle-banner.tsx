@@ -63,7 +63,7 @@ export default function LifestyleBanner() {
   // If still loading, show placeholder
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-0 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-0 w-full">
         <div className="bg-gray-100 animate-pulse flex items-center justify-center h-[300px] md:h-[400px]">
           <p className="text-gray-400">Loading...</p>
         </div>
