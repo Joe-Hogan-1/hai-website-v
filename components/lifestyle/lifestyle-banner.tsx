@@ -81,9 +81,9 @@ export default function LifestyleBanner() {
         <div className="bg-gray-100 flex items-center justify-center h-[300px] md:h-[400px]">
           <p className="text-gray-400">No image available</p>
         </div>
-        <div className="bg-gray-100 flex items-center justify-center h-[300px] md:h-[400px]">
+{/*         <div className="bg-gray-100 flex items-center justify-center h-[300px] md:h-[400px]">
           <p className="text-gray-400">No image available</p>
-        </div>
+        </div> */}
       </div>
     )
   }
