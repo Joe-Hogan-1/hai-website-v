@@ -18,7 +18,7 @@ const ProductGrid: React.FC = () => {
             alt={product.name}
             width={200}
             height={200}
-            className="w-full h-auto"
+            className="w-full h-full"
           />
           <h2 className="mt-2 text-lg font-semibold">{product.name}</h2>
         </div>
