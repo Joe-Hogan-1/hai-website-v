@@ -47,6 +47,8 @@ export default function HomePage() {
         <div className="relative z-10">
           {/* Main content area with full-width image carousel */}
           <div className="min-h-screen pt-24 pb-12 flex flex-col">
+
+          <div className="min-h-screen pt-24 px-6 pb-12 flex flex-col">
             <div className="flex-grow flex flex-col">
               {/* Full-width media carousel */}
               <div className="w-full mb-16">
@@ -96,7 +98,11 @@ export default function HomePage() {
                 <div className="w-full px-1 flex flex-col">
                   <SecondaryPhotoGrid />
                 </div>
+
                 <div className="w-full items-center text-center mt-8">
+
+                <div className="w-full items-center text-center px-64 mt-8">
+                  
                   <SecondaryTextBlock />
                 </div>
               </div>
