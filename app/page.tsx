@@ -68,16 +68,16 @@ export default function HomePage() {
 
               {/* First section: Text and photo grid */}
               <div className="w-full py-4">
-                <div className="max-w-7xl mx-auto px-4 md:px-4">
+                <div className="max-w-7xl mx-auto">
                   <div className="flex flex-col md:flex-row items-start justify-between gap-8">
                     {/* Homepage Text Block */}
-                    <div className="w-full md:w-[45%] py-8 md:py-32 px-4 md:px-20">
+                    <div className="w-full py-8 md:py-32">
                       <div className="max-w-none md:max-w-sm">
                         <HomepageTextBlock />
                       </div>
                     </div>
                     {/* Photo Grid */}
-                    <div className="w-full md:w-[60%]">
+                    <div className="w-full">
                       <PhotoGrid />
                     </div>
                   </div>
