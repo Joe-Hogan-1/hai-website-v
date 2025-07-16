@@ -1,655 +1,510 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { supabase } from "@/utils/supabase"
-import { PlusCircle, Edit, Trash2, Save, X, Eye, EyeOff, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { toast } from "@/hooks/use-toast"
+import { Trash2, Edit, Eye, EyeOff, Plus, Save, X } from "lucide-react"
 import ImageUploader from "./image-uploader"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface BlogPost {
   id: string
   title: string
   summary: string
   content: string
-  image_url: string | null
-  slug: string
+  image_url?: string
   published: boolean
-  view_count: number
   created_at: string
-  updated_at: string
-  user_id: string
-  embedded_image_url_1?: string | null
-  embedded_image_url_2?: string | null
-  embedded_image_url_3?: string | null
+  updated_at?: string
+  embedded_image_url_1?: string
+  embedded_image_url_2?: string
+  embedded_image_url_3?: string
 }
 
 interface BlogManagerProps {
   userId: string
 }
 
-const initialBlogState: Partial<BlogPost> = {
-  title: "",
-  summary: "",
-  content: "",
-  image_url: null,
-  slug: "",
-  published: false,
-  embedded_image_url_1: null,
-  embedded_image_url_2: null,
-  embedded_image_url_3: null,
-}
-
 export default function BlogManager({ userId }: BlogManagerProps) {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [currentBlog, setCurrentBlog] = useState<Partial<BlogPost>>(initialBlogState)
-
-  // Files for upload
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [embeddedImageFile1, setEmbeddedImageFile1] = useState<File | null>(null)
-  const [embeddedImageFile2, setEmbeddedImageFile2] = useState<File | null>(null)
-  const [embeddedImageFile3, setEmbeddedImageFile3] = useState<File | null>(null)
-
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [activeTab, setActiveTab] = useState("all")
   const [publishLoading, setPublishLoading] = useState<string | null>(null)
-  const [imagesToDeleteOnSave, setImagesToDeleteOnSave] = useState<Set<string>>(new Set())
+  const [currentPost, setCurrentPost] = useState<Partial<BlogPost>>({
+    title: "",
+    summary: "",
+    content: "",
+    image_url: "",
+    published: false,
+    embedded_image_url_1: "",
+    embedded_image_url_2: "",
+    embedded_image_url_3: "",
+  })
 
-  const fetchBlogPosts = useCallback(async () => {
+  const fetchBlogPosts = async () => {
     try {
       setLoading(true)
-      // Use fallback approach for better compatibility
       const { data, error } = await supabase
-        .rpc("get_user_blog_posts", { limit_count: 50, offset_count: 0 })
+        .from("blog_posts")
+        .select("*")
+        .eq("user_id", userId)
         .order("created_at", { ascending: false })
 
       if (error) {
-        console.log("RPC failed, falling back to direct query:", error)
-        // Fall back to direct query
-        const { data: directData, error: directError } = await supabase
-          .from("blog_posts")
-          .select("*")
-          .order("created_at", { ascending: false })
-
-        if (directError) throw directError
-        setBlogPosts(directData || [])
-      } else {
-        setBlogPosts(data || [])
+        console.error("Error fetching blog posts:", error)
+        toast({
+          title: "Error",
+          description: "Failed to fetch blog posts",
+          variant: "destructive",
+        })
+        return
       }
+
+      setBlogPosts(data || [])
     } catch (error) {
-      console.error("Error fetching blog posts:", error)
-      toast.error("Failed to load blog posts")
+      console.error("Unexpected error:", error)
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }
-  }, [])
+  }
 
   useEffect(() => {
     fetchBlogPosts()
-  }, [fetchBlogPosts])
+  }, [userId])
 
-  const resetFormState = () => {
-    setCurrentBlog(initialBlogState)
-    setImageFile(null)
-    setEmbeddedImageFile1(null)
-    setEmbeddedImageFile2(null)
-    setEmbeddedImageFile3(null)
-    setImagesToDeleteOnSave(new Set())
-    setUploadProgress(0)
-  }
-
-  const handleCreateNew = () => {
-    resetFormState()
-    setIsEditing(true)
-  }
-
-  const handleEdit = (blog: BlogPost) => {
-    setCurrentBlog(blog)
-    setImageFile(null)
-    setEmbeddedImageFile1(null)
-    setEmbeddedImageFile2(null)
-    setEmbeddedImageFile3(null)
-    setImagesToDeleteOnSave(new Set())
-    setIsEditing(true)
-  }
-
-  const handleCancel = () => {
-    setIsEditing(false)
-    resetFormState()
-  }
-
-  const addImageToDelete = (url: string | null | undefined) => {
-    if (url) {
-      setImagesToDeleteOnSave((prev) => new Set(prev).add(url))
-    }
-  }
-
-  const handleRemoveEmbeddedImage = (index: 1 | 2 | 3) => {
-    const fieldName = `embedded_image_url_${index}` as keyof BlogPost
-    addImageToDelete(currentBlog[fieldName] as string | undefined)
-    setCurrentBlog((prev) => ({ ...prev, [fieldName]: null }))
-    if (index === 1) setEmbeddedImageFile1(null)
-    if (index === 2) setEmbeddedImageFile2(null)
-    if (index === 3) setEmbeddedImageFile3(null)
-  }
-
-  const deleteImagesFromStorage = async (urls: string[]) => {
-    const validUrls = urls.filter((url) => url && typeof url === "string")
-    if (validUrls.length === 0) return
-
+  const handleSave = async () => {
     try {
-      const filePaths = validUrls.map((url) => {
-        const urlParts = url.split("/")
-        return urlParts[urlParts.length - 1]
-      })
-
-      if (filePaths.length > 0) {
-        const { error: deleteError } = await supabase.storage.from("blog-images").remove(filePaths)
-        if (deleteError) {
-          console.error("Error deleting images from storage:", deleteError)
-        }
+      if (!currentPost.title?.trim()) {
+        toast({
+          title: "Error",
+          description: "Title is required",
+          variant: "destructive",
+        })
+        return
       }
+
+      const postData = {
+        title: currentPost.title.trim(),
+        summary: currentPost.summary?.trim() || "",
+        content: currentPost.content?.trim() || "",
+        image_url: currentPost.image_url || null,
+        published: currentPost.published || false,
+        embedded_image_url_1: currentPost.embedded_image_url_1 || null,
+        embedded_image_url_2: currentPost.embedded_image_url_2 || null,
+        embedded_image_url_3: currentPost.embedded_image_url_3 || null,
+        updated_at: new Date().toISOString(),
+      }
+
+      if (currentPost.id) {
+        // Update existing post
+        const { error } = await supabase
+          .from("blog_posts")
+          .update(postData)
+          .eq("id", currentPost.id)
+          .eq("user_id", userId)
+
+        if (error) throw error
+        toast({
+          title: "Success",
+          description: "Blog post updated successfully",
+        })
+      } else {
+        // Create new post
+        const { error } = await supabase.from("blog_posts").insert({
+          ...postData,
+          user_id: userId,
+        })
+
+        if (error) throw error
+        toast({
+          title: "Success",
+          description: "Blog post created successfully",
+        })
+      }
+
+      setIsEditing(false)
+      setCurrentPost({
+        title: "",
+        summary: "",
+        content: "",
+        image_url: "",
+        published: false,
+        embedded_image_url_1: "",
+        embedded_image_url_2: "",
+        embedded_image_url_3: "",
+      })
+      fetchBlogPosts()
     } catch (error) {
-      console.error("Error in deleteImagesFromStorage:", error)
+      console.error("Error saving blog post:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save blog post",
+        variant: "destructive",
+      })
     }
   }
 
-  const handleDelete = async (blogPost: BlogPost) => {
-    if (!confirm("Are you sure you want to delete this blog post? This will also delete all associated images.")) return
+  const handleEdit = (post: BlogPost) => {
+    setCurrentPost({
+      ...post,
+      embedded_image_url_1: post.embedded_image_url_1 || "",
+      embedded_image_url_2: post.embedded_image_url_2 || "",
+      embedded_image_url_3: post.embedded_image_url_3 || "",
+    })
+    setIsEditing(true)
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this blog post?")) return
 
     try {
-      const { error } = await supabase.from("blog_posts").delete().eq("id", blogPost.id).eq("user_id", userId)
+      const { error } = await supabase.from("blog_posts").delete().eq("id", id).eq("user_id", userId)
+
       if (error) throw error
 
-      const imagesUrlsToDelete: string[] = []
-      if (blogPost.image_url) imagesUrlsToDelete.push(blogPost.image_url)
-      if (blogPost.embedded_image_url_1) imagesUrlsToDelete.push(blogPost.embedded_image_url_1)
-      if (blogPost.embedded_image_url_2) imagesUrlsToDelete.push(blogPost.embedded_image_url_2)
-      if (blogPost.embedded_image_url_3) imagesUrlsToDelete.push(blogPost.embedded_image_url_3)
-
-      await deleteImagesFromStorage(imagesUrlsToDelete)
-
-      toast.success("Blog post deleted successfully")
+      toast({
+        title: "Success",
+        description: "Blog post deleted successfully",
+      })
       fetchBlogPosts()
     } catch (error) {
       console.error("Error deleting blog post:", error)
-      toast.error("Failed to delete blog post")
+      toast({
+        title: "Error",
+        description: "Failed to delete blog post",
+        variant: "destructive",
+      })
     }
   }
 
-  const handleTogglePublish = async (blog: BlogPost) => {
+  const handleTogglePublish = async (post: BlogPost) => {
     try {
-      setPublishLoading(blog.id)
+      setPublishLoading(post.id)
 
-      // Try RPC first, fall back to direct update
-      // Assuming 'toggle_blog_post_published' RPC might not exist or might have issues.
-      // The fallback is now more robust.
-      let rpcError: any = null
-      try {
-        const { error } = await supabase.rpc("toggle_blog_post_published", { post_id: blog.id })
-        if (error) rpcError = error
-      } catch (e) {
-        rpcError = e
-      }
+      const { error } = await supabase
+        .from("blog_posts")
+        .update({
+          published: !post.published,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", post.id)
+        .eq("user_id", userId)
 
-      if (rpcError) {
-        console.log("RPC toggle_blog_post_published failed or does not exist, using direct update:", rpcError)
-        const { error: updateError } = await supabase
-          .from("blog_posts")
-          .update({
-            published: !blog.published,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", blog.id)
-          .eq("user_id", userId) // Added user_id check for RLS
+      if (error) throw error
 
-        if (updateError) {
-          console.error("Direct update error:", updateError)
-          throw updateError
-        }
-      }
+      toast({
+        title: "Success",
+        description: `Blog post ${!post.published ? "published" : "unpublished"} successfully`,
+      })
 
-      toast.success(`Blog post ${!blog.published ? "published" : "unpublished"} successfully`)
-      fetchBlogPosts() // Refetch to get the latest state
+      // Update local state immediately for better UX
+      setBlogPosts((prev) =>
+        prev.map((p) =>
+          p.id === post.id ? { ...p, published: !p.published, updated_at: new Date().toISOString() } : p,
+        ),
+      )
     } catch (error) {
       console.error("Error toggling publish status:", error)
-      toast.error("Failed to update publish status")
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update publish status",
+        variant: "destructive",
+      })
     } finally {
       setPublishLoading(null)
     }
   }
 
-  const uploadImage = async (file: File): Promise<string | null> => {
-    try {
-      const fileExt = file.name.split(".").pop()
-      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`
-      const filePath = fileName
-
-      const { error: uploadError, data } = await supabase.storage.from("blog-images").upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
-      })
-
-      if (uploadError) {
-        console.error("Upload error:", uploadError)
-        throw uploadError
-      }
-
-      const { data: urlData } = supabase.storage.from("blog-images").getPublicUrl(filePath)
-      return urlData.publicUrl
-    } catch (error) {
-      console.error("Error in uploadImage:", error)
-      throw error
-    }
+  const handleCancel = () => {
+    setIsEditing(false)
+    setCurrentPost({
+      title: "",
+      summary: "",
+      content: "",
+      image_url: "",
+      published: false,
+      embedded_image_url_1: "",
+      embedded_image_url_2: "",
+      embedded_image_url_3: "",
+    })
   }
 
-  const generateSlug = (title: string): string => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9 -]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim()
-  }
-
-  const handleSave = async () => {
-    if (isSaving) return // Prevent double submission
-
-    try {
-      setIsSaving(true)
-      console.log("Starting save process...")
-
-      if (!currentBlog.title || !currentBlog.content) {
-        toast.error("Title and content are required")
-        return
-      }
-
-      if (!userId) {
-        toast.error("User ID is required")
-        return
-      }
-
-      console.log("Current blog data:", currentBlog)
-      console.log("User ID:", userId)
-
-      const blogDataToSave: any = {
-        title: currentBlog.title.trim(),
-        summary: currentBlog.summary?.trim() || "",
-        content: currentBlog.content.trim(),
-        slug: currentBlog.slug?.trim() || generateSlug(currentBlog.title),
-        published: Boolean(currentBlog.published),
-        updated_at: new Date().toISOString(),
-      }
-
-      // Handle main image upload
-      if (imageFile) {
-        console.log("Uploading main image...")
-        try {
-          blogDataToSave.image_url = await uploadImage(imageFile)
-          console.log("Main image uploaded:", blogDataToSave.image_url)
-        } catch (error) {
-          console.error("Failed to upload main image:", error)
-          toast.error("Failed to upload main image")
-          return
-        }
-      } else if (currentBlog.image_url !== undefined) {
-        blogDataToSave.image_url = currentBlog.image_url
-      }
-
-      // Handle embedded images
-      const embeddedImageUpdates = [
-        { file: embeddedImageFile1, field: "embedded_image_url_1" },
-        { file: embeddedImageFile2, field: "embedded_image_url_2" },
-        { file: embeddedImageFile3, field: "embedded_image_url_3" },
-      ]
-
-      for (const update of embeddedImageUpdates) {
-        if (update.file) {
-          console.log(`Uploading ${update.field}...`)
-          try {
-            blogDataToSave[update.field] = await uploadImage(update.file)
-            console.log(`${update.field} uploaded:`, blogDataToSave[update.field])
-          } catch (error) {
-            console.error(`Failed to upload ${update.field}:`, error)
-            toast.error(`Failed to upload ${update.field}`)
-            return
-          }
-        } else if (currentBlog[update.field as keyof BlogPost] !== undefined) {
-          blogDataToSave[update.field] = currentBlog[update.field as keyof BlogPost]
-        }
-      }
-
-      console.log("Final blog data to save:", blogDataToSave)
-
-      if (currentBlog.id) {
-        // Update existing blog post
-        console.log("Updating existing blog post...")
-        const { error } = await supabase
-          .from("blog_posts")
-          .update(blogDataToSave)
-          .eq("id", currentBlog.id)
-          .eq("user_id", userId)
-
-        if (error) {
-          console.error("Update error:", error)
-          throw error
-        }
-        console.log("Blog post updated successfully")
-        toast.success("Blog post updated successfully")
-      } else {
-        // Create new blog post
-        console.log("Creating new blog post...")
-        blogDataToSave.user_id = userId
-
-        const { data, error } = await supabase.from("blog_posts").insert([blogDataToSave]).select()
-
-        if (error) {
-          console.error("Insert error:", error)
-          throw error
-        }
-        console.log("Blog post created successfully:", data)
-        toast.success("Blog post created successfully")
-      }
-
-      // Clean up old images if any were marked for deletion
-      if (imagesToDeleteOnSave.size > 0) {
-        console.log("Cleaning up old images...")
-        await deleteImagesFromStorage(Array.from(imagesToDeleteOnSave))
-      }
-
-      setIsEditing(false)
-      fetchBlogPosts()
-      resetFormState()
-    } catch (error) {
-      console.error("Error saving blog post:", error)
-      if (error instanceof Error) {
-        toast.error(`Failed to save blog post: ${error.message}`)
-      } else {
-        toast.error("Failed to save blog post")
-      }
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const filteredPosts =
-    activeTab === "all"
-      ? blogPosts
-      : activeTab === "published"
-        ? blogPosts.filter((post) => post.published)
-        : activeTab === "draft"
-          ? blogPosts.filter((post) => !post.published)
-          : blogPosts
+  const publishedPosts = blogPosts.filter((post) => post.published)
+  const draftPosts = blogPosts.filter((post) => !post.published)
 
   if (loading) {
-    return <div className="text-center py-8">Loading blog posts...</div>
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Blog Manager</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-20 bg-gray-200 rounded animate-pulse" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">Blog Posts</h2>
-        {!isEditing && (
-          <Button onClick={handleCreateNew} className="bg-[#a8d1e7] hover:bg-[#97c0d6]">
-            <PlusCircle className="mr-2 h-4 w-4" /> New Blog Post
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Blog Manager</CardTitle>
+          <Button onClick={() => setIsEditing(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            New Post
           </Button>
-        )}
-      </div>
-
-      {isEditing ? (
-        <div className="bg-gray-50 p-6 rounded-lg mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold">{currentBlog.id ? "Edit Blog Post" : "Create New Blog Post"}</h3>
-            <Button variant="ghost" onClick={handleCancel}>
-              <X className="h-4 w-4 mr-2" /> Cancel
-            </Button>
-          </div>
-
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        </CardHeader>
+        <CardContent>
+          {isEditing ? (
+            <div className="space-y-4">
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="title" className="block text-sm font-medium mb-2">
                   Title *
                 </label>
                 <Input
                   id="title"
-                  value={currentBlog.title || ""}
-                  onChange={(e) => setCurrentBlog({ ...currentBlog, title: e.target.value })}
-                  placeholder="Enter blog title"
-                  required
+                  value={currentPost.title || ""}
+                  onChange={(e) => setCurrentPost({ ...currentPost, title: e.target.value })}
+                  placeholder="Enter blog post title"
                 />
               </div>
+
               <div>
-                <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
-                  Slug (optional)
+                <label htmlFor="summary" className="block text-sm font-medium mb-2">
+                  Summary
                 </label>
-                <Input
-                  id="slug"
-                  value={currentBlog.slug || ""}
-                  onChange={(e) => setCurrentBlog({ ...currentBlog, slug: e.target.value })}
-                  placeholder="Auto-generated if blank"
+                <Textarea
+                  id="summary"
+                  value={currentPost.summary || ""}
+                  onChange={(e) => setCurrentPost({ ...currentPost, summary: e.target.value })}
+                  placeholder="Enter a brief summary"
+                  rows={3}
                 />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="summary" className="block text-sm font-medium text-gray-700 mb-2">
-                Summary
-              </label>
-              <Input
-                id="summary"
-                value={currentBlog.summary || ""}
-                onChange={(e) => setCurrentBlog({ ...currentBlog, summary: e.target.value })}
-                placeholder="Enter a brief summary"
-              />
-            </div>
+              <div>
+                <label htmlFor="content" className="block text-sm font-medium mb-2">
+                  Content
+                </label>
+                <Textarea
+                  id="content"
+                  value={currentPost.content || ""}
+                  onChange={(e) => setCurrentPost({ ...currentPost, content: e.target.value })}
+                  placeholder="Enter blog post content. Use [EMBED_IMAGE_1], [EMBED_IMAGE_2], or [EMBED_IMAGE_3] to embed images."
+                  rows={10}
+                />
+              </div>
 
-            <div>
-              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-                Content *
-              </label>
-              <Textarea
-                id="content"
-                value={currentBlog.content || ""}
-                onChange={(e) => setCurrentBlog({ ...currentBlog, content: e.target.value })}
-                placeholder="Write your blog content here... Use [EMBED_IMAGE_1], [EMBED_IMAGE_2], [EMBED_IMAGE_3] for embedded images."
-                className="min-h-[250px]"
-                required
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Use placeholders like <code>[EMBED_IMAGE_1]</code> in the content to position embedded images.
-              </p>
-            </div>
-
-            {/* Main Featured Image */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Main Featured Image</label>
-              <ImageUploader
-                existingImageUrl={currentBlog.image_url}
-                onImageSelected={setImageFile}
-                uploadProgress={imageFile ? uploadProgress : 0}
-              />
-              {currentBlog.image_url && !imageFile && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => {
-                    addImageToDelete(currentBlog.image_url)
-                    setCurrentBlog((prev) => ({ ...prev, image_url: null }))
-                  }}
-                >
-                  <XCircle className="mr-2 h-4 w-4" /> Remove Main Image
-                </Button>
-              )}
-            </div>
-
-            {/* Embedded Images Sections */}
-            {[1, 2, 3].map((index) => (
-              <div key={index} className="border-t pt-4 mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Embedded Image {index}</label>
-                <p className="text-xs text-gray-500 mb-2">
-                  This image will replace <code>[EMBED_IMAGE_{index}]</code> in your content.
-                </p>
+              <div>
+                <label className="block text-sm font-medium mb-2">Main Image</label>
                 <ImageUploader
-                  existingImageUrl={
-                    currentBlog[`embedded_image_url_${index}` as keyof BlogPost] as string | null | undefined
-                  }
-                  onImageSelected={(file) => {
-                    if (index === 1) setEmbeddedImageFile1(file)
-                    else if (index === 2) setEmbeddedImageFile2(file)
-                    else setEmbeddedImageFile3(file)
-                  }}
-                  uploadProgress={
-                    (index === 1 && embeddedImageFile1) ||
-                    (index === 2 && embeddedImageFile2) ||
-                    (index === 3 && embeddedImageFile3)
-                      ? uploadProgress
-                      : 0
-                  }
+                  currentImageUrl={currentPost.image_url || ""}
+                  onImageSelected={(url) => setCurrentPost({ ...currentPost, image_url: url })}
+                  bucketName="blog-images"
                 />
-                {currentBlog[`embedded_image_url_${index}` as keyof BlogPost] &&
-                  !(index === 1 && embeddedImageFile1) &&
-                  !(index === 2 && embeddedImageFile2) &&
-                  !(index === 3 && embeddedImageFile3) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mt-2"
-                      onClick={() => handleRemoveEmbeddedImage(index as 1 | 2 | 3)}
-                    >
-                      <XCircle className="mr-2 h-4 w-4" /> Remove Embedded Image {index}
-                    </Button>
-                  )}
               </div>
-            ))}
 
-            {/* Published Checkbox */}
-            <div className="pt-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Embedded Image 1</label>
+                  <ImageUploader
+                    currentImageUrl={currentPost.embedded_image_url_1 || ""}
+                    onImageSelected={(url) => setCurrentPost({ ...currentPost, embedded_image_url_1: url })}
+                    bucketName="blog-images"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Embedded Image 2</label>
+                  <ImageUploader
+                    currentImageUrl={currentPost.embedded_image_url_2 || ""}
+                    onImageSelected={(url) => setCurrentPost({ ...currentPost, embedded_image_url_2: url })}
+                    bucketName="blog-images"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Embedded Image 3</label>
+                  <ImageUploader
+                    currentImageUrl={currentPost.embedded_image_url_3 || ""}
+                    onImageSelected={(url) => setCurrentPost({ ...currentPost, embedded_image_url_3: url })}
+                    bucketName="blog-images"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
                   id="published"
-                  checked={currentBlog.published || false}
-                  onCheckedChange={(checked) => setCurrentBlog({ ...currentBlog, published: checked as boolean })}
+                  checked={currentPost.published || false}
+                  onChange={(e) => setCurrentPost({ ...currentPost, published: e.target.checked })}
                 />
                 <label htmlFor="published" className="text-sm font-medium">
-                  Published
+                  Publish immediately
                 </label>
               </div>
-            </div>
 
-            <div className="flex justify-end pt-4">
-              <Button onClick={handleSave} className="bg-[#ffd6c0] hover:bg-[#ffcbb0]" disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" /> Save Blog Post
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          {blogPosts.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-500 mb-4">No blog posts yet</p>
-              <Button onClick={handleCreateNew} className="bg-[#a8d1e7] hover:bg-[#97c0d6]">
-                <PlusCircle className="mr-2 h-4 w-4" /> Create Your First Blog Post
-              </Button>
-            </div>
-          ) : (
-            <div>
-              <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-                <TabsList>
-                  <TabsTrigger value="all">All Posts ({blogPosts.length})</TabsTrigger>
-                  <TabsTrigger value="published">Published ({blogPosts.filter((p) => p.published).length})</TabsTrigger>
-                  <TabsTrigger value="draft">Drafts ({blogPosts.filter((p) => !p.published).length})</TabsTrigger>
-                </TabsList>
-              </Tabs>
-
-              <div className="space-y-6">
-                {filteredPosts.map((blog) => (
-                  <Card key={blog.id} className="overflow-hidden">
-                    <CardContent className="p-0">
-                      <div className="flex flex-col md:flex-row">
-                        {blog.image_url && (
-                          <div className="w-full md:w-1/4 h-48 md:h-auto">
-                            <img
-                              src={blog.image_url || "/placeholder.svg"}
-                              alt={blog.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <div className="p-6 flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="text-xl font-semibold">{blog.title}</h3>
-                            <div className="flex space-x-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleTogglePublish(blog)}
-                                title={blog.published ? "Unpublish" : "Publish"}
-                                disabled={publishLoading === blog.id}
-                              >
-                                {publishLoading === blog.id ? (
-                                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                                ) : blog.published ? (
-                                  <Eye className="h-4 w-4" />
-                                ) : (
-                                  <EyeOff className="h-4 w-4" />
-                                )}
-                              </Button>
-                            </div>
-                          </div>
-                          <p className="text-gray-600 mb-4">{blog.summary}</p>
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <span className="text-sm text-gray-500 mr-4">
-                                {new Date(blog.created_at).toLocaleDateString()}
-                              </span>
-                              {blog.view_count > 0 && (
-                                <span className="text-sm text-gray-500">{blog.view_count} views</span>
-                              )}
-                            </div>
-                            <div className="space-x-2">
-                              <Button variant="outline" size="sm" onClick={() => handleEdit(blog)}>
-                                <Edit className="h-4 w-4 mr-1" /> Edit
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-red-500 hover:text-red-700"
-                                onClick={() => handleDelete(blog)}
-                              >
-                                <Trash2 className="h-4 w-4 mr-1" /> Delete
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+              <div className="flex gap-2">
+                <Button onClick={handleSave} className="flex items-center gap-2">
+                  <Save className="h-4 w-4" />
+                  Save
+                </Button>
+                <Button variant="outline" onClick={handleCancel} className="flex items-center gap-2 bg-transparent">
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
               </div>
             </div>
+          ) : (
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="all">All Posts ({blogPosts.length})</TabsTrigger>
+                <TabsTrigger value="published">Published ({publishedPosts.length})</TabsTrigger>
+                <TabsTrigger value="drafts">Drafts ({draftPosts.length})</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="all" className="space-y-4">
+                {blogPosts.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">No blog posts yet. Create your first post!</p>
+                ) : (
+                  blogPosts.map((post) => (
+                    <div key={post.id} className="border rounded-lg p-4 space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{post.title}</h3>
+                          {post.summary && <p className="text-gray-600 text-sm mt-1">{post.summary}</p>}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant={post.published ? "default" : "secondary"}>
+                              {post.published ? "Published" : "Draft"}
+                            </Badge>
+                            <span className="text-xs text-gray-500">
+                              {post.created_at ? new Date(post.created_at).toLocaleDateString() : "No date"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleTogglePublish(post)}
+                            disabled={publishLoading === post.id}
+                            className="flex items-center gap-1"
+                          >
+                            {post.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {publishLoading === post.id ? "..." : post.published ? "Unpublish" : "Publish"}
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(post)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(post.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="published" className="space-y-4">
+                {publishedPosts.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">No published posts yet.</p>
+                ) : (
+                  publishedPosts.map((post) => (
+                    <div key={post.id} className="border rounded-lg p-4 space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{post.title}</h3>
+                          {post.summary && <p className="text-gray-600 text-sm mt-1">{post.summary}</p>}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant="default">Published</Badge>
+                            <span className="text-xs text-gray-500">
+                              {post.created_at ? new Date(post.created_at).toLocaleDateString() : "No date"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleTogglePublish(post)}
+                            disabled={publishLoading === post.id}
+                            className="flex items-center gap-1"
+                          >
+                            <EyeOff className="h-4 w-4" />
+                            {publishLoading === post.id ? "..." : "Unpublish"}
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(post)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(post.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="drafts" className="space-y-4">
+                {draftPosts.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">No draft posts.</p>
+                ) : (
+                  draftPosts.map((post) => (
+                    <div key={post.id} className="border rounded-lg p-4 space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{post.title}</h3>
+                          {post.summary && <p className="text-gray-600 text-sm mt-1">{post.summary}</p>}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant="secondary">Draft</Badge>
+                            <span className="text-xs text-gray-500">
+                              {post.created_at ? new Date(post.created_at).toLocaleDateString() : "No date"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleTogglePublish(post)}
+                            disabled={publishLoading === post.id}
+                            className="flex items-center gap-1"
+                          >
+                            <Eye className="h-4 w-4" />
+                            {publishLoading === post.id ? "..." : "Publish"}
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(post)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(post.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </TabsContent>
+            </Tabs>
           )}
-        </>
-      )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

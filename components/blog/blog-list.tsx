@@ -12,6 +12,7 @@ interface BlogPost {
   content: string
   image_url: string
   created_at: string
+  published: boolean
 }
 
 interface BlogListProps {
@@ -29,23 +30,29 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
     async function fetchBlogPosts() {
       try {
         setLoading(true)
-        setError(null) // Reset error state
+        setError(null)
 
-        const { data: directData, error: directError } = await supabase
+        const { data, error } = await supabase
           .from("blog_posts")
           .select("*")
-          .eq("published", true) // Explicitly filter for published posts
+          .eq("published", true)
           .order("created_at", { ascending: false })
           .limit(limit || 10)
 
-        if (directError) {
-          setError(`Failed to load blog posts: ${directError.message}`)
+        if (error) {
+          console.error("Error fetching blog posts:", error)
+          setError(`Failed to load blog posts: ${error.message}`)
           setBlogPosts([])
         } else {
-          setBlogPosts(directData || [])
+          const posts = data || []
+          // Ensure all posts have the required fields and are published
+          const validPosts = posts.filter(
+            (post) => post && typeof post.id === "string" && typeof post.title === "string" && post.published === true,
+          )
+          setBlogPosts(validPosts)
         }
       } catch (error) {
-        // Catch any unexpected errors during the process
+        console.error("Unexpected error:", error)
         setError("An unexpected error occurred while loading blog posts.")
         setBlogPosts([])
       } finally {
@@ -85,7 +92,7 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
   if (blogPosts.length === 0) {
     return (
       <div className="text-center py-12 bg-white/30 backdrop-blur-sm rounded-lg">
-        <p className="text-xl text-black">No blog posts available yet.</p>
+        <p className="text-xl text-black">No published blog posts available yet.</p>
         <p className="text-black mt-2">Check back soon for updates!</p>
       </div>
     )
@@ -100,21 +107,25 @@ export function BlogList({ limit, showExcerpt = true, className = "" }: BlogList
               <div className="mb-4 overflow-hidden rounded-lg mx-auto w-full h-[620px]">
                 <img
                   src={post.image_url || "/placeholder.svg"}
-                  alt={post.title}
+                  alt={post.title || "Blog post"}
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                 />
               </div>
             )}
             <div className="flex-grow mb-4">
-              <h2 className="text-2xl font-semibold mb-3 text-black text-left">{post.title}</h2>
-              {showExcerpt && <p className="text-gray-700 mb-4 line-clamp-3 font-medium text-left">{post.summary}</p>}
+              <h2 className="text-2xl font-semibold mb-3 text-black text-left">{post.title || "Untitled"}</h2>
+              {showExcerpt && post.summary && (
+                <p className="text-gray-700 mb-4 line-clamp-3 font-medium text-left">{post.summary}</p>
+              )}
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">
-                  {new Date(post.created_at).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {post.created_at
+                    ? new Date(post.created_at).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : "No date"}
                 </span>
                 <div className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold underline">
                   Read more <ArrowRight className="ml-1 h-4 w-4" />

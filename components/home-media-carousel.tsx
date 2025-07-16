@@ -99,7 +99,7 @@ export default function HomeMediaCarousel() {
   if (loading) {
     return (
       <div className="relative w-full">
-        <div className="w-full h-64 md:h-96 bg-gray-300 animate-pulse" />
+        <div className="w-full h-80 sm:h-96 md:h-[500px] lg:h-[600px] bg-gray-300 animate-pulse" />
       </div>
     )
   }
@@ -114,12 +114,19 @@ export default function HomeMediaCarousel() {
         {mediaItems.map((item, index) => (
           <div key={item.id} className={`w-full ${index === currentIndex ? "block" : "hidden"}`}>
             {item.media_type === "video" ? (
-              <video src={item.media_url} className="w-full h-auto object-contain" autoPlay muted loop playsInline />
+              <video
+                src={item.media_url}
+                className="w-full h-80 sm:h-96 md:h-[500px] lg:h-[600px] object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
             ) : (
               <img
                 src={item.media_url || "/placeholder.svg"}
                 alt={item.title}
-                className="w-full h-auto object-contain"
+                className="w-full h-80 sm:h-96 md:h-[500px] lg:h-[600px] object-cover"
               />
             )}
 
@@ -127,12 +134,12 @@ export default function HomeMediaCarousel() {
             {(item.text_overlay || item.description) && (
               <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-10">
                 {item.text_overlay && (
-                  <h2 className="text-white text-2xl md:text-4xl font-bold mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  <h2 className="text-white text-xl sm:text-2xl md:text-4xl font-bold mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                     {item.text_overlay}
                   </h2>
                 )}
                 {item.description && (
-                  <p className="text-white text-lg md:text-xl drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
+                  <p className="text-white text-base sm:text-lg md:text-xl drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
                     {item.description}
                   </p>
                 )}
@@ -147,17 +154,17 @@ export default function HomeMediaCarousel() {
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all z-10"
+            className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all z-10"
             aria-label="Previous image"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={isMobile ? 20 : 24} />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all z-10"
+            className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all z-10"
             aria-label="Next image"
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={isMobile ? 20 : 24} />
           </button>
         </>
       )}
@@ -169,7 +176,7 @@ export default function HomeMediaCarousel() {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
+              className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${
                 index === currentIndex ? "bg-white" : "bg-white/50 hover:bg-white/75"
               }`}
               aria-label={`Go to slide ${index + 1}`}

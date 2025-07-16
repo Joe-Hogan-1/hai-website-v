@@ -46,8 +46,6 @@ export default function HomePage() {
       <div className="relative overflow-hidden">
         <div className="relative z-10">
           {/* Main content area with full-width image carousel */}
-          <div className="min-h-screen pt-24 pb-12 flex flex-col">
-
           <div className="min-h-screen pt-24 px-6 pb-12 flex flex-col">
             <div className="flex-grow flex flex-col">
               {/* Full-width media carousel */}
@@ -70,11 +68,11 @@ export default function HomePage() {
 
               {/* First section: Text and photo grid */}
               <div className="w-full py-4">
-                <div className="max-w-7xl mx-auto px-4">
+                <div className="max-w-7xl mx-auto px-4 md:px-4">
                   <div className="flex flex-col md:flex-row items-start justify-between gap-8">
                     {/* Homepage Text Block */}
-                    <div className="w-full md:w-[45%] py-32 px-20">
-                      <div className="max-w-sm">
+                    <div className="w-full md:w-[45%] py-8 md:py-32 px-4 md:px-20">
+                      <div className="max-w-none md:max-w-sm">
                         <HomepageTextBlock />
                       </div>
                     </div>
@@ -98,11 +96,7 @@ export default function HomePage() {
                 <div className="w-full px-1 flex flex-col">
                   <SecondaryPhotoGrid />
                 </div>
-
-                <div className="w-full items-center text-center mt-8">
-
-                <div className="w-full items-center text-center px-64 mt-8">
-                  
+                <div className="w-full items-center text-center px-4 mt-8">
                   <SecondaryTextBlock />
                 </div>
               </div>

@@ -78,20 +78,20 @@ export default function AdminDashboard() {
   }
 
   const tabItems = [
+    { id: "blogs", label: "Blog Management" },
+    { id: "categories", label: "Categories" },
     { id: "coming-soon", label: "Coming Soon Page" },
-    { id: "homepage-text", label: "Homepage Text (Top)" },
-    { id: "grid-images", label: "Photo Grid (Top)" },
-    { id: "secondary-text", label: "Homepage Text (Bottom)" },
-    { id: "secondary-grid", label: "Photo Grid (Bottom)" },
+    { id: "dispensaries", label: "Dispensary Locations" },
     { id: "media", label: "Homepage Carousel" },
-    { id: "vertical-carousel", label: "Vertical Image Carousel" },
+    { id: "secondary-text", label: "Homepage Text (Bottom)" },
+    { id: "homepage-text", label: "Homepage Text (Top)" },
     { id: "lifestyle-banner", label: "Lifestyle Banner" },
     { id: "lifestyle-content", label: "Lifestyle Content" },
-    { id: "blogs", label: "Blog Management" },
-    { id: "products", label: "Product Management" },
-    { id: "categories", label: "Categories" },
-    { id: "dispensaries", label: "Dispensary Locations" },
     { id: "newsletter", label: "Newsletter" },
+    { id: "secondary-grid", label: "Photo Grid (Bottom)" },
+    { id: "grid-images", label: "Photo Grid (Top)" },
+    { id: "products", label: "Product Management" },
+    { id: "vertical-carousel", label: "Vertical Image Carousel" },
   ]
 
   return (

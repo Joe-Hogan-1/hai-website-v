@@ -1,3 +1,4 @@
+import type React from "react"
 import { supabase } from "@/utils/supabase"
 import Header from "@/components/header"
 import { notFound } from "next/navigation"
@@ -14,46 +15,62 @@ interface Product {
   product_category?: string | null
 }
 
-// Function to get category badge color
-const getCategoryColor = (category?: string | null) => {
+interface ProductCategory {
+  name: string
+  color: string | null
+}
+
+// Helper to determine if a color is light or dark for text contrast
+const isColorLight = (hexColor: string | null): boolean => {
+  if (!hexColor) return false
+  const color = hexColor.startsWith("#") ? hexColor.substring(1, 7) : hexColor
+  if (color.length !== 6) return false
+  const r = Number.parseInt(color.substring(0, 2), 16)
+  const g = Number.parseInt(color.substring(2, 4), 16)
+  const b = Number.parseInt(color.substring(4, 6), 16)
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000
+  return yiq >= 128
+}
+
+const getStrainBadgeStyle = (category?: string | null) => {
   switch (category) {
     case "Indica":
-      return "bg-[#c9a3c8] text-white"
+      return { backgroundColor: "#c9a3c8", color: "#FFFFFF" }
     case "Sativa":
-      return "bg-[#c73b3a] text-white"
+      return { backgroundColor: "#c73b3a", color: "#FFFFFF" }
     case "Hybrid":
-      return "bg-[#9bc3d8] text-white"
+      return { backgroundColor: "#9bc3d8", color: "#FFFFFF" }
     default:
-      return "bg-gray-200 text-gray-700"
+      return { backgroundColor: "#F3F4F6", color: "#374151" }
   }
 }
 
-// Function to get product category badge color
-const getProductCategoryColor = (category?: string | null) => {
-  switch (category) {
-    case "Flower":
-      return "bg-green-500 text-white"
-    case "Pre-Rolls":
-      return "bg-orange-500 text-white"
-    case "Edibles":
-      return "bg-pink-500 text-white"
-    case "Merch":
-      return "bg-blue-500 text-white"
-    case "Concentrates":
-      return "bg-purple-500 text-white"
-    case "Vapes":
-      return "bg-teal-500 text-white"
-    default:
-      return "bg-gray-200 text-gray-700"
+const getProductCategoryStyle = (
+  categoryName: string | null | undefined,
+  allCategories: ProductCategory[],
+): React.CSSProperties => {
+  if (!categoryName) return {}
+  const category = allCategories.find((c) => c.name === categoryName)
+  const bgColor = category?.color || "#6B7280"
+  return {
+    backgroundColor: bgColor,
+    color: isColorLight(bgColor) ? "#000000" : "#FFFFFF",
   }
 }
 
 export default async function ProductDetailPage({ params }: { params: { id: string } }) {
-  const { data: product, error } = await supabase.from("products").select("*").eq("id", params.id).single()
+  const productPromise = supabase.from("products").select("*").eq("id", params.id).single()
+  const categoriesPromise = supabase.from("product_categories").select("name, color")
+
+  const [{ data: product, error }, { data: categories }] = await Promise.all([productPromise, categoriesPromise])
 
   if (error || !product) {
     notFound()
   }
+
+  const allCategories: ProductCategory[] = categories || []
+  const strainStyle = getStrainBadgeStyle(product.category)
+  const categoryStyle = getProductCategoryStyle(product.product_category, allCategories)
 
   return (
     <>
@@ -79,10 +96,12 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
                   </div>
                   <div className="absolute top-4 left-4 flex flex-col gap-2">
                     {product.category && (
-                      <Badge className={`${getCategoryColor(product.category)}`}>{product.category}</Badge>
+                      <Badge style={strainStyle} className="border-none">
+                        {product.category}
+                      </Badge>
                     )}
                     {product.product_category && (
-                      <Badge className={`${getProductCategoryColor(product.product_category)}`}>
+                      <Badge style={categoryStyle} className="border-none">
                         {product.product_category}
                       </Badge>
                     )}

@@ -50,27 +50,28 @@ export default function SecondaryTextBlock() {
 
   if (loading) {
     return (
-      <div className="animate-pulse px-4 md:px-0">
-        <div className="h-6 md:h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
-        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+      <div className="animate-pulse w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="h-6 md:h-8 bg-gray-200 rounded w-1/2 mb-4 mx-auto"></div>
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-full"></div>
+          <div className="h-4 bg-gray-200 rounded w-full"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4 px-4 md:px-10">
-
-    <div className="space-y-4 px-4 md:px-0">
-
-      <h2 className="text-2xl md:text-3xl font-semibold leading-tight">{title}</h2>
-      <div className="prose max-w-none">
-        {content.split("\n").map((paragraph, index) => (
-          <p key={index} className="mb-4 text-base md:text-lg text-gray-700 leading-relaxed">
-            {paragraph}
-          </p>
-        ))}
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center space-y-4">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight">{title}</h2>
+        <div className="prose prose-lg max-w-none mx-auto">
+          {content.split("\n").map((paragraph, index) => (
+            <p key={index} className="mb-4 text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed text-center">
+              {paragraph}
+            </p>
+          ))}
+        </div>
       </div>
     </div>
   )

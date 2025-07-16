@@ -22,30 +22,24 @@ export default function NewsletterPopup() {
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null)
   const pathname = usePathname()
 
-useEffect(() => {
-  const hasPopupBeenShown = localStorage.getItem("newsletter_popup_shown") === "true"
-  setHasShownPopup(hasPopupBeenShown)
-}, [])
+  useEffect(() => {
+    const hasPopupBeenShown = localStorage.getItem("newsletter_popup_shown") === "true"
+    setHasShownPopup(hasPopupBeenShown)
+  }, [])
 
-useEffect(() => {
-  if (
-    pathname === "/" &&
-    !hasSubscribed &&
-    !hasShownPopup &&
-    !hasTriggeredPopupRef.current
-  ) {
-    hasTriggeredPopupRef.current = true
+  useEffect(() => {
+    if (pathname === "/" && !hasSubscribed && !hasShownPopup && !hasTriggeredPopupRef.current) {
+      hasTriggeredPopupRef.current = true
 
-    const timer = setTimeout(() => {
-      setIsOpen(true)
-      localStorage.setItem("newsletter_popup_shown", "true")
-      setHasShownPopup(true)
-    }, 5000)
+      const timer = setTimeout(() => {
+        setIsOpen(true)
+        localStorage.setItem("newsletter_popup_shown", "true")
+        setHasShownPopup(true)
+      }, 5000)
 
-    return () => clearTimeout(timer)
-  }
-}, [pathname, hasSubscribed, hasShownPopup])
-
+      return () => clearTimeout(timer)
+    }
+  }, [pathname, hasSubscribed, hasShownPopup])
 
   // Check if user has previously subscribed
   useEffect(() => {
@@ -53,7 +47,7 @@ useEffect(() => {
     setHasSubscribed(hasSubscribed)
   }, [])
 
-const hasTriggeredPopupRef = useRef(false)
+  const hasTriggeredPopupRef = useRef(false)
 
   const handleMouseEnter = () => {
     // Clear any existing close timer
@@ -185,7 +179,7 @@ const hasTriggeredPopupRef = useRef(false)
   }
 
   return (
-    <div className="fixed right-0 top-1/3 z-50">
+    <div className="fixed right-0 top-1/3 z-40">
       <AnimatePresence>
         {isOpen ? (
           <motion.div
@@ -257,7 +251,7 @@ const hasTriggeredPopupRef = useRef(false)
           </motion.div>
         ) : isTabVisible ? (
           <motion.div
-            className="fixed right-0 top-1/3 z-50"
+            className="fixed right-0 top-1/3 z-40"
             initial="hidden"
             animate="visible"
             exit="hidden"

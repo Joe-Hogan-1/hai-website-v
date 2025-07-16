@@ -12,6 +12,7 @@ interface BlogPost {
   content: string
   image_url: string
   created_at: string
+  published: boolean
 }
 
 export default function HorizontalBlogCarousel() {
@@ -30,37 +31,35 @@ export default function HorizontalBlogCarousel() {
     async function fetchBlogPosts() {
       try {
         setLoading(true)
+        setError(null)
 
-        // Try to fetch from Supabase
-        const { data, error } = await supabase.from("blog_posts").select("*").order("created_at", { ascending: false })
+        const { data, error } = await supabase
+          .from("blog_posts")
+          .select("*")
+          .eq("published", true)
+          .order("created_at", { ascending: false })
 
         if (error) {
-          // If the table doesn't exist, use fallback data
-          if (error.message.includes("does not exist")) {
-            const fallbackData = getFallbackBlogPosts()
-            setBlogPosts(fallbackData)
-            setDisplayedPosts(fallbackData.slice(0, postsPerPage))
-            setHasMore(fallbackData.length > postsPerPage)
-          } else {
-            setError(`Failed to load blog posts: ${error.message}`)
-            const fallbackData = getFallbackBlogPosts()
-            setBlogPosts(fallbackData)
-            setDisplayedPosts(fallbackData.slice(0, postsPerPage))
-            setHasMore(fallbackData.length > postsPerPage)
-          }
+          console.error("Error fetching blog posts:", error)
+          setError(`Failed to load blog posts: ${error.message}`)
+          setBlogPosts([])
+          setDisplayedPosts([])
         } else {
-          const postsData = data && data.length > 0 ? data : getFallbackBlogPosts()
-          setBlogPosts(postsData)
-          setDisplayedPosts(postsData.slice(0, postsPerPage))
-          setHasMore(postsData.length > postsPerPage)
-          setError(null)
+          const posts = data || []
+          // Ensure all posts have the required fields and are published
+          const validPosts = posts.filter(
+            (post) => post && typeof post.id === "string" && typeof post.title === "string" && post.published === true,
+          )
+
+          setBlogPosts(validPosts)
+          setDisplayedPosts(validPosts.slice(0, postsPerPage))
+          setHasMore(validPosts.length > postsPerPage)
         }
       } catch (error) {
-        setError("An unexpected error occurred while loading blog posts")
-        const fallbackData = getFallbackBlogPosts()
-        setBlogPosts(fallbackData)
-        setDisplayedPosts(fallbackData.slice(0, postsPerPage))
-        setHasMore(fallbackData.length > postsPerPage)
+        console.error("Unexpected error:", error)
+        setError("An unexpected error occurred while loading blog posts.")
+        setBlogPosts([])
+        setDisplayedPosts([])
       } finally {
         setLoading(false)
       }
@@ -125,116 +124,32 @@ export default function HorizontalBlogCarousel() {
     }
   }, [hasMore, loadingMore, loadMorePosts])
 
-  // Add this function to provide fallback data
-  function getFallbackBlogPosts(): BlogPost[] {
-    return [
-      {
-        id: "1",
-        title: "The Benefits of CBD for Relaxation",
-        summary: "Discover how CBD can help you unwind and relax after a long day.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/diverse-group-relaxing.png",
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: "2",
-        title: "Exploring Cannabis Terpenes",
-        summary: "Learn about the aromatic compounds that give cannabis its unique flavors and effects.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/cannabis-terpenes.png",
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: "3",
-        title: "Cannabis and Creativity",
-        summary: "How cannabis has influenced art, music, and creative thinking throughout history.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/cannabis-creativity.png",
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: "4",
-        title: "Understanding Different Cannabis Strains",
-        summary: "A guide to indica, sativa, and hybrid strains and their effects.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg?height=160&width=320&query=cannabis strains",
-        created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "5",
-        title: "The History of Cannabis Cultivation",
-        summary: "Tracing the origins and spread of cannabis cultivation throughout human history.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg?height=160&width=320&query=cannabis history",
-        created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "6",
-        title: "Medical Applications of Cannabis",
-        summary: "Exploring the growing body of research on cannabis for medical treatments.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg?height=160&width=320&query=medical cannabis",
-        created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "7",
-        title: "The Endocannabinoid System Explained",
-        summary: "Understanding how cannabis interacts with the body's natural systems.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg?height=160&width=320&query=endocannabinoid system",
-        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "8",
-        title: "Cannabis Cooking: Beyond Brownies",
-        summary: "Creative recipes and techniques for cooking with cannabis.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg?height=160&width=320&query=cannabis cooking",
-        created_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "9",
-        title: "Sustainable Cannabis Cultivation",
-        summary: "Eco-friendly approaches to growing cannabis with minimal environmental impact.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg?height=160&width=320&query=sustainable cannabis",
-        created_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "10",
-        title: "Cannabis and Sleep: Finding Balance",
-        summary: "How different cannabis compounds can affect sleep patterns and quality.",
-        content: "Lorem ipsum dolor sit amet...",
-        image_url: "/placeholder.svg?height=160&width=320&query=cannabis sleep",
-        created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ]
-  }
-
   // Create a card component to ensure consistency
   const BlogCard = ({ post }: { post: BlogPost }) => (
     <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-md border border-white/30 transition-all duration-300 hover:shadow-lg flex flex-col w-[350px] h-[480px] flex-shrink-0">
       <div className="mb-3 overflow-hidden rounded-lg w-full h-[320px] bg-gray-100 flex-shrink-0">
         <img
           src={post.image_url || "/placeholder.svg?height=160&width=320&query=lifestyle"}
-          alt={post.title}
+          alt={post.title || "Blog post"}
           className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement
-            target.src = "/diverse-group-relaxing.png"
+            target.src = "/placeholder.svg?height=160&width=320"
           }}
         />
       </div>
       <div className="flex flex-col flex-grow">
-        <h3 className="text-lg font-semibold mb-2 text-black line-clamp-2 text-left">{post.title}</h3>
-        <p className="text-gray-700 mb-2 text-sm line-clamp-2 flex-grow text-left">{post.summary}</p>
+        <h3 className="text-lg font-semibold mb-2 text-black line-clamp-2 text-left">{post.title || "Untitled"}</h3>
+        <p className="text-gray-700 mb-2 text-sm line-clamp-2 flex-grow text-left">{post.summary || ""}</p>
         <div className="flex justify-between items-center mt-auto">
           <span className="text-xs text-gray-500">
-            {new Date(post.created_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
+            {post.created_at
+              ? new Date(post.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : "No date"}
           </span>
           <div className="text-[#e76f51] hover:text-[#e76f51]/80 flex items-center font-semibold text-sm">
             Read more <ArrowRight className="ml-1 h-3 w-3" />
@@ -263,17 +178,21 @@ export default function HorizontalBlogCarousel() {
   if (error) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-red-500 mb-4">{error}</p>
-        <p className="text-black">Unable to load lifestyle articles</p>
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <p className="text-black">Unable to load lifestyle articles</p>
+        </div>
       </div>
     )
   }
 
-  if (blogPosts.length === 0) {
+  if (displayedPosts.length === 0) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-xl text-black">No lifestyle articles available yet.</p>
-        <p className="text-black mt-2">Check back soon for updates!</p>
+        <div className="text-center">
+          <p className="text-xl text-black">No published lifestyle articles available yet.</p>
+          <p className="text-black mt-2">Check back soon for updates!</p>
+        </div>
       </div>
     )
   }

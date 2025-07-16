@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { getCookie, setCookie } from "@/utils/cookies"
+import { getCookie, setCookie, eraseCookie } from "@/utils/cookies"
 import { toast } from "sonner"
 
 interface CookiePreferencesProps {
@@ -33,49 +33,77 @@ export default function CookiePreferences({ open, onOpenChange }: CookiePreferen
     const savedPreferences = getCookie("cookie_preferences")
     if (savedPreferences) {
       try {
-        const parsedPreferences = JSON.parse(savedPreferences)
-        setPreferences({
-          ...preferences,
-          ...parsedPreferences,
-          essential: true, // Essential cookies are always enabled
-        })
+        // Clean the cookie value and validate it's proper JSON
+        const cleanedPreferences = savedPreferences.trim()
+        if (cleanedPreferences.startsWith("{") && cleanedPreferences.endsWith("}")) {
+          const parsedPreferences = JSON.parse(cleanedPreferences)
+          setPreferences({
+            essential: true, // Essential cookies are always enabled
+            analytics: parsedPreferences.analytics ?? true,
+            functional: parsedPreferences.functional ?? true,
+            targeting: parsedPreferences.targeting ?? false,
+          })
+        } else {
+          // Invalid JSON format, reset to defaults
+          console.warn("Invalid cookie preferences format, resetting to defaults")
+          setDefaultPreferences()
+        }
       } catch (error) {
         console.error("Error parsing cookie preferences:", error)
+        // Clear the corrupted cookie and set defaults
+        eraseCookie("cookie_preferences")
+        setDefaultPreferences()
       }
     } else {
-      // If no preferences are saved, use the consent status
-      const hasConsent = getCookie("cookie_consent") === "true"
-      if (hasConsent) {
-        setPreferences({
-          essential: true,
-          analytics: true,
-          functional: true,
-          targeting: false,
-        })
-      } else if (getCookie("cookie_consent") === "essential") {
-        setPreferences({
-          essential: true,
-          analytics: false,
-          functional: false,
-          targeting: false,
-        })
-      }
+      setDefaultPreferences()
     }
   }, [open])
 
-  const handleSavePreferences = () => {
-    // Save preferences to cookie
-    setCookie("cookie_preferences", JSON.stringify(preferences), 365)
-
-    // Update the main consent cookie based on preferences
-    if (preferences.analytics || preferences.functional || preferences.targeting) {
-      setCookie("cookie_consent", "true", 365)
-    } else {
-      setCookie("cookie_consent", "essential", 365)
+  // Helper function to set default preferences
+  const setDefaultPreferences = () => {
+    const hasConsent = getCookie("cookie_consent") === "true"
+    if (hasConsent) {
+      setPreferences({
+        essential: true,
+        analytics: true,
+        functional: true,
+        targeting: false,
+      })
+    } else if (getCookie("cookie_consent") === "essential") {
+      setPreferences({
+        essential: true,
+        analytics: false,
+        functional: false,
+        targeting: false,
+      })
     }
+  }
 
-    toast.success("Cookie preferences saved")
-    onOpenChange(false)
+  const handleSavePreferences = () => {
+    try {
+      // Ensure we're storing clean JSON
+      const preferencesToSave = {
+        essential: true,
+        analytics: preferences.analytics,
+        functional: preferences.functional,
+        targeting: preferences.targeting,
+      }
+
+      setCookie("cookie_preferences", JSON.stringify(preferencesToSave), 365)
+
+      // Update the main consent cookie based on preferences
+      if (preferences.analytics || preferences.functional || preferences.targeting) {
+        setCookie("cookie_consent", "true", 365)
+      } else {
+        setCookie("cookie_consent", "essential", 365)
+      }
+
+      toast.success("Cookie preferences saved")
+      onOpenChange(false)
+    } catch (error) {
+      console.error("Error saving cookie preferences:", error)
+      toast.error("Failed to save preferences")
+    }
   }
 
   const handleAcceptAll = () => {
@@ -188,10 +216,10 @@ export default function CookiePreferences({ open, onOpenChange }: CookiePreferen
               Save Preferences
             </Button>
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={handleAcceptAll} className="cookie-button-outline">
+              <Button variant="outline" onClick={handleAcceptAll} className="cookie-button-outline bg-transparent">
                 Accept All
               </Button>
-              <Button variant="outline" onClick={handleRejectAll} className="cookie-button-outline">
+              <Button variant="outline" onClick={handleRejectAll} className="cookie-button-outline bg-transparent">
                 Essential Only
               </Button>
             </div>

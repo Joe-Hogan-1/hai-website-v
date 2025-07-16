@@ -68,11 +68,13 @@ export default function HomepageTextBlock() {
 
   if (loading) {
     return (
-      <div className="w-full py-8 animate-pulse">
-        <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
-        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-pulse">
+        <div className="text-center">
+          <div className="h-6 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+        </div>
       </div>
     )
   }
@@ -82,12 +84,14 @@ export default function HomepageTextBlock() {
   }
 
   return (
-    <div className="w-full items-center text-center py-0 px-0">
-      {text.title && <h2 className="text-2xl font-semibold mb-4">{text.title}</h2>}
-      <div
-        className="prose max-w-none whitespace-pre-wrap"
-        dangerouslySetInnerHTML={{ __html: `<p>${formatTextAsHtml(text.content)}</p>` }}
-      />
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center">
+        {text.title && <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4">{text.title}</h2>}
+        <div
+          className="prose prose-lg max-w-none mx-auto text-base sm:text-lg md:text-xl leading-relaxed whitespace-pre-wrap"
+          dangerouslySetInnerHTML={{ __html: `<p>${formatTextAsHtml(text.content)}</p>` }}
+        />
+      </div>
     </div>
   )
 }

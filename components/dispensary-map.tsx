@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState, useMemo } from "react"
-import L from "leaflet"
-import "leaflet/dist/leaflet.css"
 
 // Define the Dispensary type
 interface Dispensary {
@@ -31,11 +29,13 @@ export default function DispensaryMap({
   selectedLocation = null,
   showOnlyHaiProducts = false,
 }: DispensaryMapProps) {
-  const mapRef = useRef<L.Map | null>(null)
-  const markersRef = useRef<Record<string, L.Marker>>({})
+  const mapRef = useRef<any>(null)
+  const markersRef = useRef<Record<string, any>>({})
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const [isMapInitialized, setIsMapInitialized] = useState(false)
   const [prevSelectedLocation, setPrevSelectedLocation] = useState<[number, number] | null>(null)
+  const [leafletLoaded, setLeafletLoaded] = useState(false)
+  const [L, setL] = useState<any>(null)
 
   // Filter dispensaries based on hai products flag if needed
   const filteredDispensaries = useMemo(() => {
@@ -47,13 +47,41 @@ export default function DispensaryMap({
 
   // New York State bounds and center
   const NY_CENTER: [number, number] = [42.9538, -75.5268] // Center of NY State
-  const NY_BOUNDS: L.LatLngBoundsExpression = [
+  const NY_BOUNDS: [[number, number], [number, number]] = [
     [40.4774, -79.7624], // Southwest corner
     [45.0153, -71.7517], // Northeast corner
   ]
 
+  // Load Leaflet dynamically
+  useEffect(() => {
+    const loadLeaflet = async () => {
+      try {
+        // Dynamically import Leaflet
+        const leafletModule = await import("leaflet")
+
+        // Load CSS dynamically
+        if (typeof window !== "undefined") {
+          const link = document.createElement("link")
+          link.rel = "stylesheet"
+          link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          document.head.appendChild(link)
+        }
+
+        setL(leafletModule.default)
+        setLeafletLoaded(true)
+      } catch (error) {
+        console.error("Error loading Leaflet:", error)
+      }
+    }
+
+    if (!leafletLoaded) {
+      loadLeaflet()
+    }
+  }, [leafletLoaded])
+
   // Create custom icons for markers
   const createHaiIcon = () => {
+    if (!L) return null
     return L.divIcon({
       html: `
         <div style="background-color: #ffd6c0; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
@@ -68,6 +96,7 @@ export default function DispensaryMap({
   }
 
   const createStandardIcon = () => {
+    if (!L) return null
     return L.divIcon({
       html: `
         <div style="background-color: #a8d1e7; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
@@ -84,9 +113,9 @@ export default function DispensaryMap({
     })
   }
 
-  // Initialize map when component mounts
+  // Initialize map when component mounts and Leaflet is loaded
   useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current || isMapInitialized) {
+    if (!mapContainerRef.current || mapRef.current || isMapInitialized || !leafletLoaded || !L) {
       return
     }
 
@@ -94,9 +123,9 @@ export default function DispensaryMap({
       // Fix Leaflet's icon paths
       delete (L.Icon.Default.prototype as any)._getIconUrl
       L.Icon.Default.mergeOptions({
-        iconRetinaUrl: "/marker-icon-2x.png",
-        iconUrl: "/marker-icon.png",
-        shadowUrl: "/marker-shadow.png",
+        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
       })
 
       // Initialize map
@@ -145,11 +174,11 @@ export default function DispensaryMap({
         setIsMapInitialized(false)
       }
     }
-  }, []) // Empty dependency array - only run once on mount
+  }, [leafletLoaded, L]) // Added leafletLoaded and L as dependencies
 
   // Add markers when dispensaries change or map is loaded
   useEffect(() => {
-    if (!mapRef.current || !isMapInitialized || filteredDispensaries.length === 0) {
+    if (!mapRef.current || !isMapInitialized || filteredDispensaries.length === 0 || !L) {
       return
     }
 
@@ -302,12 +331,12 @@ export default function DispensaryMap({
     } catch (error) {
       console.error("Error in marker management:", error)
     }
-  }, [filteredDispensaries, isMapInitialized]) // Only run when filteredDispensaries or isMapInitialized changes
+  }, [filteredDispensaries, isMapInitialized, L]) // Added L as dependency
 
   // Handle selected location changes
   useEffect(() => {
     // Skip if no map, not loaded, or no selected location
-    if (!mapRef.current || !isMapInitialized || !selectedLocation) {
+    if (!mapRef.current || !isMapInitialized || !selectedLocation || !L) {
       return
     }
 
@@ -327,7 +356,7 @@ export default function DispensaryMap({
       const [lat, lng] = selectedLocation
 
       // Find the marker closest to the selected location
-      let closestMarker: L.Marker | null = null
+      let closestMarker: any = null
       let closestDistance = Number.POSITIVE_INFINITY
 
       Object.entries(markersRef.current).forEach(([id, marker]) => {
@@ -360,24 +389,24 @@ export default function DispensaryMap({
     } catch (error) {
       console.error("Error handling selected location:", error)
     }
-  }, [selectedLocation, isMapInitialized, prevSelectedLocation]) // Only run when selectedLocation, isMapInitialized, or prevSelectedLocation changes
+  }, [selectedLocation, isMapInitialized, prevSelectedLocation, L]) // Added L as dependency
 
   return (
-    <div className="h-[600px] w-full relative rounded-lg overflow-hidden map-wrapper">
-      {(!isMapInitialized || loading) && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-[1000]">
+    <div className="h-[600px] w-full relative rounded-lg overflow-hidden map-wrapper z-0">
+      {(!isMapInitialized || loading || !leafletLoaded) && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
           <div className="text-2xl font-bold text-gray-400">Loading Map...</div>
         </div>
       )}
 
       <div ref={mapContainerRef} className="h-full w-full map-container" />
 
-      <div className="absolute bottom-4 left-4 z-[1000] bg-white p-2 rounded shadow text-xs">
+      <div className="absolute bottom-4 left-4 z-10 bg-white p-2 rounded shadow text-xs">
         <p>Data provided by hai. Locations may change. Please call ahead to confirm availability.</p>
       </div>
 
       {filteredDispensaries.length === 0 && !loading && isMapInitialized && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-[999]">
+        <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-20">
           <div className="text-center p-4 bg-white rounded-lg shadow-lg">
             <p className="text-xl font-bold text-gray-700 mb-2">No Dispensaries Found</p>
             <p className="text-gray-600">We couldn't find any dispensary locations to display.</p>
