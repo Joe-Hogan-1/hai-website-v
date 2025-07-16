@@ -124,7 +124,7 @@ export default function BlogImageBanner({ position }: BlogImageBannerProps) {
   }
 
   return (
-    <div ref={ref} className="image-banner-section relative overflow-visible">
+    <div ref={ref} className="image-banner-section relative overflow-hidden">
       {blogPosts.map((post, index) => (
         <RiverImageBanner
           key={post.id}

@@ -164,7 +164,7 @@ export default function ProductGrid() {
         href={`/products/${product.id}`}
         className="block bg-white rounded-lg overflow-hidden product-card border border-gray-200"
       >
-        <div className="h-48 overflow-hidden relative">
+        <div className="overflow-hidden relative">
           <img
             src={product.image_url || "/placeholder.svg?height=200&width=300"}
             alt={product.name}

@@ -60,7 +60,10 @@ export default function SecondaryTextBlock() {
   }
 
   return (
+    <div className="space-y-4 px-4 md:px-10">
+
     <div className="space-y-4 px-4 md:px-0">
+
       <h2 className="text-2xl md:text-3xl font-semibold leading-tight">{title}</h2>
       <div className="prose max-w-none">
         {content.split("\n").map((paragraph, index) => (
